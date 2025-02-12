@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -14,11 +14,11 @@ export default function Map() {
   const {
     userLongitude,
     userLatitude,
+    departureLatitude,
+    departureLongitude,
     destinationLatitude,
     destinationLongitude,
   } = useLocationStore();
-
-  console.log("user details for map", userLongitude, userLatitude);
 
   const region = calculateRegion({
     userLatitude,
@@ -26,8 +26,6 @@ export default function Map() {
     destinationLatitude,
     destinationLongitude,
   });
-
-  console.log("the user region", region);
 
   if (!userLatitude && !userLongitude)
     return (
@@ -61,8 +59,8 @@ export default function Map() {
             />
             <MapViewDirections
               origin={{
-                latitude: userLatitude!,
-                longitude: userLongitude!,
+                latitude: departureLatitude ?? userLatitude!,
+                longitude: departureLongitude ?? userLongitude!,
               }}
               destination={{
                 latitude: destinationLatitude,

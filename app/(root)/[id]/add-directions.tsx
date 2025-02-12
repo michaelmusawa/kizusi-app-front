@@ -8,17 +8,24 @@ import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
 import { DateTimePickerComponent } from "@/components/DateTimePicker";
 import { Picker } from "@react-native-picker/picker";
+import { calculateTimes } from "@/lib/map";
 
 export default function AddDirections() {
   const { id } = useLocalSearchParams<{ id?: string }>();
 
   const {
+    departureLatitude,
+    departureLongitude,
+    destinationLatitude,
+    destinationLongitude,
     destinationAddress,
     departureAddress,
     bookType,
+    rideDetails,
     setDestinationLocation,
     setDepartureLocation,
     setBookType,
+    setRideDetails,
   } = useLocationStore();
 
   const [localDepartureAddress, setLocalDepartureAddress] =
@@ -26,8 +33,17 @@ export default function AddDirections() {
   const [localDestinationAddress, setLocalDestinationAddress] =
     useState(destinationAddress);
   const [localBookType, setLocalBookType] = useState(bookType);
+  const [localRideDetails, setLocalRideDetails] = useState({
+    time: 0,
+    price: 0,
+  });
 
   // Sync local state with store updates
+  useEffect(() => {
+    if (rideDetails) {
+      setLocalRideDetails(rideDetails);
+    }
+  }, [rideDetails]);
 
   useEffect(() => {
     setLocalDestinationAddress(destinationAddress);
@@ -35,11 +51,42 @@ export default function AddDirections() {
 
   useEffect(() => {
     setLocalDepartureAddress(departureAddress);
-  }, [departureAddress]);
+  }, [departureAddress, localDepartureAddress]);
 
   useEffect(() => {
     setLocalBookType(bookType);
   }, [bookType]);
+
+  useEffect(() => {
+    if (
+      departureLatitude !== undefined &&
+      departureLongitude !== undefined &&
+      destinationLatitude !== undefined &&
+      destinationLongitude !== undefined
+    ) {
+      calculateTimes({
+        departureLatitude,
+        departureLongitude,
+        destinationLatitude,
+        destinationLongitude,
+      })
+        .then((result) => {
+          if (result) {
+            setRideDetails(result); // ✅ Correct usage
+          }
+        })
+        .catch((error) => {
+          console.error("Error fetching ride details:", error);
+        });
+    }
+  }, [
+    departureLatitude,
+    departureLongitude,
+    destinationLatitude,
+    destinationLongitude,
+  ]);
+
+  console.log("ride details", localRideDetails);
 
   const SelectComponent = () => {
     return (
@@ -77,7 +124,6 @@ export default function AddDirections() {
         <Text className="text-lg font-JakartaSemiBold mb-3">From</Text>
 
         <GoogleTextInput
-          key={localDepartureAddress}
           icon={icons.target}
           initialLocation={localDepartureAddress!}
           containerStyle="bg-neutral-100"
@@ -97,7 +143,6 @@ export default function AddDirections() {
           <Text className="text-lg font-JakartaSemiBold mb-3">To</Text>
 
           <GoogleTextInput
-            key={localDestinationAddress}
             icon={icons.map}
             initialLocation={localDestinationAddress!}
             containerStyle="bg-neutral-100"

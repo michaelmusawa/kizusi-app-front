@@ -50,50 +50,44 @@ export const calculateRegion = ({
   };
 };
 
-export const calculateDriverTimes = async ({
-  markers,
-  userLatitude,
-  userLongitude,
+export const calculateTimes = async ({
+  departureLatitude,
+  departureLongitude,
   destinationLatitude,
   destinationLongitude,
 }: {
-  markers: MarkerData[];
-  userLatitude: number | null;
-  userLongitude: number | null;
+  departureLatitude: number | null;
+  departureLongitude: number | null;
   destinationLatitude: number | null;
   destinationLongitude: number | null;
 }) => {
   if (
-    !userLatitude ||
-    !userLongitude ||
+    !departureLatitude ||
+    !departureLongitude ||
     !destinationLatitude ||
     !destinationLongitude
-  )
+  ) {
     return;
+  }
 
   try {
-    const timesPromises = markers.map(async (marker) => {
-      const responseToUser = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${marker.latitude},${marker.longitude}&destination=${userLatitude},${userLongitude}&key=${directionsAPI}`
-      );
-      const dataToUser = await responseToUser.json();
-      const timeToUser = dataToUser.routes[0].legs[0].duration.value; // Time in seconds
+    const response = await fetch(
+      `https://maps.googleapis.com/maps/api/directions/json?origin=${departureLatitude},${departureLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
+    );
 
-      const responseToDestination = await fetch(
-        `https://maps.googleapis.com/maps/api/directions/json?origin=${userLatitude},${userLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
-      );
-      const dataToDestination = await responseToDestination.json();
-      const timeToDestination =
-        dataToDestination.routes[0].legs[0].duration.value; // Time in seconds
+    const data = await response.json();
 
-      const totalTime = (timeToUser + timeToDestination) / 60; // Total time in minutes
-      const price = (totalTime * 0.5).toFixed(2); // Calculate price based on time
+    if (!data.routes || data.routes.length === 0) {
+      console.error("No routes found.");
+      return;
+    }
 
-      return { ...marker, time: totalTime, price };
-    });
+    const timeToDestination = data.routes[0].legs[0].duration.value; // Time in seconds
+    const totalTime = timeToDestination / 60; // Convert to minutes
+    const price = (totalTime * 0.5).toFixed(2); // Calculate price based on time
 
-    return await Promise.all(timesPromises);
+    return { time: totalTime, price };
   } catch (error) {
-    console.error("Error calculating driver times:", error);
+    console.error("Error calculating times:", error);
   }
 };

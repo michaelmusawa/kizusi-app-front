@@ -14,6 +14,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   bookType: null,
   date: null,
   userAddons: [],
+  rideDetails: { time: null, price: null },
 
   setUserLocation: ({
     latitude,
@@ -73,5 +74,9 @@ export const useLocationStore = create<LocationStore>((set) => ({
 
   setUserAddons: (userAddons: string[]) => {
     set({ userAddons });
+  },
+
+  setRideDetails: ({ time, price }: { time: number; price: number }) => {
+    set((state) => ({ rideDetails: { time, price } }));
   },
 }));

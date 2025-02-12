@@ -98,6 +98,7 @@ declare interface LocationStore {
   date: string | null;
   bookType: string | null;
   userAddons: string[];
+  rideDetails: { time: number | null; price: number | null };
   setUserLocation: ({
     latitude,
     longitude,
@@ -128,4 +129,5 @@ declare interface LocationStore {
   setDate: ({ date }: { date: string }) => void;
   setBookType: ({ bookType }: { bookType: string }) => void;
   setUserAddons: (payload: string[]) => void;
+  setRideDetails: ({ time, price }: { time: number; price: number }) => void;
 }

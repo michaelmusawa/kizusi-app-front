@@ -4,12 +4,14 @@ import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
 import { fetchAPI } from "@/lib/fetch";
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { Text, ScrollView, View, Image, Alert } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
 export default function SignUp() {
+  const params = useLocalSearchParams<{ query?: string; id?: string }>();
+
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
@@ -132,7 +134,11 @@ export default function SignUp() {
           <OAuth />
 
           <Link
-            href="/sign-in"
+            href={
+              params?.query === "add_userDetails"
+                ? "/sign-in"
+                : "/sign-in?query=add_userDetails"
+            }
             className="text-lg text-center text-general-200 mt-10"
           >
             <Text>Already have an account? </Text>
@@ -192,10 +198,18 @@ export default function SignUp() {
             </Text>
 
             <CustomButton
-              title="Browse Home"
+              title={
+                params?.query === "add_userDetails"
+                  ? "Continue to book"
+                  : "Browse home"
+              }
               onPress={() => {
                 setShowSuccessModal(false);
-                router.push("/(root)/(tabs)");
+                router.push(
+                  params?.query === "add_userDetails"
+                    ? `/(root)/${params.id}/book-details`
+                    : "/(root)/(tabs)"
+                );
               }}
               className="mt-5"
             />

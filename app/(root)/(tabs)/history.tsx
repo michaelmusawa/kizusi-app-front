@@ -9,7 +9,11 @@ import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
 const BookingCard = ({ booking }: { booking: Booking }) => {
   return (
     <TouchableOpacity
-      onPress={() => router.push(`/(root)/${booking.id}/history-details`)}
+      onPress={() =>
+        router.push(
+          `/(root)/${booking.id}/history-details?query=${booking.carId}`
+        )
+      }
       className="bg-white rounded-lg shadow-md p-4 mb-4"
     >
       <Text className="text-orange-500 font-bold">
@@ -60,12 +64,6 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             <Text className="text-gray-700">
               <Text className="text-green-500">{booking.bookingStatus}</Text>
             </Text>
-            <TouchableOpacity
-              onPress={() => router.push(`/(root)/cancel-order`)}
-              className="rounded-lg bg-gray-200 p-2"
-            >
-              <Text>Cancel order</Text>
-            </TouchableOpacity>
           </View>
         </View>
       </View>

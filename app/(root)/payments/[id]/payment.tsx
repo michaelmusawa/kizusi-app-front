@@ -20,9 +20,22 @@ import * as Linking from "expo-linking";
 const Payment = () => {
   useEffect(() => {
     const handleDeepLink = (event) => {
-      const data = Linking.parse(event.url);
-      console.log("Payment callback data:", data);
-      // Process the payment status here
+      const { url } = event;
+
+      console.log("Dem call back url", url);
+      const data = Linking.parse(url);
+
+      if (data.queryParams) {
+        const { status, transactionId } = data.queryParams;
+        console.log("Payment callback data:", { status, transactionId });
+
+        // Process the payment status here
+        if (status === "success") {
+          // Handle success logic
+        } else {
+          // Handle failure logic
+        }
+      }
     };
 
     const subscription = Linking.addEventListener("url", handleDeepLink);
@@ -78,7 +91,7 @@ const Payment = () => {
       phoneNumber: "254700123456",
       reference: id,
       description: "Car Rental Payment",
-      callbackUrl: "myapp://payment-response",
+      callbackUrl: "kizusi.app://payment-response",
     };
 
     try {

@@ -13,7 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Search from "@/components/Search";
 import Filters from "@/components/Filters";
 import NoResults from "@/components/NoResults";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useLocationStore } from "@/store";
 import * as Location from "expo-location";
 import { Card, CategoryCard } from "@/components/CarCard";
@@ -23,16 +23,16 @@ import { icons } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
 
 const Home = () => {
-  const userDetails = {
-    avatar: null,
-    // "https://images.unsplash.com/photo-1606814893907-c2e42943c91f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
-    name: null,
+  const { user } = useUser();
+  const { signOut } = useAuth();
+
+  const handleSignOut = () => {
+    signOut();
   };
 
   // Get user location logic
 
   const { setUserLocation } = useLocationStore();
-  const { user } = useUser();
 
   const [hasPermissions, setHasPermissions] = useState(false);
   const [fetchLimit, setFetchLimit] = useState("6");
@@ -45,7 +45,7 @@ const Home = () => {
       if (status !== "granted") {
         setHasPermissions(false);
         return;
-      }
+      } else setHasPermissions(true);
 
       let location = await Location.getCurrentPositionAsync();
 
@@ -160,26 +160,45 @@ const Home = () => {
         ListHeaderComponent={() => (
           <View className="px-5">
             <View className="flex flex-row items-center justify-between mt-5">
-              <View className="flex flex-row">
-                <View className="rounded-full size-10 items-center justify-center border border-primary-600">
-                  <Image
-                    source={
-                      userDetails?.avatar
-                        ? { uri: userDetails.avatar }
-                        : icons.person
-                    }
-                    className="size-8 rounded-full"
-                  />
+              <View className="flex flex-row justify-between w-full">
+                <View className="flex flex-row">
+                  <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
+                    <Image
+                      source={
+                        user?.imageUrl ? { uri: user?.imageUrl } : icons.person
+                      }
+                      className="size-8 rounded-full"
+                    />
+                  </View>
+
+                  <View className="flex flex-col items-start ml-2 justify-center">
+                    <Text className="text-xs font-rubik text-black-100">
+                      Good Morning,
+                    </Text>
+                    <Text className="text-base font-rubik-medium text-black-300">
+                      {user?.firstName ?? "Welcome"}
+                    </Text>
+                  </View>
                 </View>
 
-                <View className="flex flex-col items-start ml-2 justify-center">
-                  <Text className="text-xs font-rubik text-black-100">
-                    Good Morning
-                  </Text>
-                  <Text className="text-base font-rubik-medium text-black-300">
-                    {userDetails?.name ?? "there"}
-                  </Text>
-                </View>
+                <TouchableOpacity
+                  onPress={
+                    user ? handleSignOut : () => router.push("/(auth)/sign-in")
+                  }
+                  className="flex flex-col justify-center items-center gap-1"
+                >
+                  <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
+                    <Image
+                      source={user ? icons.out : icons.to}
+                      className="size-5 rounded-full"
+                    />
+                  </View>
+                  {!user && (
+                    <Text className="text-xs font-rubik text-secondary-100">
+                      Login
+                    </Text>
+                  )}
+                </TouchableOpacity>
               </View>
             </View>
 
@@ -218,15 +237,13 @@ const Home = () => {
               </View>
             )}
 
-            {/* <Button title="seed" onPress={seed} /> */}
-
             <View className="mt-5">
               <View className="flex flex-row items-center justify-between">
                 <Text className="text-xl font-rubik-bold text-black-300">
                   Available cars
                 </Text>
                 <TouchableOpacity onPress={handleSeeAll}>
-                  <Text className="text-base font-rubik-bold text-primary-300">
+                  <Text className="text-base font-rubik-bold text-secondary-100">
                     {seeAll ? "See all" : "See less"}
                   </Text>
                 </TouchableOpacity>
@@ -242,87 +259,3 @@ const Home = () => {
 };
 
 export default Home;
-
-// import React, { useState, useEffect } from "react";
-// import {
-//   View,
-//   Text,
-//   TextInput,
-//   Button,
-//   FlatList,
-//   StyleSheet,
-// } from "react-native";
-// import { fetchAPI, useFetch } from "@/lib/fetch";
-
-// type User = {
-//   id: number;
-//   name: string;
-//   email: string;
-// };
-
-// const App = () => {
-//   const [users, setUsers] = useState<User[]>([]);
-//   const [name, setName] = useState("");
-//   const [email, setEmail] = useState("");
-
-//   const {
-//     data: ourUsers,
-//     loading,
-//     error,
-//     refetch,
-//   } = useFetch<User[]>("/(api)/user", {
-//     method: "GET",
-//   });
-
-//   useEffect(() => {
-//     if (ourUsers) {
-//       setUsers(ourUsers);
-//     }
-//   }, [ourUsers]);
-
-//   const handleAddUser = async () => {
-//     if (!name.trim() || !email.trim()) {
-//       return alert("Please provide both name and email");
-//     }
-//     try {
-//       await fetchAPI("/(api)/user", {
-//         method: "POST",
-//         body: JSON.stringify({ name, email }),
-//       });
-//       setName("");
-//       setEmail("");
-//       refetch();
-//     } catch (error) {
-//       console.error("Failed to add user:", error);
-//     }
-//   };
-
-//   return (
-//     <View style={styles.container}>
-//       <Text style={styles.heading}>User List:</Text>
-//       <FlatList
-//         data={users}
-//         keyExtractor={(item) => item.id.toString()}
-//         renderItem={({ item }) => (
-//           <Text style={styles.listItem}>{`${item.name} - ${item.email}`}</Text>
-//         )}
-//         contentContainerStyle={styles.listContainer}
-//       />
-
-//       <TextInput
-//         placeholder="Name"
-//         value={name}
-//         onChangeText={setName}
-//         style={styles.input}
-//       />
-//       <TextInput
-//         placeholder="Email"
-//         value={email}
-//         onChangeText={setEmail}
-//         style={styles.input}
-//         keyboardType="email-address"
-//       />
-//       <Button title="Add User" onPress={handleAddUser} />
-//     </View>
-//   );
-// };

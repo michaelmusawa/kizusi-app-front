@@ -3,13 +3,12 @@ import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
 import { useSignIn } from "@clerk/clerk-expo";
-import { Link, useRouter } from "expo-router";
+import { Link, router } from "expo-router";
 import { useCallback, useState } from "react";
-import { Text, ScrollView, View, Image } from "react-native";
+import { Alert, Image, ScrollView, Text, View } from "react-native";
 
-export default function SignIn() {
+const SignIn = () => {
   const { signIn, setActive, isLoaded } = useSignIn();
-  const router = useRouter();
 
   const [form, setForm] = useState({
     email: "",
@@ -17,9 +16,7 @@ export default function SignIn() {
   });
 
   const onSignInPress = useCallback(async () => {
-    if (!isLoaded) {
-      return;
-    }
+    if (!isLoaded) return;
 
     try {
       const signInAttempt = await signIn.create({
@@ -29,17 +26,17 @@ export default function SignIn() {
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/");
+        router.replace("/(root)/(tabs)");
       } else {
-        // See https://clerk.com/docs/custom-flows/error-handling
-        // for more info on error handling
-        console.error(JSON.stringify(signInAttempt, null, 2));
+        // See https://clerk.com/docs/custom-flows/error-handling for more info on error handling
+        console.log(JSON.stringify(signInAttempt, null, 2));
+        Alert.alert("Error", "Log in failed. Please try again.");
       }
     } catch (err: any) {
-      console.error(JSON.stringify(err, null, 2));
+      console.log(JSON.stringify(err, null, 2));
+      Alert.alert("Error", err.errors[0].longMessage);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, form.email, form.password]);
+  }, [isLoaded, form]);
 
   return (
     <ScrollView className="flex-1 bg-white">
@@ -50,22 +47,27 @@ export default function SignIn() {
             Welcome 👋
           </Text>
         </View>
+
         <View className="p-5">
           <InputField
             label="Email"
-            placeholder="Enter your email"
+            placeholder="Enter email"
             icon={icons.email}
+            textContentType="emailAddress"
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
           />
+
           <InputField
             label="Password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             icon={icons.lock}
             secureTextEntry={true}
+            textContentType="password"
             value={form.password}
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
+
           <CustomButton
             title="Sign In"
             onPress={onSignInPress}
@@ -78,11 +80,13 @@ export default function SignIn() {
             href="/sign-up"
             className="text-lg text-center text-general-200 mt-10"
           >
-            <Text>Don't have an account? </Text>
+            Don't have an account?{" "}
             <Text className="text-primary-500">Sign Up</Text>
           </Link>
         </View>
       </View>
     </ScrollView>
   );
-}
+};
+
+export default SignIn;

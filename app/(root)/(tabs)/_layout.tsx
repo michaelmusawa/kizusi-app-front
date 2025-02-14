@@ -14,14 +14,14 @@ const TabIcon = ({
   <View className="flex-1 mt-3 flex flex-col items-center">
     <Image
       source={icon}
-      tintColor={focused ? "#0061FF" : "#666876"}
+      tintColor={focused ? "#58B8C9" : "#666876"}
       resizeMode="contain"
       className="size-6"
     />
     <Text
       className={`${
         focused
-          ? "text-primary-300 font-rubik-medium"
+          ? "text-secondary-100 font-rubik-medium"
           : "text-black-200 font-rubik"
       } text-xs w-full text-center mt-1`}
     >
@@ -40,7 +40,7 @@ const TabsLayout = () => {
           position: "absolute",
           borderTopColor: "#0061FF1A",
           borderTopWidth: 1,
-          minHeight: 70,
+          minHeight: 60,
         },
       }}
     >

@@ -17,10 +17,12 @@ export const RadioButton = ({
   >
     <View
       className={`h-5 w-5 rounded-full border-2 ${
-        selected ? "border-purple-600" : "border-gray-400"
+        selected ? "border-secondary-100" : "border-gray-400"
       } flex items-center justify-center mr-3`}
     >
-      {selected && <View className="h-2.5 w-2.5 rounded-full bg-purple-600" />}
+      {selected && (
+        <View className="h-2.5 w-2.5 rounded-full bg-secondary-100" />
+      )}
     </View>
     <Text className="text-black-300 text-sm text-center font-rubik mt-1.5">
       {label}

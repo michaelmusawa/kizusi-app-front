@@ -4,9 +4,7 @@ import { Text, ScrollView, TouchableOpacity } from "react-native";
 
 const Filters = ({ brands }: { brands: string[] }) => {
   const params = useLocalSearchParams<{ filter?: string }>();
-  const [selectedCategory, setSelectedCategory] = useState(
-    params.filter || "All"
-  );
+  const [selectedCategory, setSelectedCategory] = useState(params.filter || "");
 
   const handleCategoryPress = (category: string) => {
     if (selectedCategory === category) {
@@ -29,14 +27,14 @@ const Filters = ({ brands }: { brands: string[] }) => {
         onPress={() => handleCategoryPress("")}
         className={`flex flex-col items-start mr-4 px-4 py-2 rounded-full ${
           selectedCategory === ""
-            ? "bg-primary-300"
+            ? "bg-secondary-100/50"
             : "bg-primary-100 border border-primary-200"
         }`}
       >
         <Text
           className={`text-sm ${
             selectedCategory === ""
-              ? "text-white font-rubik-bold mt-0.5"
+              ? "text-gray-50 font-rubik-bold mt-0.5"
               : "text-black-300 font-rubik"
           }`}
         >
@@ -49,14 +47,14 @@ const Filters = ({ brands }: { brands: string[] }) => {
           key={index}
           className={`flex flex-col items-start mr-4 px-4 py-2 rounded-full ${
             selectedCategory === brand
-              ? "bg-primary-300"
+              ? "bg-secondary-100/50"
               : "bg-primary-100 border border-primary-200"
           }`}
         >
           <Text
             className={`text-sm ${
               selectedCategory === brand
-                ? "text-white font-rubik-bold mt-0.5"
+                ? "text-gray-50 font-rubik-bold mt-0.5"
                 : "text-black-300 font-rubik"
             }`}
           >

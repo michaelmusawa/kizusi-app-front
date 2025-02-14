@@ -63,7 +63,7 @@ const Search = ({ cars }: { cars: Car[] }) => {
 
   return (
     <>
-      <View className="flex flex-row items-center justify-between w-full px-4 rounded-lg bg-accent-100 border border-primary-100 mt-5 py-2">
+      <View className="flex flex-row items-center justify-between w-full px-4 rounded-lg bg-accent-100 border border-gray-100 mt-5 py-2">
         <View className="flex-1 flex flex-row items-center justify-start z-50">
           <Image source={icons.search} className="size-5" />
           <TextInput
@@ -81,13 +81,13 @@ const Search = ({ cars }: { cars: Car[] }) => {
         )}
       </View>
 
-      <View className="border border-primary-100 rounded-lg">
+      <View className="rounded-lg">
         {query !== "" && search !== ""
           ? filteredCars.length > 0
             ? filteredCars.map((item, index) => (
                 <TouchableOpacity
                   key={index}
-                  className="py-3 px-4 border-b border-primary-100"
+                  className="py-3 px-4 border-b border-gray-100"
                   onPress={() => handleSelectCar(item)}
                 >
                   <Text className="text-sm font-rubik text-black-300 ml-2 flex-1">

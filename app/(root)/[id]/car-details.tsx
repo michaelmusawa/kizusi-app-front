@@ -20,9 +20,10 @@ const CarDetails = () => {
 
   const windowHeight = Dimensions.get("window").height;
 
-  const { setUserAddons } = useLocationStore();
+  const { userAddons, setUserAddons } = useLocationStore();
 
   const [addons, setAddons] = useState([]);
+  const [addonsAmount, setAddonsAmount] = useState(0);
 
   const {
     data: response,
@@ -52,6 +53,7 @@ const CarDetails = () => {
       setUserAddons(updatedAddons);
       return updatedAddons;
     });
+    setAddonsAmount(userAddons.length * 20);
   };
 
   return (
@@ -62,7 +64,7 @@ const CarDetails = () => {
       >
         <View
           className="relative w-full flex justify-center items-center"
-          style={{ height: windowHeight / 3 }}
+          style={{ height: windowHeight / 4 }}
         >
           <Image
             source={carImages.audiCar}
@@ -99,25 +101,34 @@ const CarDetails = () => {
           </View>
         </View>
 
+        <View className="flex justify-center items-center mt-7 w-full max-w-lg p-2">
+          <Text className="text-2xl text-secondary-100 font-rubik-extrabold">
+            Ksh. {car?.price}/day
+          </Text>
+
+          <Text className="text-xl text-secondary-600 font-rubik-semibold">
+            Ksh. {(car?.price / 1440).toFixed(2)}/minute
+          </Text>
+        </View>
+
         <View className="px-5 mt-7 flex gap-2 h-full">
+          <View className="items-center px-4 py-2 bg-gray-100 rounded-full inline">
+            <Text className="text-sm font-rubik-bold text-secondary-100">
+              {car?.brand.brandName}
+            </Text>
+          </View>
+
           <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
 
           <View className="flex flex-row items-center gap-3">
-            <View className="flex flex-row items-center px-4 py-2 bg-gray-100 rounded-full">
-              <Text className="text-sm font-rubik-bold text-primary-300">
-                {car?.brand.brandName}
-              </Text>
-            </View>
-
             <View className="flex flex-row items-center gap-2">
-              <Image source={icons.star} className="size-5" />
-              <Text className="text-black-200 text-sm mt-1 font-rubik-medium">
+              <Text className="text-black-200 mt-1 font-rubik-medium">
                 ({car?.category.name})
               </Text>
             </View>
           </View>
 
-          <View className="flex flex-row flex-wrap items-center mt-5">
+          <View className="flex flex-row flex-wrap items-center mt-2 border-y border-gray-300 py-4">
             {car?.features?.map((feature, index) => {
               const icon =
                 featureIcons[feature.featureName.toLowerCase()] || icons.star; // Fallback to a default icon
@@ -149,7 +160,7 @@ const CarDetails = () => {
 
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
-              Addons
+              Select addons
             </Text>
 
             <View className="flex-row justify-between mt-4">
@@ -162,9 +173,14 @@ const CarDetails = () => {
                     key={index}
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
+                    <Text className="text-xs text-secondary-600 font-rubik-medium">
+                      +20/=
+                    </Text>
                     <View
-                      className={`size-14 bg-primary-100 rounded-full flex items-center justify-center ${
-                        addons?.includes(addon.addonName) ? "border" : ""
+                      className={`size-14 rounded-full flex items-center justify-center ${
+                        addons?.includes(addon.addonName)
+                          ? "border bg-primary-100"
+                          : "bg-primary-100/50"
                       }`}
                     >
                       <Text className="text-lg">{icon}</Text>
@@ -181,27 +197,20 @@ const CarDetails = () => {
                 );
               })}
             </View>
+            {addons.length > 0 && (
+              <Text className="text-secondary-100 text-sm text-center font-rubik mt-2">
+                Addons amount: +{addonsAmount}/=
+              </Text>
+            )}
           </View>
         </View>
       </ScrollView>
 
       <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
         <View className="flex flex-row items-center justify-between gap-10">
-          <View className="flex flex-col items-start">
-            <Text className="text-black-200 text-xs font-rubik-medium">
-              Price
-            </Text>
-            <Text
-              numberOfLines={1}
-              className="text-primary-300 text-start text-2xl font-rubik-bold"
-            >
-              ${car?.price}
-            </Text>
-          </View>
-
           <TouchableOpacity
             onPress={() => router.replace(`/${id}/add-directions`)}
-            className="flex-1 flex flex-row items-center justify-center bg-primary-300 py-3 rounded-full shadow-md shadow-zinc-400"
+            className="flex-1 flex flex-row items-center justify-center bg-secondary-100/70 py-3 rounded-full shadow-md shadow-zinc-400"
           >
             <Text className="text-white text-lg text-center font-rubik-bold">
               Proceed to book

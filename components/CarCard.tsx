@@ -24,6 +24,9 @@ export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
       />
 
       <View className="flex flex-col mt-2">
+        <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg p-1 inline">
+          {car.category.categoryName}
+        </Text>
         <Text className="text-base font-rubik-bold text-black-300">
           {car.name || "Unknown Car"}
         </Text>
@@ -33,12 +36,9 @@ export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
         >
           {car.description}
         </Text>
-        <Text className="text-xs font-rubik text-black-100">
-          {car.category.categoryName}
-        </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">
-          <Text className="text-base font-rubik-bold text-primary-300">
+          <Text className="text-base font-rubik-bold text-secondary-100">
             Ksh.{car.price || "0"}
           </Text>
           <Image
@@ -66,7 +66,7 @@ export const CategoryCard = ({
     >
       <Image
         source={{
-          uri: "https://images.unsplash.com/photo-1606814893907-c2e42943c91f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
+          uri: "https://images.unsplash.com/photo-1555353540-64580b51c258?q=80&w=1278&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         }}
         className="size-full rounded-2xl"
       />

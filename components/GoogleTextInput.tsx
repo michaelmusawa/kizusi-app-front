@@ -68,14 +68,7 @@ const GoogleTextInput = ({
         onChangeText={onInputChange}
         placeholder={initialLocation ?? "Search places"}
         placeholderTextColor="gray"
-        style={{
-          borderWidth: 1,
-          borderColor: "gray",
-          padding: 10,
-          borderRadius: 5,
-          fontSize: 16,
-          fontWeight: "300",
-        }}
+        className="border border-gray-300 rounded-lg p-2"
       />
       {suggestions.length > 0 && (
         <FlatList
@@ -85,13 +78,7 @@ const GoogleTextInput = ({
             <TouchableOpacity
               onPress={() => onSuggestionPress(item.place_id, item.description)}
             >
-              <Text
-                style={{
-                  padding: 10,
-                  borderBottomWidth: 1,
-                  borderBottomColor: "gray",
-                }}
-              >
+              <Text className="border-b border-gray-200 text-secondary-600 py-2">
                 {item.description}
               </Text>
             </TouchableOpacity>

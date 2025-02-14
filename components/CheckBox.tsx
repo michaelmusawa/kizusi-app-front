@@ -17,7 +17,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({
   >
     <View
       className={`h-5 w-5 rounded-md border-2 ${
-        checked ? "border-purple-600 bg-purple-600" : "border-gray-400"
+        checked ? "border-secondary-100 bg-secondary-100" : "border-gray-400"
       } flex items-center justify-center mr-3`}
     >
       {checked && <View className="h-3 w-3 rounded-md bg-white" />}

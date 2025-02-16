@@ -29,6 +29,8 @@ import sunroof from "@/assets/icons/sunroof.png";
 import fuel from "@/assets/icons/fuel.png";
 import seat from "@/assets/icons/seat.png";
 import door from "@/assets/icons/door.png";
+import logout from "@/assets/icons/logout.png";
+import login from "@/assets/icons/login.png";
 import rightArrow from "@/assets/icons/rightArrow.png";
 import mpesa from "@/assets/icons/mpesa.png";
 import pesapal from "@/assets/icons/pesapal.png";
@@ -141,6 +143,8 @@ export const icons = {
   calender,
   help,
   rightArrow,
+  login,
+  logout,
 };
 
 export const onboarding = [

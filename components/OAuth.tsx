@@ -6,15 +6,19 @@ import CustomButton from "@/components/CustomButton";
 import { icons } from "@/constants";
 import { googleOAuth } from "@/lib/auth";
 
-const OAuth = () => {
+const OAuth = ({ id }: { id: string | undefined }) => {
   const { startOAuthFlow } = useOAuth({ strategy: "oauth_google" });
 
   const handleGoogleSignIn = async () => {
-    const result = await googleOAuth(startOAuthFlow);
+    const result = await googleOAuth(startOAuthFlow, id);
 
     if (result.code === "session_exists") {
       Alert.alert("Success", "Session exists. Redirecting to home screen.");
-      router.replace("/(root)/(tabs)");
+      if (id) {
+        router.replace(`/(root)/${id}/book-details`);
+      } else {
+        router.replace("/(root)/(tabs)");
+      }
     }
 
     Alert.alert(result.success ? "Success" : "Error", result.message);

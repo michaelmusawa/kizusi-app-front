@@ -28,7 +28,7 @@ const GoogleTextInput = ({
 
   const onInputChange = (text) => {
     setInput(text);
-    fetchSuggestions(text); // Fetch suggestions using the hook
+    fetchSuggestions(text);
   };
 
   const onSuggestionPress = async (placeId, selectedSuggestion) => {
@@ -54,8 +54,8 @@ const GoogleTextInput = ({
         address: fullAddress,
       });
 
-      setInput(fullAddress); // Update input field
-      clearSuggestions(); // Clear suggestions
+      setInput(fullAddress);
+      clearSuggestions();
     } catch (error) {
       console.error("Error fetching place details:", error);
     }
@@ -68,12 +68,13 @@ const GoogleTextInput = ({
         onChangeText={onInputChange}
         placeholder={initialLocation ?? "Search places"}
         placeholderTextColor="gray"
-        className="border border-gray-300 rounded-lg p-2"
+        className="border border-gray-300 rounded-lg px-2 py-4"
       />
-      {suggestions.length > 0 && (
+      {suggestions.length > 0 && input !== "" && (
         <FlatList
           data={suggestions}
           keyExtractor={(item) => item.place_id}
+          scrollEnabled={false}
           renderItem={({ item }) => (
             <TouchableOpacity
               onPress={() => onSuggestionPress(item.place_id, item.description)}

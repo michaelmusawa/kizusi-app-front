@@ -57,6 +57,15 @@ export default function Map() {
               title="Destination"
               image={icons.pin}
             />
+            <Marker
+              key="departure"
+              coordinate={{
+                latitude: departureLatitude ?? userLatitude!,
+                longitude: departureLongitude ?? userLongitude!,
+              }}
+              title="Destination"
+              image={icons.selectedMarker}
+            />
             <MapViewDirections
               origin={{
                 latitude: departureLatitude ?? userLatitude!,

@@ -189,8 +189,10 @@ const Home = () => {
                 >
                   <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
                     <Image
-                      source={user ? icons.out : icons.to}
-                      className="size-5 rounded-full"
+                      source={user ? icons.logout : icons.login}
+                      className={
+                        user ? "rounded-full size-3" : "rounded-full size-6"
+                      }
                     />
                   </View>
                   {!user && (

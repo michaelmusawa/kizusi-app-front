@@ -252,7 +252,7 @@ export default function AddDirections() {
 
           <TouchableOpacity
             onPress={handleProceedToBook}
-            className="flex-1 flex flex-row items-center justify-center bg-secondary-100/70 py-2 rounded-full shadow-md shadow-zinc-400"
+            className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400"
           >
             <Text className="text-white text-lg text-center font-rubik-bold">
               Proceed to book

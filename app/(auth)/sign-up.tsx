@@ -10,7 +10,7 @@ import { Text, ScrollView, View, Image, Alert } from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
 export default function SignUp() {
-  const params = useLocalSearchParams<{ query?: string; id?: string }>();
+  const { id } = useLocalSearchParams<{ id?: string }>();
 
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -19,7 +19,6 @@ export default function SignUp() {
     name: "",
     email: "",
     password: "",
-    phone: "",
   });
 
   const [verification, setVerification] = useState({
@@ -64,7 +63,6 @@ export default function SignUp() {
             name: form.name,
             email: form.email,
             clerkId: completeSignUp.createdUserId,
-            phone: form.phone,
           }),
         });
 
@@ -98,30 +96,25 @@ export default function SignUp() {
         <View className="p-5">
           <InputField
             label="Name"
-            placeholder="Enter your name"
+            placeholder="Enter name"
             icon={icons.person}
             value={form.name}
             onChangeText={(value) => setForm({ ...form, name: value })}
           />
           <InputField
             label="Email"
-            placeholder="Enter your email"
+            placeholder="Enter email"
             icon={icons.email}
+            textContentType="emailAddress"
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
           />
           <InputField
-            label="Phone"
-            placeholder="Enter your phone number"
-            icon={icons.email}
-            value={form.phone}
-            onChangeText={(value) => setForm({ ...form, phone: value })}
-          />
-          <InputField
             label="Password"
-            placeholder="Enter your password"
+            placeholder="Enter password"
             icon={icons.lock}
             secureTextEntry={true}
+            textContentType="password"
             value={form.password}
             onChangeText={(value) => setForm({ ...form, password: value })}
           />
@@ -130,52 +123,48 @@ export default function SignUp() {
             onPress={onSignUpPress}
             className="mt-6"
           />
-
           <OAuth />
-
           <Link
-            href={
-              params?.query === "add_userDetails"
-                ? "/sign-in"
-                : "/sign-in?query=add_userDetails"
-            }
+            href="/sign-in"
             className="text-lg text-center text-general-200 mt-10"
           >
-            <Text>Already have an account? </Text>
+            Already have an account?{" "}
             <Text className="text-primary-500">Log In</Text>
           </Link>
         </View>
-
         <ReactNativeModal
           isVisible={verification.state === "pending"}
+          // onBackdropPress={() =>
+          //   setVerification({ ...verification, state: "default" })
+          // }
           onModalHide={() => {
-            if (verification.state === "success") setShowSuccessModal(true);
+            if (verification.state === "success") {
+              setShowSuccessModal(true);
+            }
           }}
         >
           <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
-            <Text className="text-2xl font-JakartaExtraBold mb-2">
+            <Text className="font-JakartaExtraBold text-2xl mb-2">
               Verification
             </Text>
-            <Text className="font-Jakarta mb-2">
-              We've sent a verification code to {form.email}
+            <Text className="font-Jakarta mb-5">
+              We've sent a verification code to {form.email}.
             </Text>
             <InputField
-              label="Code"
+              label={"Code"}
               icon={icons.lock}
-              placeholder="12345"
+              placeholder={"12345"}
               value={verification.code}
               keyboardType="numeric"
               onChangeText={(code) =>
                 setVerification({ ...verification, code })
               }
             />
-
             {verification.error && (
               <Text className="text-red-500 text-sm mt-1">
                 {verification.error}
               </Text>
             )}
-
             <CustomButton
               title="Verify Email"
               onPress={onPressVerify}
@@ -183,7 +172,6 @@ export default function SignUp() {
             />
           </View>
         </ReactNativeModal>
-
         <ReactNativeModal isVisible={showSuccessModal}>
           <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
             <Image
@@ -196,21 +184,17 @@ export default function SignUp() {
             <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">
               You have successfully verified your account.
             </Text>
-
             <CustomButton
-              title={
-                params?.query === "add_userDetails"
-                  ? "Continue to book"
-                  : "Browse home"
+              title={id ? "Back to checkout" : "Browse Home"}
+              onPress={
+                id
+                  ? () => {
+                      router.push(`/(root)/${id}/book-details`);
+                    }
+                  : () => {
+                      router.push(`/(root)/(tabs)`);
+                    }
               }
-              onPress={() => {
-                setShowSuccessModal(false);
-                router.push(
-                  params?.query === "add_userDetails"
-                    ? `/(root)/${params.id}/book-details`
-                    : "/(root)/(tabs)"
-                );
-              }}
               className="mt-5"
             />
           </View>

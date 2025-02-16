@@ -5,7 +5,6 @@ import axios from "axios";
 const API_BASE_URL = "http://localhost:5000";
 
 export async function GET(request: Request, { id }: Record<string, string>) {
-  console.log("the id", id);
   try {
     // Fetch the car by ID from the API
     const response = await axios.get(`${API_BASE_URL}/cars/${id}`);

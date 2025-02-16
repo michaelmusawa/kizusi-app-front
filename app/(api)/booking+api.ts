@@ -7,11 +7,13 @@ export async function GET(request: Request) {
     // Extract query parameters from the request
     const url = new URL(request.url);
     const filter = url.searchParams.get("filter") || "";
+    const query = url.searchParams.get("query") || "";
 
     // Build the API request URL with query parameters
     const response = await axios.get(`${API_BASE_URL}/bookings`, {
       params: {
         filter,
+        query,
       },
     });
 

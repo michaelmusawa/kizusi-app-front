@@ -11,7 +11,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { carImages, icons, images } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocationStore } from "@/store";
 import { addonIcons, featureIcons } from "@/constants/data";
 
@@ -35,6 +35,34 @@ const CarDetails = () => {
 
   const car = response?.data;
 
+  const handleAddonPress = (addonLabel: string) => {
+    setAddons((prev) => {
+      const updatedAddons = prev.includes(addonLabel)
+        ? prev.filter((label) => label !== addonLabel)
+        : [...prev, addonLabel];
+
+      setUserAddons(updatedAddons);
+      return updatedAddons;
+    });
+
+    // Calculate the total amount based on the selected addons
+  };
+
+  useEffect(() => {
+    if (userAddons?.length > 0 && car?.addons.length > 0) {
+      setAddonsAmount(() => {
+        const totalAmount = car.addons.reduce((total, addon) => {
+          if (userAddons.includes(addon.addonName)) {
+            return total + parseFloat(addon.addonValue); // Add the addon amount to the total if matched
+          }
+          return total; // Return the previous total if no match
+        }, 0); // Start from a total of 0
+
+        return totalAmount;
+      });
+    }
+  }, [userAddons]);
+
   if (carLoading) {
     return <Text className="text-center mt-4">Loading...</Text>;
   }
@@ -42,19 +70,6 @@ const CarDetails = () => {
   if (carError) {
     return <Text className="text-center mt-4">Error loading car details.</Text>;
   }
-
-  const handleAddonPress = (addonLabel: string) => {
-    setAddons((prev) => {
-      const updatedAddons = prev.includes(addonLabel)
-        ? prev.filter((label) => label !== addonLabel)
-        : [...prev, addonLabel];
-
-      // Update Zustand store with the latest addons
-      setUserAddons(updatedAddons);
-      return updatedAddons;
-    });
-    setAddonsAmount(userAddons.length * 20);
-  };
 
   return (
     <View className="h-full">
@@ -67,7 +82,9 @@ const CarDetails = () => {
           style={{ height: windowHeight / 4 }}
         >
           <Image
-            source={carImages.audiCar}
+            source={{
+              uri: car?.image,
+            }}
             className="size-full"
             resizeMode="cover"
           />
@@ -163,7 +180,7 @@ const CarDetails = () => {
               Select addons
             </Text>
 
-            <View className="flex-row justify-between mt-4">
+            <View className="flex-row mt-4">
               {car?.addons?.map((addon, index) => {
                 const icon = addonIcons[addon.addonName] || "❓";
 
@@ -174,7 +191,7 @@ const CarDetails = () => {
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
                     <Text className="text-xs text-secondary-600 font-rubik-medium">
-                      +20/=
+                      +{addon.addonValue}
                     </Text>
                     <View
                       className={`size-14 rounded-full flex items-center justify-center ${
@@ -210,7 +227,7 @@ const CarDetails = () => {
         <View className="flex flex-row items-center justify-between gap-10">
           <TouchableOpacity
             onPress={() => router.replace(`/${id}/add-directions`)}
-            className="flex-1 flex flex-row items-center justify-center bg-secondary-100/70 py-3 rounded-full shadow-md shadow-zinc-400"
+            className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-3 rounded-full shadow-md shadow-zinc-400"
           >
             <Text className="text-white text-lg text-center font-rubik-bold">
               Proceed to book

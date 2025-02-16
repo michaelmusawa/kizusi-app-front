@@ -28,10 +28,15 @@ export const tokenCache = {
   },
 };
 
-export const googleOAuth = async (startOAuthFlow: any) => {
+export const googleOAuth = async (
+  startOAuthFlow: (options: { redirectUrl: string }) => Promise<any>,
+  id: string | undefined
+) => {
   try {
     const { createdSessionId, setActive, signUp } = await startOAuthFlow({
-      redirectUrl: Linking.createURL("/(root)/(tabs)"),
+      redirectUrl: Linking.createURL(
+        id ? `/(root)/${id}/book-details` : "/(root)/(tabs)"
+      ),
     });
 
     if (createdSessionId) {

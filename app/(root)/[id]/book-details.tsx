@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { carImages, icons, images } from "@/constants";
+import { icons, images } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { Car, User } from "@/lib/definitions";
 import { useEffect, useState } from "react";
@@ -34,13 +34,15 @@ const BookDetails = () => {
   const {
     userAddons,
     date,
+    departureLatitude,
+    departureLongitude,
+    destinationLatitude,
+    destinationLongitude,
     departureAddress,
     destinationAddress,
     bookType,
     rideDetails,
   } = useLocationStore();
-
-  const addonsAmount = userAddons.length * 20;
 
   const {
     data: carResponse,
@@ -52,17 +54,11 @@ const BookDetails = () => {
 
   const car = carResponse?.data;
 
-  if (!user) {
-    router.replace(
-      `/(auth)/sign-up?id=${id}&query=add_userDetails&callback=true`
-    );
-  }
-
   const {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
     method: "GET",
   });
 
@@ -82,7 +78,23 @@ const BookDetails = () => {
     setPaymentType(value);
   };
 
+  const calculateAddonsAmount = () => {
+    if (userAddons?.length > 0 && car?.addons.length > 0) {
+      const totalAmount = car.addons.reduce((total, addon) => {
+        if (userAddons.includes(addon.addonName)) {
+          return total + parseFloat(addon.addonValue);
+        }
+        return total;
+      }, 0);
+
+      return totalAmount;
+    }
+
+    return 0;
+  };
+
   let rideAmount = 0;
+  const addonsAmount = calculateAddonsAmount();
 
   if (bookType === "full_day") {
     rideAmount = car?.price || 0;
@@ -96,7 +108,7 @@ const BookDetails = () => {
     } else if (paymentType === "reserve") {
       setPaymentAmount((rideAmount + addonsAmount) / 2);
     }
-  }, [rideAmount, addonsAmount, paymentType]);
+  }, [rideAmount, paymentType]);
 
   const handlePayment = async () => {
     if (!isAgreed) {
@@ -104,19 +116,25 @@ const BookDetails = () => {
       return;
     }
 
-    console.log("im here");
     const reference = uuid.v4();
-    console.log("reference", reference);
     const paymentData = {
-      amount: paymentAmount.toFixed(2),
+      amount: paymentAmount,
       first_name: user?.firstName,
       last_name: user?.lastName,
-      email: returnedUser.email,
-      phoneNumber: returnedUser.phone,
+      email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress,
+      phoneNumber: returnedUser?.phone ?? user?.primaryPhoneNumber,
+      image:
+        returnedUser?.image ??
+        user?.externalAccounts?.[0]?.imageUrl ??
+        user?.imageUrl,
       carId: id,
       reference: reference,
       userId: user?.id,
       bookingDate: date,
+      departureLatitude: departureLatitude,
+      departureLongitude: departureLongitude,
+      destinationLatitude: destinationLatitude,
+      destinationLongitude: destinationLongitude,
       departure: departureAddress,
       destination: destinationAddress,
       bookType: bookType,
@@ -128,7 +146,7 @@ const BookDetails = () => {
       ),
     };
 
-    console.log(paymentData);
+    console.log("the payment data", paymentData);
 
     try {
       await initiatePayment(paymentData);
@@ -137,11 +155,11 @@ const BookDetails = () => {
     }
   };
 
-  if (userLoading || carLoading) {
+  if (carLoading) {
     return <Text className="text-center mt-4">Loading...</Text>;
   }
 
-  if (userError || carError) {
+  if (carError) {
     return <Text className="text-center mt-4">Error loading details.</Text>;
   }
 
@@ -156,7 +174,9 @@ const BookDetails = () => {
           style={{ height: windowHeight / 4 }}
         >
           <Image
-            source={carImages.audiCar}
+            source={{
+              uri: car?.image,
+            }}
             className="size-full"
             resizeMode="cover"
           />
@@ -207,70 +227,82 @@ const BookDetails = () => {
             </View>
           </View>
 
-          <View className="w-full mt-4">
-            <Text className="text-black-300 text-xl font-rubik-bold">
-              Your details
-            </Text>
+          {user && (
+            <View className="w-full mt-4">
+              <Text className="text-black-300 text-xl font-rubik-bold">
+                Your details
+              </Text>
 
-            <View className="flex flex-row items-center justify-between mt-4">
-              <View className="flex flex-row items-center">
-                <Image
-                  source={{
-                    uri: "https://images.unsplash.com/photo-1606814893907-c2e42943c91f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
-                  }}
-                  className="size-14 rounded-full border border-secondary-100"
-                />
+              <View className="flex flex-row items-center justify-between mt-4">
+                <View className="flex flex-row items-center">
+                  <Image
+                    source={{
+                      uri:
+                        returnedUser?.image ??
+                        user?.externalAccounts?.[0]?.imageUrl ??
+                        user?.imageUrl,
+                    }}
+                    className="size-14 rounded-full border border-secondary-100"
+                  />
 
-                <View className="flex flex-col items-start justify-center ml-7">
-                  <Text className="text-lg text-black-300 text-start font-rubik-bold">
-                    {returnedUser?.name}
-                  </Text>
-                  <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                    {returnedUser?.email}
-                  </Text>
-                  <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                    {returnedUser?.phone}
-                  </Text>
+                  <View className="flex flex-col items-start justify-center ml-7">
+                    <Text className="text-lg text-black-300 text-start font-rubik-bold">
+                      {returnedUser?.name ??
+                        user?.fullName ??
+                        "No name available"}
+                    </Text>
+                    <Text className="text-sm text-black-200 text-start font-rubik-medium">
+                      {returnedUser?.email ??
+                        user?.primaryEmailAddress?.emailAddress ??
+                        "No email address"}
+                    </Text>
+                    <Text className="text-sm text-black-200 text-start font-rubik-medium">
+                      {returnedUser?.phone ??
+                        user?.primaryPhoneNumber ??
+                        "No phone number available"}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          )}
 
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
               Directions
             </Text>
 
-            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative border">
+            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
                 <Image
-                  source={{ uri: "" }}
+                  source={{
+                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${destinationLongitude},${destinationLatitude}&zoom=14&path=lonlat:${departureLongitude},${departureLatitude}|lonlat:${destinationLongitude},${destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+                  }}
                   className="w-1/3 h-32 rounded-lg border"
                 />
 
-                <View className="flex flex-col mt-2 gap-2 border w-full">
-                  {/* From section */}
-                  <View className="flex flex-row gap-2 items-center w-full">
-                    <Image source={icons.pin} className="w-4 h-5" />
-                    <Text className="flex text-base font-rubik-bold text-black-300 flex-wrap">
-                      From: {departureAddress}
+                <View className="flex-1 ml-4">
+                  <View className="flex-row items-center mb-2">
+                    <Image source={icons.point} className="h-5 w-5" />
+                    <Text className="ml-2 font-semibold">
+                      {departureAddress}
                     </Text>
                   </View>
-
-                  {/* To section */}
-                  <View className="flex flex-row gap-2 items-center w-full">
-                    <Image source={icons.marker} className="w-4 h-5" />
-                    <Text className="text-base font-rubik-bold text-black-300 flex-wrap">
-                      To: {destinationAddress}
-                    </Text>
-                  </View>
+                  {destinationAddress && (
+                    <View className="flex-row items-center mb-2">
+                      <Image source={icons.to} className="h-5 w-5" />
+                      <Text className="ml-2 font-semibold">
+                        {destinationAddress}
+                      </Text>
+                    </View>
+                  )}
 
                   {/* Date and book type */}
                   <View className="flex flex-row items-center justify-between mt-2 w-full">
                     <Text className="text-base font-rubik-bold text-secondary-100">
-                      Date: {date.toLocaleDateString()},{" "}
-                      {date.toLocaleTimeString()}
+                      Date: {new Date(date).toLocaleDateString()},{" "}
+                      {new Date(date).toLocaleTimeString()}
                     </Text>
 
                     <View className="flex flex-row items-center justify-between mt-2">
@@ -288,7 +320,7 @@ const BookDetails = () => {
             <Text className="text-black-300 text-xl font-rubik-bold">
               Addons
             </Text>
-            <View className="flex-row justify-between mt-4">
+            <View className="flex-row mt-4">
               {car?.addons?.map((addon, index) => {
                 const icon = addonIcons[addon.addonName] || "❓";
 
@@ -298,7 +330,7 @@ const BookDetails = () => {
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
                     <Text className="text-xs text-secondary-600 font-rubik-medium">
-                      +20/=
+                      +{addon.addonValue}
                     </Text>
                     <View
                       className={`size-14 rounded-full flex items-center justify-center ${
@@ -334,7 +366,7 @@ const BookDetails = () => {
             </Text>
 
             <View className="flex-row justify-between mt-2">
-              <View className="flex flex-row w-full border p-4">
+              <View className="flex flex-row w-full p-4">
                 <View className="flex-1">
                   <View className="flex flex-1 flex-col min-w-16 max-w-20">
                     <RadioButton
@@ -425,11 +457,15 @@ const BookDetails = () => {
           </View>
 
           <TouchableOpacity
-            onPress={handlePayment}
-            className="flex-1 flex flex-row items-center justify-center bg-secondary-100/70 py-2 rounded-full shadow-md shadow-zinc-400"
+            onPress={
+              user
+                ? handlePayment
+                : () => router.push(`/(auth)/sign-in?id=${id}`)
+            }
+            className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400"
           >
             <Text className="text-white text-lg text-center font-rubik-bold">
-              Check out
+              {user ? "Check out" : "Login to check out"}
             </Text>
           </TouchableOpacity>
         </View>

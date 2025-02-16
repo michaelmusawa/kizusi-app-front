@@ -5,7 +5,7 @@ const API_BASE_URL = "http://localhost:5000";
 export async function GET(request: Request) {
   try {
     // Extract query parameters from the request
-    const url = new URL(request.url); // Assuming this is a Next.js API route
+    const url = new URL(request.url);
     const filter = url.searchParams.get("filter") || "";
     const query = url.searchParams.get("query") || "";
     const limit = url.searchParams.get("limit") || "6";

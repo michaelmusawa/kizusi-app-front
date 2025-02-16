@@ -12,6 +12,10 @@ import {
 
 import { icons } from "@/constants/index";
 import { router } from "expo-router";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import { useFetch } from "@/lib/fetch";
+import { User } from "@/lib/definitions";
+import NoUserPage from "@/components/NoUserPage";
 
 interface SettingsItemProp {
   icon: ImageSourcePropType;
@@ -46,6 +50,37 @@ const SettingsItem = ({
 const Profile = () => {
   const windowHeight = Dimensions.get("window").height;
 
+  const { user } = useUser();
+
+  const { signOut } = useAuth();
+
+  const handleSignOut = () => {
+    signOut();
+    router.push("/(root)/(tabs)");
+  };
+
+  const {
+    data: response,
+    loading: userLoading,
+    error: userError,
+  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+    method: "GET",
+  });
+
+  const returnedUser = response?.data;
+
+  if (!user) {
+    return <NoUserPage text={"Please login to view your profile"} />;
+  }
+
+  if (userLoading) {
+    return <Text className="text-center mt-4">Loading...</Text>;
+  }
+
+  if (userError) {
+    return <Text className="text-center mt-4">Error loading details.</Text>;
+  }
+
   return (
     <SafeAreaView className="h-full bg-white">
       <ScrollView
@@ -53,7 +88,7 @@ const Profile = () => {
         contentContainerClassName="pb-32 px-7"
       >
         <View className="flex flex-row items-center justify-between mt-5">
-          <Text className="text-xl font-rubik-bold">Profile</Text>
+          <Text className="text-2xl font-rubik-ExtraBold">Profile</Text>
         </View>
 
         <View
@@ -63,16 +98,25 @@ const Profile = () => {
           <View className="flex flex-col items-center relative mt-5">
             <Image
               source={{
-                uri: "https://images.unsplash.com/photo-1606814893907-c2e42943c91f?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3",
+                uri:
+                  returnedUser?.image ??
+                  user?.externalAccounts?.[0]?.imageUrl ??
+                  user?.imageUrl,
               }}
               className="size-44 relative rounded-full"
             />
 
-            <Text className="text-2xl font-rubik-bold mt-2">Joe Doe</Text>
-            <Text className="text-xl font-rubik-medium mt-2">
-              doe@gmail.com
+            <Text className="text-2xl font-rubik-bold mt-2">
+              {returnedUser?.name ?? user?.fullName}
             </Text>
-            <Text className="text-xl font-rubik-medium mt-2">0712345678</Text>
+            <Text className="text-xl font-rubik-medium mt-2">
+              {returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress}
+            </Text>
+            <Text className="text-xl font-rubik-medium mt-2">
+              {returnedUser?.phone ??
+                user?.primaryPhoneNumber ??
+                "No phone number"}
+            </Text>
           </View>
         </View>
 
@@ -106,7 +150,7 @@ const Profile = () => {
             title="Logout"
             textStyle="text-danger"
             showArrow={false}
-            // onPress={}
+            onPress={handleSignOut}
           />
         </View>
       </ScrollView>
@@ -115,74 +159,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
-// import { useUser } from "@clerk/clerk-expo";
-// import { Image, ScrollView, Text, View } from "react-native";
-// import { SafeAreaView } from "react-native-safe-area-context";
-
-// import InputField from "@/components/InputField";
-
-// const Profile = () => {
-//   const { user } = useUser();
-
-//   return (
-//     <SafeAreaView className="flex-1">
-//       <ScrollView
-//         className="px-5"
-//         contentContainerStyle={{ paddingBottom: 120 }}
-//       >
-//         <Text className="text-2xl font-JakartaBold my-5">My profile</Text>
-
-//         <View className="flex items-center justify-center my-5">
-//           <Image
-//             source={{
-//               uri: user?.externalAccounts[0]?.imageUrl ?? user?.imageUrl,
-//             }}
-//             style={{ width: 110, height: 110, borderRadius: 110 / 2 }}
-//             className=" rounded-full h-[110px] w-[110px] border-[3px] border-white shadow-sm shadow-neutral-300"
-//           />
-//         </View>
-
-//         <View className="flex flex-col items-start justify-center bg-white rounded-lg shadow-sm shadow-neutral-300 px-5 py-3">
-//           <View className="flex flex-col items-start justify-start w-full">
-//             <InputField
-//               label="First name"
-//               placeholder={user?.firstName || "Not Found"}
-//               containerStyle="w-full"
-//               inputStyle="p-3.5"
-//               editable={false}
-//             />
-
-//             <InputField
-//               label="Last name"
-//               placeholder={user?.lastName || "Not Found"}
-//               containerStyle="w-full"
-//               inputStyle="p-3.5"
-//               editable={false}
-//             />
-
-//             <InputField
-//               label="Email"
-//               placeholder={
-//                 user?.primaryEmailAddress?.emailAddress || "Not Found"
-//               }
-//               containerStyle="w-full"
-//               inputStyle="p-3.5"
-//               editable={false}
-//             />
-
-//             <InputField
-//               label="Phone"
-//               placeholder={user?.primaryPhoneNumber?.phoneNumber || "Not Found"}
-//               containerStyle="w-full"
-//               inputStyle="p-3.5"
-//               editable={false}
-//             />
-//           </View>
-//         </View>
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// };
-
-// export default Profile;

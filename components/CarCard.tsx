@@ -18,15 +18,16 @@ export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
 
       <Image
         source={{
-          uri: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          uri: car.image,
         }}
         className="w-full h-32 rounded-lg"
       />
 
-      <View className="flex flex-col mt-2">
-        <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg p-1 inline">
+      <View className="mt-2">
+        <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg p-1 w-fit">
           {car.category.categoryName}
         </Text>
+
         <Text className="text-base font-rubik-bold text-black-300">
           {car.name || "Unknown Car"}
         </Text>
@@ -66,7 +67,7 @@ export const CategoryCard = ({
     >
       <Image
         source={{
-          uri: "https://images.unsplash.com/photo-1555353540-64580b51c258?q=80&w=1278&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          uri: category.image,
         }}
         className="size-full rounded-2xl"
       />

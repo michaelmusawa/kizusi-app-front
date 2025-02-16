@@ -3,11 +3,14 @@ import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
 import { useSignIn } from "@clerk/clerk-expo";
-import { Link, router } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
 import { Alert, Image, ScrollView, Text, View } from "react-native";
 
 const SignIn = () => {
+  const { id } = useLocalSearchParams<{ id?: string }>();
+
+  console.log("the id", id);
   const { signIn, setActive, isLoaded } = useSignIn();
 
   const [form, setForm] = useState({
@@ -26,7 +29,11 @@ const SignIn = () => {
 
       if (signInAttempt.status === "complete") {
         await setActive({ session: signInAttempt.createdSessionId });
-        router.replace("/(root)/(tabs)");
+        if (id) {
+          router.replace(`/(root)/${id}/book-details`);
+        } else {
+          router.replace("/(root)/(tabs)");
+        }
       } else {
         // See https://clerk.com/docs/custom-flows/error-handling for more info on error handling
         console.log(JSON.stringify(signInAttempt, null, 2));
@@ -74,10 +81,10 @@ const SignIn = () => {
             className="mt-6"
           />
 
-          <OAuth />
+          <OAuth id={id} />
 
           <Link
-            href="/sign-up"
+            href={id ? `/sign-up?${id}` : "/sign-up"}
             className="text-lg text-center text-general-200 mt-10"
           >
             Don't have an account?{" "}

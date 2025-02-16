@@ -9,25 +9,29 @@ import {
   Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { fetchAPI, useFetch } from "@/lib/fetch";
+import { fetchAPI, initiatePayment, useFetch } from "@/lib/fetch";
 import { Booking, Car } from "@/lib/definitions";
-import { icons, carImages, images } from "@/constants";
-import { featureIcons } from "@/constants/data";
+import { icons, images } from "@/constants";
+
 import ReactNativeModal from "react-native-modal";
 import CustomButton from "@/components/CustomButton";
 import { RadioButton } from "@/components/RadioButton";
-import { Checkbox } from "@/components/CheckBox";
+import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
+import uuid from "react-native-uuid";
 
 const HistoryDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
-  const params = useLocalSearchParams<{ query?: string; callback?: string }>();
+  const params = useLocalSearchParams<{
+    query?: string;
+    callback?: string;
+    completePayment?: string;
+  }>();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
-  console.log("the callback: ", params.callback);
+  const { user } = useUser();
 
   useEffect(() => {
-    if (params.callback === "true") {
+    if (params.callback === "true" || params.completePayment === "true") {
       setShowSuccessModal(true);
     }
   }, [params]);
@@ -49,6 +53,16 @@ const HistoryDetails = () => {
   });
 
   const car = carResponse?.data;
+
+  const {
+    data: userResponse,
+    loading: userLoading,
+    error: userError,
+  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
+    method: "GET",
+  });
+
+  const returnedUser = userResponse?.data;
 
   if (loading) {
     return <Text className="text-center mt-4">Loading...</Text>;
@@ -82,6 +96,31 @@ const HistoryDetails = () => {
     }
   };
 
+  const handlePayment = async () => {
+    const reference = uuid.v4();
+    const paymentData = {
+      reference: reference,
+      bookingId: booking?.id,
+      first_name: user?.firstName,
+      last_name: user?.lastName,
+      userId: user?.id,
+      email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress,
+      phoneNumber: returnedUser?.phone ?? user?.primaryPhoneNumber,
+      description: "Complete car rental payment",
+      callbackUrl: Linking.createURL(
+        `/(root)/${id}/history-details?query=${params.query}&completePayment=true`
+      ),
+    };
+
+    console.log("the payment data", paymentData);
+
+    try {
+      await initiatePayment(paymentData);
+    } catch (error) {
+      console.error("Payment initiation failed:", error);
+    }
+  };
+
   return (
     <View className="h-full">
       <ScrollView
@@ -93,7 +132,9 @@ const HistoryDetails = () => {
           style={{ height: windowHeight / 4 }}
         >
           <Image
-            source={carImages.audiCar}
+            source={{
+              uri: car?.image,
+            }}
             className="size-full"
             resizeMode="cover"
           />
@@ -110,7 +151,7 @@ const HistoryDetails = () => {
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.push("/(root)/(tabs)/history")}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
                 <Image source={icons.backArrow} className="size-5" />
@@ -149,30 +190,31 @@ const HistoryDetails = () => {
               Directions
             </Text>
 
-            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative border">
+            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
                 <Image
-                  source={{ uri: "" }}
-                  className="w-1/3 h-32 rounded-lg border"
+                  source={{
+                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&zoom=14&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+                  }}
+                  className="w-1/3 h-32 rounded-lg"
                 />
 
-                <View className="flex flex-col mt-2 gap-2 border w-full">
-                  {/* From section */}
-                  <View className="flex flex-row gap-2 items-center w-full">
-                    <Image source={icons.pin} className="w-4 h-5" />
-                    <Text className="flex text-base font-rubik-bold text-black-300 flex-wrap">
-                      From: {booking?.departure}
+                <View className="flex-1 ml-4">
+                  <View className="flex-row items-center mb-2">
+                    <Image source={icons.point} className="h-5 w-5" />
+                    <Text className="ml-2 font-semibold">
+                      {booking?.departure}
                     </Text>
                   </View>
-
-                  {/* To section */}
-                  <View className="flex flex-row gap-2 items-center w-full">
-                    <Image source={icons.marker} className="w-4 h-5" />
-                    <Text className="text-base font-rubik-bold text-black-300 flex-wrap">
-                      To: {booking?.destination}
-                    </Text>
-                  </View>
+                  {booking?.destination && (
+                    <View className="flex-row items-center mb-2">
+                      <Image source={icons.to} className="h-5 w-5" />
+                      <Text className="ml-2 font-semibold">
+                        {booking.destination}
+                      </Text>
+                    </View>
+                  )}
 
                   {/* Date and book type */}
                   <View className="flex flex-row items-center justify-between mt-2 w-full">
@@ -243,7 +285,7 @@ const HistoryDetails = () => {
             </Text>
 
             <View className="flex-row justify-between mt-2">
-              <View className="flex flex-row w-full border p-4">
+              <View className="flex flex-row w-full p-4">
                 <View className="flex-1">
                   <View className="flex flex-1 flex-col min-w-16 max-w-20">
                     <RadioButton
@@ -296,14 +338,46 @@ const HistoryDetails = () => {
               </View>
             </View>
           </View>
+          {booking?.paymentType === "reserve" && (
+            <View className="mt-4 p-4 bg-primary-100/50 rounded-lg">
+              <Text className="text-black-300 text-base font-rubik-medium">
+                A full payment is required before the booking date to confirm
+                your reservation.
+              </Text>
+              <View className="bg-white bottom-0 w-full rounded-2xl border-t border border-primary-200 py-4 px-7">
+                <View className="flex flex-row items-center justify-between gap-10">
+                  <View className="flex flex-col items-center">
+                    <Text className="text-black text-xs font-rubik-medium">
+                      Payment balance
+                    </Text>
+                    <Text
+                      numberOfLines={1}
+                      className="text-red-500 text-start text-2xl font-rubik-bold"
+                    >
+                      ${booking?.amount}
+                    </Text>
+                  </View>
+
+                  <TouchableOpacity
+                    onPress={handlePayment}
+                    className="flex-1 flex flex-row items-center justify-center bg-gray-100 py-2 rounded-full shadow-md shadow-zinc-400"
+                  >
+                    <Text className="text-gray-600 text-lg text-center font-rubik-bold">
+                      Complete payment
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
       </ScrollView>
 
       <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 py-4 px-7">
         <View className="flex flex-row items-center justify-between gap-10">
-          <View className="flex flex-col items-start">
-            <Text className="text-black-200 text-xs font-rubik-medium">
-              {booking?.paymentStatus}
+          <View className="flex flex-col items-center">
+            <Text className="text-green-600 text-xs font-rubik-medium text-center">
+              {booking?.paymentStatus} PAYMENT
             </Text>
             <Text
               numberOfLines={1}
@@ -313,9 +387,9 @@ const HistoryDetails = () => {
             </Text>
           </View>
 
-          <TouchableOpacity className="flex-1 flex flex-row items-center justify-center bg-secondary-100/70 py-2 rounded-full shadow-md shadow-zinc-400">
+          <TouchableOpacity className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400">
             <Text className="text-white text-lg text-center font-rubik-bold">
-              Cancel
+              Cancel booking
             </Text>
           </TouchableOpacity>
         </View>
@@ -327,10 +401,13 @@ const HistoryDetails = () => {
             source={images.check}
             className="w-[110px] h-[110px] mx-auto my-5"
           />
-          <Text className="text-3xl font-JakartaBold text-center">Booked</Text>
+          <Text className="text-3xl font-JakartaBold text-center">
+            {params.callback === "true" ? "Booked" : "Payment completed"}
+          </Text>
           <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">
-            Your booking has been place successfully. You will be contacted soon
-            by the admin.
+            {params.callback === "true"
+              ? "Your booking has been place successfully. You will be contacted soon by the admin."
+              : "You have completed your booking payment successfully."}
           </Text>
 
           <CustomButton

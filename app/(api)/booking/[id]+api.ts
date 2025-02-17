@@ -26,8 +26,17 @@ export async function GET(request: Request, { id }: Record<string, string>) {
 
 export async function POST(request: Request, { id }: Record<string, string>) {
   try {
-    // Fetch the user by ID from the API
-    const response = await axios.post(`${API_BASE_URL}/bookings/cancel/${id}`);
+    const refundData = await request.json();
+
+    const response = await axios.post(
+      `${API_BASE_URL}/bookings/cancel/${id}`,
+      refundData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     return new Response(JSON.stringify(response.data), {
       headers: { "Content-Type": "application/json" },

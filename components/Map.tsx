@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -20,12 +20,31 @@ export default function Map() {
     destinationLongitude,
   } = useLocationStore();
 
-  const region = calculateRegion({
+  const [region, setRegion] = useState({
+    latitude: -1.286389,
+    longitude: 36.817223,
+    latitudeDelta: 0.01,
+    longitudeDelta: 0.01,
+  });
+
+  useEffect(() => {
+    const newRegion = calculateRegion({
+      userLatitude,
+      userLongitude,
+      departureLatitude,
+      departureLongitude,
+      destinationLatitude,
+      destinationLongitude,
+    });
+    setRegion(newRegion);
+  }, [
     userLatitude,
     userLongitude,
     destinationLatitude,
     destinationLongitude,
-  });
+    departureLatitude,
+    departureLongitude,
+  ]);
 
   if (!userLatitude && !userLongitude)
     return (
@@ -46,6 +65,18 @@ export default function Map() {
         showsUserLocation={true}
         userInterfaceStyle="light"
       >
+        {departureLatitude && departureLongitude && (
+          <Marker
+            key="departure"
+            coordinate={{
+              latitude: departureLatitude,
+              longitude: departureLongitude,
+            }}
+            title="Departure"
+            image={icons.selectedMarker}
+          />
+        )}
+
         {destinationLatitude && destinationLongitude && (
           <>
             <Marker
@@ -57,15 +88,7 @@ export default function Map() {
               title="Destination"
               image={icons.pin}
             />
-            <Marker
-              key="departure"
-              coordinate={{
-                latitude: departureLatitude ?? userLatitude!,
-                longitude: departureLongitude ?? userLongitude!,
-              }}
-              title="Destination"
-              image={icons.selectedMarker}
-            />
+
             <MapViewDirections
               origin={{
                 latitude: departureLatitude ?? userLatitude!,

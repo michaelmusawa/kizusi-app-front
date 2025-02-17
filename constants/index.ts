@@ -11,6 +11,7 @@ import google from "@/assets/icons/google.png";
 import filter from "@/assets/icons/filter.png";
 import home from "@/assets/icons/home.png";
 import list from "@/assets/icons/list.png";
+import phone from "@/assets/icons/phone.png";
 import lock from "@/assets/icons/lock.png";
 import map from "@/assets/icons/map.png";
 import marker from "@/assets/icons/marker.png";
@@ -66,6 +67,7 @@ import sedan from "@/assets/cars/sedan.png";
 import favorite from "@/assets/icons/favorite.png";
 import cardGradient from "@/assets/images/card-gradient.png";
 import whiteGradient from "@/assets/images/white-gradient.png";
+import error from "@/assets/images/error.png";
 
 export const images = {
   onboarding1,
@@ -78,6 +80,7 @@ export const images = {
   message,
   cardGradient,
   whiteGradient,
+  error,
 };
 
 export const brands = {
@@ -145,6 +148,7 @@ export const icons = {
   rightArrow,
   login,
   logout,
+  phone,
 };
 
 export const onboarding = [

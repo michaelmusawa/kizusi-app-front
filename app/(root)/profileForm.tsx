@@ -35,6 +35,8 @@ export default function ProfileForm() {
 
   const returnedUser = response?.data;
 
+  console.log("the motherfucker", returnedUser);
+
   const [form, setForm] = useState({
     name: returnedUser?.name ?? user?.fullName ?? "",
     email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress ?? "",
@@ -66,12 +68,6 @@ export default function ProfileForm() {
     if (form.name === "") {
       setError("Please enter a name");
       return;
-    } else if (form.email === "") {
-      setError("Please enter email address");
-      return;
-    } else if (form.password === "") {
-      setError("Please provide password");
-      return;
     }
     setError(null);
 
@@ -85,7 +81,6 @@ export default function ProfileForm() {
         body: JSON.stringify({
           name: form.name,
           email: form.email,
-          password: form.password,
           phone: form.phone,
           image: form.image,
         }),
@@ -97,7 +92,7 @@ export default function ProfileForm() {
         setError(errorData.message || "Something went wrong");
       } else {
         alert("Profile updated successfully");
-        console.log("User updated successfully");
+        router.push("/profile");
       }
     } catch (error) {
       console.error(error);
@@ -105,6 +100,8 @@ export default function ProfileForm() {
     }
     setError(null);
   };
+
+  console.log("the motherfucker phone", form.phone);
 
   return (
     <ScrollView
@@ -128,14 +125,6 @@ export default function ProfileForm() {
             >
               <Image source={icons.backArrow} className="size-5" />
             </TouchableOpacity>
-
-            <View className="flex flex-row items-center gap-3">
-              <Image
-                source={icons.favorite}
-                className="size-7"
-                tintColor={"#191D31"}
-              />
-            </View>
           </View>
         </View>
 
@@ -176,23 +165,17 @@ export default function ProfileForm() {
             placeholder="Enter your email"
             icon={icons.email}
             value={form.email}
-            onChangeText={(value) => setForm({ ...form, email: value })}
+            editable={false}
+            pointerEvents="none"
+            className="text-gray-300"
+            style={{ color: "gray" }}
           />
           <InputField
             label="Phone"
             placeholder="Enter your phone number"
-            icon={icons.email}
+            icon={icons.phone}
             value={form.phone}
             onChangeText={(value) => setForm({ ...form, phone: value })}
-          />
-
-          <InputField
-            label="Password"
-            placeholder="Enter your password"
-            icon={icons.lock}
-            secureTextEntry={true}
-            value={form.password}
-            onChangeText={(value) => setForm({ ...form, password: value })}
           />
 
           {error && (
@@ -201,7 +184,7 @@ export default function ProfileForm() {
             </Text>
           )}
           <CustomButton
-            title="Sign In"
+            title="Submit"
             onPress={handleSubmit}
             className="mt-6"
           />

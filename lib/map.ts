@@ -5,42 +5,68 @@ const directionsAPI = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 export const calculateRegion = ({
   userLatitude,
   userLongitude,
+  departureLatitude,
+  departureLongitude,
   destinationLatitude,
   destinationLongitude,
 }: {
   userLatitude: number | null;
   userLongitude: number | null;
+  departureLatitude?: number | null;
+  departureLongitude?: number | null;
   destinationLatitude?: number | null;
   destinationLongitude?: number | null;
 }) => {
+  // If user coordinates are missing
   if (!userLatitude || !userLongitude) {
     return {
-      latitude: 37.78825,
-      longitude: -122.4324,
+      latitude: -1.286389,
+      longitude: 36.817223,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     };
   }
 
+  // If destination coordinates are missing
   if (!destinationLatitude || !destinationLongitude) {
     return {
-      latitude: userLatitude,
-      longitude: userLongitude,
+      latitude: departureLatitude ?? userLatitude,
+      longitude: departureLongitude ?? userLongitude,
       latitudeDelta: 0.01,
       longitudeDelta: 0.01,
     };
   }
 
-  const minLat = Math.min(userLatitude, destinationLatitude);
-  const maxLat = Math.max(userLatitude, destinationLatitude);
-  const minLng = Math.min(userLongitude, destinationLongitude);
-  const maxLng = Math.max(userLongitude, destinationLongitude);
+  const minLat = Math.min(
+    departureLatitude ?? userLatitude,
+    destinationLatitude
+  );
+  const maxLat = Math.max(
+    departureLatitude ?? userLatitude,
+    destinationLatitude
+  );
+  const minLng = Math.min(
+    departureLongitude ?? userLongitude,
+    destinationLongitude
+  );
+  const maxLng = Math.max(
+    departureLongitude ?? userLongitude,
+    destinationLongitude
+  );
 
+  // Calculate deltas
   const latitudeDelta = (maxLat - minLat) * 1.3; // Adding some padding
   const longitudeDelta = (maxLng - minLng) * 1.3; // Adding some padding
 
-  const latitude = (userLatitude + destinationLatitude) / 2;
-  const longitude = (userLongitude + destinationLongitude) / 2;
+  // Calculate midpoint between departure and destination
+  const latitude =
+    ((departureLatitude ?? userLatitude) +
+      (destinationLatitude ?? userLatitude)) /
+    2;
+  const longitude =
+    ((departureLongitude ?? userLongitude) +
+      (destinationLongitude ?? userLongitude)) /
+    2;
 
   return {
     latitude,

@@ -146,8 +146,6 @@ const BookDetails = () => {
       ),
     };
 
-    console.log("the payment data", paymentData);
-
     try {
       await initiatePayment(paymentData);
     } catch (error) {
@@ -277,7 +275,7 @@ const BookDetails = () => {
                 {/* Image section */}
                 <Image
                   source={{
-                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${destinationLongitude},${destinationLatitude}&zoom=14&path=lonlat:${departureLongitude},${departureLatitude}|lonlat:${destinationLongitude},${destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${destinationLongitude || departureLongitude},${destinationLatitude || departureLatitude}&zoom=14&marker=lonlat:${departureLongitude},${departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${destinationLongitude && destinationLatitude ? `&marker=lonlat:${destinationLongitude},${destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${departureLongitude},${departureLatitude}|lonlat:${destinationLongitude},${destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
                   }}
                   className="w-1/3 h-32 rounded-lg border"
                 />

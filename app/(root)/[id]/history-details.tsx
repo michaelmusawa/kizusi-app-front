@@ -9,7 +9,12 @@ import {
   Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { fetchAPI, initiatePayment, useFetch } from "@/lib/fetch";
+import {
+  fetchAPI,
+  initiatePayment,
+  initiateRefund,
+  useFetch,
+} from "@/lib/fetch";
 import { Booking, Car } from "@/lib/definitions";
 import { icons, images } from "@/constants";
 
@@ -28,6 +33,7 @@ const HistoryDetails = () => {
     completePayment?: string;
   }>();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [cancelBooking, setCancelBooking] = useState(false);
   const { user } = useUser();
 
   useEffect(() => {
@@ -76,19 +82,21 @@ const HistoryDetails = () => {
   const windowHeight = Dimensions.get("window").height;
 
   const handleCancelBooking = async () => {
+    const cancelBookingData = {
+      amount: booking?.amount,
+      remarks: "Cancel booking",
+      first_name: user?.firstName,
+      last_name: user?.lastName,
+    };
+
     try {
-      const response = await fetchAPI(`/(api)/booking/${id}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await initiateRefund(id, cancelBookingData);
 
-      console.log("Cancel booking response", response.booking.bookingStatus);
-      const success = response.booking.bookingStatus === "CANCELLED";
+      console.log("the response from refunding", response);
 
-      if (success) {
+      if (response.refundResponses[0].status === "200") {
         setShowSuccessModal(true);
+        setCancelBooking(true);
       }
     } catch (error) {
       console.error("Cancelling booking:", error);
@@ -195,7 +203,7 @@ const HistoryDetails = () => {
                 {/* Image section */}
                 <Image
                   source={{
-                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&zoom=14&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude || booking.departureLongitude},${booking.destinationLatitude || booking.departureLatitude}&zoom=14&marker=lonlat:${booking.departureLongitude},${booking.departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${booking.destinationLongitude && booking.destinationLatitude ? `&marker=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${booking.departureLongitude},${booking.departureLatitude}|lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
                   }}
                   className="w-1/3 h-32 rounded-lg"
                 />
@@ -387,9 +395,20 @@ const HistoryDetails = () => {
             </Text>
           </View>
 
-          <TouchableOpacity className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400">
-            <Text className="text-white text-lg text-center font-rubik-bold">
-              Cancel booking
+          <TouchableOpacity
+            onPress={
+              booking?.bookingStatus !== "CANCELLED"
+                ? handleCancelBooking
+                : () => {}
+            }
+            className={`flex-1 flex flex-row items-center justify-center py-2 rounded-full shadow-md shadow-zinc-400 ${booking?.bookingStatus !== "CANCELLED" ? "bg-secondary-100" : "bg-gray-100"}`}
+          >
+            <Text
+              className={` text-lg text-center font-rubik-bold ${booking?.bookingStatus !== "CANCELLED" ? "text-white" : "text-red-500"}`}
+            >
+              {booking?.bookingStatus !== "CANCELLED"
+                ? "Cancel booking"
+                : "Booking cancelled"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -398,26 +417,44 @@ const HistoryDetails = () => {
       <ReactNativeModal isVisible={showSuccessModal}>
         <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
           <Image
-            source={images.check}
+            source={
+              booking?.paymentStatus === "CONFIRMED"
+                ? images.check
+                : images.error
+            }
             className="w-[110px] h-[110px] mx-auto my-5"
           />
           <Text className="text-3xl font-JakartaBold text-center">
-            {params.callback === "true" ? "Booked" : "Payment completed"}
+            {booking?.paymentStatus === "CONFIRMED"
+              ? cancelBooking === true
+                ? "Cancelled"
+                : params.callback === "true"
+                  ? "Booked"
+                  : "Payment completed"
+              : "Error occurred"}
           </Text>
+
           <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">
-            {params.callback === "true"
-              ? "Your booking has been place successfully. You will be contacted soon by the admin."
-              : "You have completed your booking payment successfully."}
+            {booking?.paymentStatus === "CONFIRMED"
+              ? cancelBooking === true
+                ? "The booking has been cancelled successfully. You will be conducted by the admin for your refund soon. Go to profile -> Help for more information."
+                : params.callback === "true"
+                  ? "Your booking has been place successfully. You will be contacted soon by the admin."
+                  : "You have completed your booking payment successfully."
+              : "Error occurred"}
           </Text>
 
           <CustomButton
             title={
-              booking?.paymentStatus === "CONFIRMED"
+              booking?.paymentStatus === "CONFIRMED" || cancelBooking === true
                 ? "View Booking"
                 : "Try Again"
             }
             onPress={() => {
               setShowSuccessModal(false);
+              if (cancelBooking === true) {
+                setCancelBooking(false);
+              }
               router.push(
                 booking?.paymentStatus === "CONFIRMED"
                   ? `/(root)/${id}/history-details?query=${params.query}`

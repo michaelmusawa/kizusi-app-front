@@ -18,7 +18,7 @@ import { useLocationStore } from "@/store";
 import * as Location from "expo-location";
 import { Card, CategoryCard } from "@/components/CarCard";
 import { useFetch } from "@/lib/fetch";
-import { Car, Category } from "@/lib/definitions";
+import { Car, Category, User } from "@/lib/definitions";
 import { icons } from "@/constants";
 import { useDebouncedCallback } from "use-debounce";
 
@@ -138,6 +138,16 @@ const Home = () => {
     ];
   }
 
+  const {
+    data: response,
+    loading: userLoading,
+    error: userError,
+  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+    method: "GET",
+  });
+
+  const returnedUser = response?.data;
+
   return (
     <SafeAreaView className="h-full bg-white">
       <FlatList
@@ -165,7 +175,14 @@ const Home = () => {
                   <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
                     <Image
                       source={
-                        user?.imageUrl ? { uri: user?.imageUrl } : icons.person
+                        user
+                          ? {
+                              uri:
+                                returnedUser?.image ??
+                                user?.externalAccounts?.[0]?.imageUrl ??
+                                user?.imageUrl,
+                            }
+                          : icons.person
                       }
                       className="size-8 rounded-full"
                     />
@@ -176,7 +193,7 @@ const Home = () => {
                       Good Morning,
                     </Text>
                     <Text className="text-base font-rubik-medium text-black-300">
-                      {user?.firstName ?? "Welcome"}
+                      {returnedUser?.name ?? user?.fullName ?? "Welcome"}
                     </Text>
                   </View>
                 </View>

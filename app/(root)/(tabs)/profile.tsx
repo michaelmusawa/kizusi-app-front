@@ -95,7 +95,8 @@ const Profile = () => {
           className="flex flex-row justify-center items-center mt-5"
           style={{ height: windowHeight / 2 }}
         >
-          <View className="flex flex-col items-center relative mt-5">
+          <View className="flex flex-col items-center justify-center relative mt-5 bg-white p-6 rounded-2xl shadow-lg w-11/12 h-5/6">
+            {/* Profile Image */}
             <Image
               source={{
                 uri:
@@ -103,16 +104,21 @@ const Profile = () => {
                   user?.externalAccounts?.[0]?.imageUrl ??
                   user?.imageUrl,
               }}
-              className="size-44 relative rounded-full"
+              className="w-32 h-32 rounded-full border-4 border-gray-200"
             />
 
-            <Text className="text-2xl font-rubik-bold mt-2">
+            {/* User Name */}
+            <Text className="text-3xl font-semibold mt-4 text-gray-800">
               {returnedUser?.name ?? user?.fullName}
             </Text>
-            <Text className="text-xl font-rubik-medium mt-2">
+
+            {/* User Email */}
+            <Text className="text-lg font-medium mt-2 text-gray-600">
               {returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress}
             </Text>
-            <Text className="text-xl font-rubik-medium mt-2">
+
+            {/* User Phone */}
+            <Text className="text-lg font-medium mt-2 text-gray-600">
               {returnedUser?.phone ??
                 user?.primaryPhoneNumber ??
                 "No phone number"}

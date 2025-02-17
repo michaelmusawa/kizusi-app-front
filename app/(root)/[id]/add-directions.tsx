@@ -22,12 +22,12 @@ export default function AddDirections() {
     departureAddress,
     bookType,
     rideDetails,
+    userAddress,
     setDestinationLocation,
     setDepartureLocation,
     setBookType,
     setRideDetails,
     date,
-    setDate,
   } = useLocationStore();
 
   const [localDepartureAddress, setLocalDepartureAddress] =
@@ -122,6 +122,7 @@ export default function AddDirections() {
       (departureLatitude === null || departureLongitude === null)
     ) {
       setError("Departure location is required.");
+      setLocalDestinationAddress(null);
       return;
     }
 
@@ -166,6 +167,7 @@ export default function AddDirections() {
   return (
     <>
       <RideLayout title="Car details" snapPoints={["45%", "85%"]}>
+        {error && <Text className="text-red-500 text-center">{error}</Text>}
         <View className="flex flex-row">
           <View className="flex-1">
             <SelectComponent />
@@ -212,10 +214,6 @@ export default function AddDirections() {
               }}
             />
           </View>
-        )}
-
-        {error && (
-          <Text className="text-red-500 text-center mt-2">{error}</Text>
         )}
       </RideLayout>
 

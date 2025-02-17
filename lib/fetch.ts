@@ -90,3 +90,21 @@ export const initiatePayment = async (paymentData: PaymentData) => {
     throw error;
   }
 };
+
+export const initiateRefund = async (id: string, paymentData: PaymentData) => {
+  try {
+    const response = await fetchAPI(`/(api)/booking/${id}`, {
+      method: "POST",
+      body: JSON.stringify(paymentData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log("The refund response", response);
+    return response;
+  } catch (error) {
+    console.error("Error cancelling booking:", error);
+    throw error;
+  }
+};

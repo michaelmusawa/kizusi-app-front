@@ -16,13 +16,13 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
       className="bg-white rounded-lg shadow-md p-4 mb-4"
     >
       <Text className="text-primary-100 font-bold">
-        Book type: {booking.bookType}
+        Book type: {booking.bookType === "full_day" ? "Full Day" : "Transfer"}
       </Text>
       <View className="flex-row mt-4">
         <View className="flex-1">
           <Image
             source={{
-              uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&zoom=14&path=lonlat:${booking.departureLongitude},${booking.departureLatitude}|lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
+              uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude || booking.departureLongitude},${booking.destinationLatitude || booking.departureLatitude}&zoom=14&marker=lonlat:${booking.departureLongitude},${booking.departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${booking.destinationLongitude && booking.destinationLatitude ? `&marker=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${booking.departureLongitude},${booking.departureLatitude}|lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
             }}
             className="w-[80px] h-[90px] rounded-lg border border-primary-100"
           />
@@ -33,8 +33,12 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             </Text>
             <Text className="text-gray-700">
               <Text className="font-bold">Payment status: </Text>
-              <Text className="text-secondary-100">
-                {booking.paymentStatus}
+              <Text
+                className={`${booking.paymentType === "full" ? "text-secondary-100" : "text-red-500"}`}
+              >
+                {booking.paymentType === "full"
+                  ? "Full payment"
+                  : "Half payment"}
               </Text>
             </Text>
             <Text className="text-gray-700">

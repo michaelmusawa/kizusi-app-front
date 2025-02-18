@@ -153,12 +153,12 @@ const CarDetails = () => {
               return (
                 <View
                   key={index}
-                  className="flex flex-row items-center mr-4 mb-2"
+                  className="flex flex-col items-center justify-center mb-2 gap-2 w-20 "
                 >
                   <View className="flex flex-row items-center justify-center bg-primary-100 rounded-full size-10">
                     <Image source={icon} className="size-4" />
                   </View>
-                  <Text className="text-black-300 text-sm font-rubik-medium ml-2">
+                  <Text className="text-black-300 text-center text-sm font-rubik-medium ml-2">
                     {feature.featureValue} {feature.featureName}
                   </Text>
                 </View>

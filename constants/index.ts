@@ -157,21 +157,21 @@ export const onboarding = [
     title: "The perfect car rental in your hands with Kizusi Smartex",
     description:
       "Discover the convenience of finding a perfect chauffer with our Kizusi cab Smartex App.",
-    image: images.onboarding1,
+    image: carImages.audiCar,
   },
   {
     id: 2,
     title: "We prioritize your safety and enjoyment of your trip",
     description:
       "Each of our car has undergone detailed inspection and maintenance to ensure the enjoyment and safety of your trip",
-    image: images.onboarding2,
+    image: carImages.benzCar,
   },
   {
     id: 3,
     title: "Your ride, your way. Let's go!",
     description:
       "Enter your date and destination, sit back, and let us take care of the rest.",
-    image: images.onboarding3,
+    image: carImages.volkswagenCar,
   },
 ];
 

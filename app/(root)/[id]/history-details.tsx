@@ -33,6 +33,7 @@ const HistoryDetails = () => {
     completePayment?: string;
   }>();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
   const [cancelBooking, setCancelBooking] = useState(false);
   const { user } = useUser();
 
@@ -92,14 +93,15 @@ const HistoryDetails = () => {
     try {
       const response = await initiateRefund(id, cancelBookingData);
 
-      console.log("the response from refunding", response);
-
       if (response.refundResponses[0].status === "200") {
         setShowSuccessModal(true);
         setCancelBooking(true);
+        console.log("dem", response);
       }
     } catch (error) {
+      setShowErrorModal(true);
       console.error("Cancelling booking:", error);
+
       throw error;
     }
   };
@@ -459,6 +461,35 @@ const HistoryDetails = () => {
                 booking?.paymentStatus === "CONFIRMED"
                   ? `/(root)/${id}/history-details?query=${params.query}`
                   : `/(root)//${params.query}/book-details`
+              );
+            }}
+            className="mt-5"
+          />
+        </View>
+      </ReactNativeModal>
+
+      <ReactNativeModal isVisible={showErrorModal}>
+        <View className="bg-white px-7 py-9 rounded-2xl min-h-[300px]">
+          <Image
+            source={images.error}
+            className="w-[110px] h-[110px] mx-auto my-5"
+          />
+          <Text className="text-3xl font-JakartaBold text-center">
+            Error occurred
+          </Text>
+
+          <Text className="text-base text-gray-400 font-Jakarta text-center mt-2">
+            {
+              "Error occurred during placement of your refund. Go to profile -> Help to contact the admin for assistance. "
+            }
+          </Text>
+
+          <CustomButton
+            title="View Booking"
+            onPress={() => {
+              setShowErrorModal(false);
+              router.push(
+                `/(root)/${id}/history-details?query=${params.query}`
               );
             }}
             className="mt-5"

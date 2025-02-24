@@ -24,7 +24,7 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             source={{
               uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude || booking.departureLongitude},${booking.destinationLatitude || booking.departureLatitude}&zoom=14&marker=lonlat:${booking.departureLongitude},${booking.departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${booking.destinationLongitude && booking.destinationLatitude ? `&marker=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${booking.departureLongitude},${booking.departureLatitude}|lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
             }}
-            className="w-[80px] h-[90px] rounded-lg border border-primary-100"
+            className="w-[150px] h-[90px] rounded-lg"
           />
           <View className="mt-4 flex flex-col gap-2">
             <Text className="text-gray-700">
@@ -43,7 +43,7 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             </Text>
             <Text className="text-gray-700">
               <Text className="font-bold">Amount: </Text>
-              <Text className="text-secondary-100">{booking.amount}</Text>
+              <Text className="text-secondary-100">Ksh. {booking.amount}</Text>
             </Text>
           </View>
         </View>

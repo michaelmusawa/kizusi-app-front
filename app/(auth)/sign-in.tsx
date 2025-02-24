@@ -43,6 +43,7 @@ const SignIn = () => {
       console.log(JSON.stringify(err, null, 2));
       Alert.alert("Error", err.errors[0].longMessage);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, form]);
 
   return (

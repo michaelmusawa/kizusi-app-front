@@ -6,12 +6,12 @@ import { Image, View, Text, TouchableOpacity } from "react-native";
 export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
   return (
     <TouchableOpacity
-      className="flex-1 w-full mt-4 px-3 py-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
+      className="flex-1 w-full mt-4 rounded-lg bg-white shadow-lg shadow-black-100/70 relative"
       onPress={onPress}
     >
       <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
         <Image source={icons.star} className="size-2.5" />
-        <Text className="text-xs font-rubik-bold text-primary-300 ml-0.5">
+        <Text className="text-xs font-rubik-bold text-secondary-100 ml-0.5">
           {car.brand.brandName}
         </Text>
       </View>
@@ -23,8 +23,8 @@ export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
         className="w-full h-32 rounded-lg"
       />
 
-      <View className="mt-2">
-        <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg p-1 w-fit">
+      <View className="mt-2 gap-1 p-2">
+        <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg py-1 px-2 self-start">
           {car.category.categoryName}
         </Text>
 
@@ -89,11 +89,11 @@ export const CategoryCard = ({
         >
           {category.name}
         </Text>
-        <Text className="text-base font-rubik text-white" numberOfLines={1}>
+        <Text className="text-base font-rubik text-white">
           Brands:{" "}
           {category?.brands?.length > 0
             ? category.brands.map((b) => (
-                <Text key={b.brandId}> {b.brandName} </Text>
+                <Text key={b.brandId}> {b.brandName}, </Text>
               ))
             : "No brands available"}
         </Text>

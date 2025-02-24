@@ -24,6 +24,7 @@ import { RadioButton } from "@/components/RadioButton";
 import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
+import { LinearGradient } from "expo-linear-gradient";
 
 const HistoryDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -139,34 +140,37 @@ const HistoryDetails = () => {
       >
         <View
           className="relative w-full flex justify-center items-center"
-          style={{ height: windowHeight / 4 }}
+          style={{ height: windowHeight / 3 }}
         >
           <Image
-            source={{
-              uri: car?.image,
-            }}
+            source={{ uri: car?.image }}
             className="size-full"
             resizeMode="cover"
           />
-          <Image
-            source={images.whiteGradient}
-            className="absolute top-0 w-full z-40"
+
+          {/* Bottom Linear Gradient overlay */}
+          <LinearGradient
+            colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 80,
+            }}
           />
 
           <View
             className="z-50 absolute inset-x-7"
-            style={{
-              top: Platform.OS === "ios" ? 70 : 20,
-            }}
+            style={{ top: Platform.OS === "ios" ? 70 : 20 }}
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
-                onPress={() => router.push("/(root)/(tabs)/history")}
+                onPress={() => router.back()}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
-
               <View className="flex flex-row items-center gap-3">
                 <Image
                   source={icons.favorite}
@@ -179,8 +183,8 @@ const HistoryDetails = () => {
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <View className="items-center px-4 py-2 bg-gray-100 rounded-full inline">
-            <Text className="text-sm font-rubik-bold text-secondary-100">
+          <View className="items-start">
+            <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full">
               {car?.brand.brandName}
             </Text>
           </View>
@@ -228,17 +232,17 @@ const HistoryDetails = () => {
 
                   {/* Date and book type */}
                   <View className="flex flex-row items-center justify-between mt-2 w-full">
+                    <View className="flex flex-row items-center justify-between mt-2">
+                      <Text className="text-base font-rubik-bold text-secondary-100">
+                        {booking?.bookType === "full_day"
+                          ? "Full day"
+                          : "Transfer"}
+                      </Text>
+                    </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
-                      Date:{" "}
                       {new Date(booking?.bookingDate).toLocaleDateString()},{" "}
                       {new Date(booking?.bookingDate).toLocaleTimeString()}
                     </Text>
-
-                    <View className="flex flex-row items-center justify-between mt-2">
-                      <Text className="text-base font-rubik-bold text-secondary-100">
-                        {booking?.bookType}
-                      </Text>
-                    </View>
                   </View>
                 </View>
               </View>

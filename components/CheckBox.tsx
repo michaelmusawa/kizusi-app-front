@@ -22,6 +22,8 @@ export const Checkbox: React.FC<CheckboxProps> = ({
     >
       {checked && <View className="h-3 w-3 rounded-md bg-white" />}
     </View>
-    <Text className="text-black-200 text-base font-rubik mt-2">{label}</Text>
+    <Text className="text-secondary-600 text-base font-rubik mt-2">
+      {label}
+    </Text>
   </TouchableOpacity>
 );

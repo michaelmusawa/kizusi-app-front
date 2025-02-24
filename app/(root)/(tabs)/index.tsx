@@ -190,7 +190,9 @@ const Home = () => {
 
                   <View className="flex flex-col items-start ml-2 justify-center">
                     <Text className="text-xs font-rubik text-black-100">
-                      Good Morning,
+                      {new Date().getHours() < 12
+                        ? "Good Morning,"
+                        : "Good Evening,"}
                     </Text>
                     <Text className="text-base font-rubik-medium text-black-300">
                       {returnedUser?.name ?? user?.fullName ?? "Welcome"}
@@ -206,9 +208,11 @@ const Home = () => {
                 >
                   <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
                     <Image
-                      source={user ? icons.logout : icons.login}
+                      source={user ? icons.out : icons.login}
                       className={
-                        user ? "rounded-full size-3" : "rounded-full size-6"
+                        user
+                          ? "rounded-full size-5 rotate-180"
+                          : "rounded-full size-6"
                       }
                     />
                   </View>

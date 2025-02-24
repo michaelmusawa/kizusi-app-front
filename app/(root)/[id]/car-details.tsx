@@ -14,6 +14,7 @@ import { Car } from "@/lib/definitions";
 import { useEffect, useState } from "react";
 import { useLocationStore } from "@/store";
 import { addonIcons, featureIcons } from "@/constants/data";
+import { LinearGradient } from "expo-linear-gradient";
 
 const CarDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -79,25 +80,29 @@ const CarDetails = () => {
       >
         <View
           className="relative w-full flex justify-center items-center"
-          style={{ height: windowHeight / 4 }}
+          style={{ height: windowHeight / 2 }}
         >
           <Image
-            source={{
-              uri: car?.image,
-            }}
+            source={{ uri: car?.image }}
             className="size-full"
             resizeMode="cover"
           />
-          <Image
-            source={images.whiteGradient}
-            className="absolute top-0 w-full z-40"
+
+          {/* Bottom Linear Gradient overlay */}
+          <LinearGradient
+            colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 80,
+            }}
           />
 
           <View
             className="z-50 absolute inset-x-7"
-            style={{
-              top: Platform.OS === "ios" ? 70 : 20,
-            }}
+            style={{ top: Platform.OS === "ios" ? 70 : 20 }}
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
@@ -106,7 +111,6 @@ const CarDetails = () => {
               >
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
-
               <View className="flex flex-row items-center gap-3">
                 <Image
                   source={icons.favorite}
@@ -116,21 +120,21 @@ const CarDetails = () => {
               </View>
             </View>
           </View>
-        </View>
 
-        <View className="flex justify-center items-center mt-7 w-full max-w-lg p-2">
-          <Text className="text-2xl text-secondary-100 font-rubik-extrabold">
-            Ksh. {car?.price}/day
-          </Text>
-
-          <Text className="text-xl text-secondary-600 font-rubik-semibold">
-            Ksh. {(car?.price / 1440).toFixed(2)}/minute
-          </Text>
+          {/* Price text overlay at the bottom of the image */}
+          <View className="absolute bottom-0 w-full flex justify-center items-center z-50">
+            <Text className="text-2xl text-secondary-100 font-rubik-extrabold">
+              Ksh. {car?.price}/day
+            </Text>
+            <Text className="text-xl text-secondary-600 font-rubik-semibold">
+              Ksh. {(car?.price / 1440).toFixed(2)}/minute
+            </Text>
+          </View>
         </View>
 
         <View className="px-5 mt-7 flex gap-2 h-full">
-          <View className="items-center px-4 py-2 bg-gray-100 rounded-full inline">
-            <Text className="text-sm font-rubik-bold text-secondary-100">
+          <View className="items-center ">
+            <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
               {car?.brand.brandName}
             </Text>
           </View>
@@ -170,7 +174,7 @@ const CarDetails = () => {
             <Text className="text-black-300 text-xl font-rubik-bold">
               Overview
             </Text>
-            <Text className="text-black-200 text-base font-rubik mt-2">
+            <Text className="text-secondary-600 text-base font-rubik mt-2">
               {car?.description}
             </Text>
           </View>

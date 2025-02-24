@@ -42,11 +42,10 @@ const RideLayout = ({
 
         <BottomSheet
           ref={bottomSheetRef}
-          snapPoints={snapPoints || ["45%", "85%"]}
+          snapPoints={snapPoints || ["25%", "45%", "85%"]}
           index={0}
         >
           <BottomSheetScrollView
-            // keyboardShouldPersistTaps={"handled"}
             style={{
               flex: 1,
               padding: 20,

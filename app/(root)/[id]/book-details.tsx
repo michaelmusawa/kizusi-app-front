@@ -20,6 +20,7 @@ import { useLocationStore } from "@/store";
 import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
+import { LinearGradient } from "expo-linear-gradient";
 
 const BookDetails = () => {
   const { user } = useUser();
@@ -169,25 +170,29 @@ const BookDetails = () => {
       >
         <View
           className="relative w-full flex justify-center items-center"
-          style={{ height: windowHeight / 4 }}
+          style={{ height: windowHeight / 3 }}
         >
           <Image
-            source={{
-              uri: car?.image,
-            }}
+            source={{ uri: car?.image }}
             className="size-full"
             resizeMode="cover"
           />
-          <Image
-            source={images.whiteGradient}
-            className="absolute top-0 w-full z-40"
+
+          {/* Bottom Linear Gradient overlay */}
+          <LinearGradient
+            colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
+            style={{
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              height: 80,
+            }}
           />
 
           <View
             className="z-50 absolute inset-x-7"
-            style={{
-              top: Platform.OS === "ios" ? 70 : 20,
-            }}
+            style={{ top: Platform.OS === "ios" ? 70 : 20 }}
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
@@ -196,7 +201,6 @@ const BookDetails = () => {
               >
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
-
               <View className="flex flex-row items-center gap-3">
                 <Image
                   source={icons.favorite}
@@ -209,8 +213,8 @@ const BookDetails = () => {
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <View className="items-center px-4 py-2 bg-gray-100 rounded-full inline">
-            <Text className="text-sm font-rubik-bold text-secondary-100">
+          <View className="items-start">
+            <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full">
               {car?.brand.brandName}
             </Text>
           </View>
@@ -280,7 +284,7 @@ const BookDetails = () => {
                   className="w-1/3 h-32 rounded-lg border"
                 />
 
-                <View className="flex-1 ml-4">
+                <View className="flex-1 mx-4">
                   <View className="flex-row items-center mb-2">
                     <Image source={icons.point} className="h-5 w-5" />
                     <Text className="ml-2 font-semibold">
@@ -298,16 +302,15 @@ const BookDetails = () => {
 
                   {/* Date and book type */}
                   <View className="flex flex-row items-center justify-between mt-2 w-full">
-                    <Text className="text-base font-rubik-bold text-secondary-100">
-                      Date: {new Date(date).toLocaleDateString()},{" "}
-                      {new Date(date).toLocaleTimeString()}
-                    </Text>
-
                     <View className="flex flex-row items-center justify-between mt-2">
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        {bookType}
+                        {bookType === "full_day" ? "Full day" : "Transfer"}
                       </Text>
                     </View>
+                    <Text className="text-base font-rubik-bold text-secondary-100">
+                      {new Date(date).toLocaleDateString()},{" "}
+                      {new Date(date).toLocaleTimeString()}
+                    </Text>
                   </View>
                 </View>
               </View>
@@ -333,7 +336,7 @@ const BookDetails = () => {
                     <View
                       className={`size-14 rounded-full flex items-center justify-center ${
                         userAddons?.includes(addon.addonName)
-                          ? "border bg-primary-100"
+                          ? "border border-gray-300 bg-primary-100"
                           : "bg-primary-100/50"
                       }`}
                     >
@@ -440,7 +443,7 @@ const BookDetails = () => {
         </View>
       </ScrollView>
 
-      <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 py-4 px-7">
+      <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
         <View className="flex flex-row items-center justify-between gap-10">
           <View className="flex flex-col items-start">
             <Text className="text-black-200 text-xs font-rubik-medium">

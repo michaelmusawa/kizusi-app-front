@@ -5,13 +5,24 @@ import { icons, images } from "@/constants";
 import { useSignIn } from "@clerk/clerk-expo";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useCallback, useState } from "react";
-import { Alert, Image, ScrollView, Text, View } from "react-native";
+import {
+  Alert,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 const SignIn = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
 
-  console.log("the id", id);
   const { signIn, setActive, isLoaded } = useSignIn();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const [form, setForm] = useState({
     email: "",
@@ -66,15 +77,24 @@ const SignIn = () => {
             onChangeText={(value) => setForm({ ...form, email: value })}
           />
 
-          <InputField
-            label="Password"
-            placeholder="Enter password"
-            icon={icons.lock}
-            secureTextEntry={true}
-            textContentType="password"
-            value={form.password}
-            onChangeText={(value) => setForm({ ...form, password: value })}
-          />
+          <View className="relative">
+            <InputField
+              label="Password"
+              placeholder="Enter password"
+              icon={icons.lock}
+              secureTextEntry={showPassword ? false : true}
+              textContentType="password"
+              value={form.password}
+              onChangeText={(value) => setForm({ ...form, password: value })}
+            />
+
+            <TouchableOpacity
+              className="absolute right-4 top-14 pt-2 cursor-pointer"
+              onPress={togglePassword}
+            >
+              <Text>{showPassword ? "👁️" : "🙈"}</Text>
+            </TouchableOpacity>
+          </View>
 
           <CustomButton
             title="Sign In"

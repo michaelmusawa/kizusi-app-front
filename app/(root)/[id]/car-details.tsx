@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { carImages, icons, images } from "@/constants";
+import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
 import { useEffect, useState } from "react";
@@ -23,18 +23,18 @@ const CarDetails = () => {
 
   const { userAddons, setUserAddons } = useLocationStore();
 
-  const [addons, setAddons] = useState([]);
+  const [addons, setAddons] = useState<string[]>([]);
   const [addonsAmount, setAddonsAmount] = useState(0);
 
   const {
     data: response,
     loading: carLoading,
     error: carError,
-  } = useFetch<Car>(`/(api)/car/${id}`, {
+  } = useFetch<{ data: Car }>(`/(api)/car/${id}`, {
     method: "GET",
   });
 
-  const car = response?.data;
+  const car = response?.data || null;
 
   const handleAddonPress = (addonLabel: string) => {
     setAddons((prev) => {
@@ -45,24 +45,25 @@ const CarDetails = () => {
       setUserAddons(updatedAddons);
       return updatedAddons;
     });
-
-    // Calculate the total amount based on the selected addons
   };
 
   useEffect(() => {
-    if (userAddons?.length > 0 && car?.addons.length > 0) {
+    if (!(userAddons && car?.addons)) {
+      return;
+    }
+    if (userAddons?.length > 0 && car?.addons?.length > 0) {
       setAddonsAmount(() => {
-        const totalAmount = car.addons.reduce((total, addon) => {
+        const totalAmount = car?.addons.reduce((total, addon) => {
           if (userAddons.includes(addon.addonName)) {
-            return total + parseFloat(addon.addonValue); // Add the addon amount to the total if matched
+            return total + parseFloat(addon.addonValue);
           }
-          return total; // Return the previous total if no match
-        }, 0); // Start from a total of 0
+          return total;
+        }, 0);
 
         return totalAmount;
       });
     }
-  }, [userAddons]);
+  }, [car?.addons, userAddons]);
 
   if (carLoading) {
     return <Text className="text-center mt-4">Loading...</Text>;
@@ -127,7 +128,7 @@ const CarDetails = () => {
               Ksh. {car?.price}/day
             </Text>
             <Text className="text-xl text-secondary-600 font-rubik-semibold">
-              Ksh. {(car?.price / 1440).toFixed(2)}/minute
+              Ksh. {((car?.price ?? 0) / 1440).toFixed(2)}/minute
             </Text>
           </View>
         </View>
@@ -152,7 +153,9 @@ const CarDetails = () => {
           <View className="flex flex-row flex-wrap items-center mt-2 border-y border-gray-300 py-4">
             {car?.features?.map((feature, index) => {
               const icon =
-                featureIcons[feature.featureName.toLowerCase()] || icons.star; // Fallback to a default icon
+                featureIcons[
+                  feature.featureName.toLowerCase() as keyof typeof featureIcons
+                ] || icons.star;
 
               return (
                 <View
@@ -186,7 +189,9 @@ const CarDetails = () => {
 
             <View className="flex-row mt-4">
               {car?.addons?.map((addon, index) => {
-                const icon = addonIcons[addon.addonName] || "❓";
+                const icon =
+                  addonIcons[addon.addonName as keyof typeof addonIcons] ||
+                  "❓";
 
                 return (
                   <TouchableOpacity

@@ -60,7 +60,7 @@ const HistoryDetails = () => {
     method: "GET",
   });
 
-  const car = carResponse?.data;
+  const car = carResponse?.data || null;
 
   const {
     data: userResponse,
@@ -70,7 +70,7 @@ const HistoryDetails = () => {
     method: "GET",
   });
 
-  const returnedUser = userResponse?.data;
+  const returnedUser = userResponse?.data || null;
 
   if (loading) {
     return <Text className="text-center mt-4">Loading...</Text>;
@@ -166,7 +166,7 @@ const HistoryDetails = () => {
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.push("/(root)/(tabs)/history")}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
                 <Image source={icons.backArrow} className="size-5" />

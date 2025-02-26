@@ -63,11 +63,11 @@ const Profile = () => {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
     method: "GET",
   });
 
-  const returnedUser = response?.data;
+  const returnedUser = response?.data || null;
 
   if (!user) {
     return <NoUserPage text={"Please login to view your profile"} />;

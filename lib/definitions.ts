@@ -2,11 +2,11 @@ export type Car = {
   id: string;
   name: string;
   brand: Brand;
-  category: { categoryId: string; categoryName: string; categoryPrice: number };
+  category: { categoryId: string; name: string; categoryPrice: number };
   price: number;
   image: string;
   description: string;
-  addons: { addonId: string; addonName: string }[];
+  addons: { addonId: string; addonName: string; addonValue: string }[];
   features: { featureName: string; featureValue: string }[];
 };
 
@@ -29,6 +29,7 @@ export type User = {
   name: string;
   email: string;
   phone: string;
+  image: string;
 };
 
 export type Booking = {

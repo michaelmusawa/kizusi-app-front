@@ -9,6 +9,7 @@ import { DateTimePickerComponent } from "@/components/DateTimePicker";
 import { Picker } from "@react-native-picker/picker";
 import { calculateTimes } from "@/lib/map";
 import { useFetch } from "@/lib/fetch";
+import { Car } from "@/lib/definitions";
 
 export default function AddDirections() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -22,7 +23,6 @@ export default function AddDirections() {
     departureAddress,
     bookType,
     rideDetails,
-    userAddress,
     setDestinationLocation,
     setDepartureLocation,
     setBookType,
@@ -35,7 +35,10 @@ export default function AddDirections() {
   const [localDestinationAddress, setLocalDestinationAddress] =
     useState(destinationAddress);
   const [localBookType, setLocalBookType] = useState(bookType);
-  const [localRideDetails, setLocalRideDetails] = useState({
+  const [localRideDetails, setLocalRideDetails] = useState<{
+    time: number | null;
+    price: number | null;
+  }>({
     time: 0,
     price: 0,
   });
@@ -82,6 +85,7 @@ export default function AddDirections() {
           console.error("Error fetching ride details:", error);
         });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     departureLatitude,
     departureLongitude,
@@ -93,19 +97,18 @@ export default function AddDirections() {
     data: response,
     loading: carLoading,
     error: carError,
-  } = useFetch<Car>(`/(api)/car/${id}`, {
+  } = useFetch<{ data: Car }>(`/(api)/car/${id ?? ""}`, {
     method: "GET",
   });
 
   const car = response?.data;
 
   const handleProceedToBook = () => {
-    console.log("book type", localBookType);
     if (localBookType === null) {
       setError("Select book type");
       return;
     }
-    // 1. Ensure the date is selected and not in the past
+
     if (!date || new Date(date).toString() === "Invalid Date") {
       setError("Please select a valid date.");
       return;
@@ -116,7 +119,6 @@ export default function AddDirections() {
       return;
     }
 
-    // 2. Ensure departure location is set when `bookType` is "full_day"
     if (
       localBookType === "full_day" &&
       (departureLatitude === null || departureLongitude === null)
@@ -126,7 +128,6 @@ export default function AddDirections() {
       return;
     }
 
-    // 3. Ensure both departure and destination locations are set when `bookType` is "transfer"
     if (
       localBookType === "transfer" &&
       (departureLatitude === null ||
@@ -138,9 +139,8 @@ export default function AddDirections() {
       return;
     }
 
-    // If no errors, proceed with navigation
-    setError(null); // Clear any existing error
-    router.push(`/${id}/book-details`); // Navigate to the next page
+    setError(null);
+    router.push(`/${id}/book-details`);
   };
 
   const SelectComponent = () => {
@@ -151,7 +151,7 @@ export default function AddDirections() {
           <Picker
             selectedValue={localBookType}
             onValueChange={(itemValue, index) =>
-              setBookType({ bookType: itemValue })
+              setBookType({ bookType: itemValue || "" })
             }
             style={{ width: 140, height: 46 }}
           >
@@ -224,7 +224,14 @@ export default function AddDirections() {
               Price
             </Text>
 
-            {carLoading ? (
+            {carError ? (
+              <Text
+                numberOfLines={1}
+                className="text-red-500 text-start text-2xl font-rubik-bold"
+              >
+                Loading...
+              </Text>
+            ) : carLoading ? (
               <Text
                 numberOfLines={1}
                 className="text-secondary-100 text-start text-2xl font-rubik-bold"
@@ -236,7 +243,11 @@ export default function AddDirections() {
                 numberOfLines={1}
                 className="text-secondary-100 text-start text-2xl font-rubik-bold"
               >
-                ${((car?.price / 1440) * rideDetails.time).toFixed(2)}
+                $
+                {((car?.price ?? 0 / 1440) * (rideDetails?.time ?? 0)).toFixed(
+                  // eslint-disable-next-line prettier/prettier
+                  2
+                )}
               </Text>
             ) : (
               <Text

@@ -108,9 +108,9 @@ export const calculateTimes = async ({
       return;
     }
 
-    const timeToDestination = data.routes[0].legs[0].duration.value; // Time in seconds
-    const totalTime = timeToDestination / 60; // Convert to minutes
-    const price = (totalTime * 0.5).toFixed(2); // Calculate price based on time
+    const timeToDestination = data.routes[0].legs[0].duration.value;
+    const totalTime = timeToDestination / 60;
+    const price = totalTime * 0.5;
 
     return { time: totalTime, price };
   } catch (error) {

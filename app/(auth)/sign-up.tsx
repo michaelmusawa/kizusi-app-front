@@ -3,10 +3,18 @@ import InputField from "@/components/InputField";
 import OAuth from "@/components/OAuth";
 import { icons, images } from "@/constants";
 import { fetchAPI } from "@/lib/fetch";
+import { validatePassword } from "@/lib/utils";
 import { useSignUp } from "@clerk/clerk-expo";
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
-import { Text, ScrollView, View, Image, Alert } from "react-native";
+import {
+  Text,
+  ScrollView,
+  View,
+  Image,
+  Alert,
+  TouchableOpacity,
+} from "react-native";
 import { ReactNativeModal } from "react-native-modal";
 
 export default function SignUp() {
@@ -14,6 +22,14 @@ export default function SignUp() {
 
   const { isLoaded, signUp, setActive } = useSignUp();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [errors, setErrors] = useState({
+    password: "",
+  });
+
+  const togglePassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const [form, setForm] = useState({
     name: "",
@@ -30,6 +46,12 @@ export default function SignUp() {
   const onSignUpPress = async () => {
     if (!isLoaded) {
       return;
+    }
+
+    const passwordError = validatePassword(form.password);
+    if (passwordError) {
+      setErrors({ ...errors, password: passwordError });
+      return; // Stop submission if password is invalid
     }
 
     try {
@@ -109,15 +131,36 @@ export default function SignUp() {
             value={form.email}
             onChangeText={(value) => setForm({ ...form, email: value })}
           />
-          <InputField
-            label="Password"
-            placeholder="Enter password"
-            icon={icons.lock}
-            secureTextEntry={true}
-            textContentType="password"
-            value={form.password}
-            onChangeText={(value) => setForm({ ...form, password: value })}
-          />
+          <View className="relative">
+            <InputField
+              label="Password"
+              placeholder="Enter password"
+              icon={icons.lock}
+              secureTextEntry={!showPassword}
+              textContentType="password"
+              value={form.password}
+              onChangeText={(value) => {
+                setForm({ ...form, password: value });
+
+                const errorMessage = validatePassword(value);
+                setErrors({ ...errors, password: errorMessage });
+              }}
+            />
+
+            <TouchableOpacity
+              className="absolute right-4 top-14 pt-2 cursor-pointer"
+              onPress={togglePassword}
+            >
+              <Text>{showPassword ? "👁️" : "🙈"}</Text>
+            </TouchableOpacity>
+
+            {errors.password ? (
+              <Text className="text-red-500 text-sm mt-1">
+                {errors.password}
+              </Text>
+            ) : null}
+          </View>
+
           <CustomButton
             title="Sign Up"
             onPress={onSignUpPress}

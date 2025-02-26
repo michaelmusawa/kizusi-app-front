@@ -27,3 +27,29 @@ export function formatDate(dateString: string): string {
   // Return the formatted date and time
   return `${day < 10 ? "0" + day : day} ${month} ${year}, ${formattedTime}`;
 }
+
+export const validatePassword = (password: string) => {
+  const minLength = /.{6,}/; // At least 6 characters
+  const upperCase = /[A-Z]/; // At least one uppercase letter
+  const lowerCase = /[a-z]/; // At least one lowercase letter
+  const number = /[0-9]/; // At least one number
+  const specialChar = /[!@#$%^&*]/; // At least one special character
+
+  if (!minLength.test(password)) {
+    return "Password must be at least 6 characters long.";
+  }
+  if (!upperCase.test(password)) {
+    return "Password must include at least one uppercase letter.";
+  }
+  if (!lowerCase.test(password)) {
+    return "Password must include at least one lowercase letter.";
+  }
+  if (!number.test(password)) {
+    return "Password must include at least one number.";
+  }
+  if (!specialChar.test(password)) {
+    return "Password must include at least one special character.";
+  }
+
+  return "";
+};

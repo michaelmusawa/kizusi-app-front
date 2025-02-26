@@ -49,7 +49,7 @@ const BookDetails = () => {
     data: carResponse,
     loading: carLoading,
     error: carError,
-  } = useFetch<Car>(`/(api)/car/${id}`, {
+  } = useFetch<{ data: Car }>(`/(api)/car/${id || ""}`, {
     method: "GET",
   });
 
@@ -59,11 +59,11 @@ const BookDetails = () => {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
+  } = useFetch<{ data: User | null }>(`/(api)/user/${user?.id || ""}`, {
     method: "GET",
   });
 
-  const returnedUser = response?.data;
+  const returnedUser = response?.data || null;
 
   const windowHeight = Dimensions.get("window").height;
 
@@ -80,7 +80,10 @@ const BookDetails = () => {
   };
 
   const calculateAddonsAmount = () => {
-    if (userAddons?.length > 0 && car?.addons.length > 0) {
+    if (!(userAddons && car?.addons)) {
+      return;
+    }
+    if (userAddons?.length > 0 && car?.addons?.length > 0) {
       const totalAmount = car.addons.reduce((total, addon) => {
         if (userAddons.includes(addon.addonName)) {
           return total + parseFloat(addon.addonValue);
@@ -105,11 +108,11 @@ const BookDetails = () => {
 
   useEffect(() => {
     if (paymentType === "full") {
-      setPaymentAmount(rideAmount + addonsAmount);
+      setPaymentAmount(rideAmount + (addonsAmount || 0));
     } else if (paymentType === "reserve") {
-      setPaymentAmount((rideAmount + addonsAmount) / 2);
+      setPaymentAmount((rideAmount + (addonsAmount || 0)) / 2);
     }
-  }, [rideAmount, paymentType]);
+  }, [rideAmount, paymentType, addonsAmount]);
 
   const handlePayment = async () => {
     if (!isAgreed) {

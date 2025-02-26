@@ -70,7 +70,7 @@ const Home = () => {
     data: categoriesResponse,
     loading: categoriesLoading,
     error: categoriesError,
-  } = useFetch<{ data: Category[] }>("/(api)/category", {
+  } = useFetch<{ data: { categories: Category[] } }>("/(api)/category", {
     method: "GET",
   });
 
@@ -126,13 +126,16 @@ const Home = () => {
     }
   };
 
-  let brandNames;
+  let brandNames: string[] = [];
 
   if (categories) {
     brandNames = [
       ...new Set(
-        categories.flatMap((category) =>
-          category.brands.map((brand) => brand.brandName)
+        categories.flatMap(
+          (category) =>
+            // eslint-disable-next-line prettier/prettier
+            category.brands.map((brand) => brand.brandName)
+          // eslint-disable-next-line prettier/prettier
         )
       ),
     ];
@@ -142,11 +145,11 @@ const Home = () => {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+  } = useFetch<{ data: User | null }>(`/(api)/user/${user?.id ?? ""}`, {
     method: "GET",
   });
 
-  const returnedUser = response?.data;
+  const returnedUser = response?.data ?? null;
 
   return (
     <SafeAreaView className="h-full bg-white">
@@ -173,19 +176,23 @@ const Home = () => {
               <View className="flex flex-row justify-between w-full">
                 <View className="flex flex-row">
                   <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
-                    <Image
-                      source={
-                        user
-                          ? {
-                              uri:
-                                returnedUser?.image ??
-                                user?.externalAccounts?.[0]?.imageUrl ??
-                                user?.imageUrl,
-                            }
-                          : icons.person
-                      }
-                      className="size-8 rounded-full"
-                    />
+                    {userLoading ? (
+                      <Text className="text-xs">Loading..</Text>
+                    ) : (
+                      <Image
+                        source={
+                          user
+                            ? {
+                                uri:
+                                  returnedUser?.image ??
+                                  user?.externalAccounts?.[0]?.imageUrl ??
+                                  user?.imageUrl,
+                              }
+                            : icons.person
+                        }
+                        className="size-8 rounded-full"
+                      />
+                    )}
                   </View>
 
                   <View className="flex flex-col items-start ml-2 justify-center">
@@ -195,7 +202,9 @@ const Home = () => {
                         : "Good Evening,"}
                     </Text>
                     <Text className="text-base font-rubik-medium text-black-300">
-                      {returnedUser?.name ?? user?.fullName ?? "Welcome"}
+                      {user
+                        ? (returnedUser?.name ?? user?.fullName)
+                        : "Welcome"}
                     </Text>
                   </View>
                 </View>

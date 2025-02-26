@@ -11,6 +11,8 @@ export async function GET(request: Request, { id }: Record<string, string>) {
 
     const user = response.data;
 
+    console.log("The user data response", response.data);
+
     return new Response(JSON.stringify({ data: user }), {
       headers: { "Content-Type": "application/json" },
     });

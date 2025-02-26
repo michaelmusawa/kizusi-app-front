@@ -2,8 +2,25 @@ import { useState, useEffect, useCallback } from "react";
 import { Linking } from "react-native";
 
 type PaymentData = {
-  amount: string;
-  currency: string;
+  amount: number;
+  first_name: string | undefined | null;
+  last_name: string | undefined | null;
+  email: string | undefined | null;
+  phoneNumber: string | undefined | null | any;
+  image: string | undefined | null;
+  carId: number;
+  reference: string;
+  userId: string | undefined | null;
+  bookingDate: string;
+  departureLatitude: string | undefined | null;
+  departureLongitude: string | undefined | null;
+  destinationLatitude: string;
+  destinationLongitude: string;
+  departure: string;
+  destination: string;
+  bookType: string;
+  paymentType: string;
+  addons: string;
   description: string;
   callbackUrl: string;
   [key: string]: any; // Allow additional optional fields if needed

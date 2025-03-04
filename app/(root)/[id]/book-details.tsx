@@ -205,33 +205,30 @@ const BookDetails = () => {
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
               <View className="flex flex-row items-center gap-3">
-                <Image
-                  source={icons.favorite}
-                  className="size-7"
-                  tintColor={"#191D31"}
-                />
+                <View className="items-center ">
+                  <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
+                    {car?.brand.brandName}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Price text overlay at the bottom of the image */}
+          <View className="absolute -bottom-6 w-full flex justify-center items-center z-50">
+            <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
+
+            <View className="flex flex-row items-center gap-3">
+              <View className="flex flex-row items-center gap-2">
+                <Text className="text-black-200 mt-1 font-rubik-medium">
+                  ({car?.category.name})
+                </Text>
               </View>
             </View>
           </View>
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <View className="items-start">
-            <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full">
-              {car?.brand.brandName}
-            </Text>
-          </View>
-
-          <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
-
-          <View className="flex flex-row items-center gap-3">
-            <View className="flex flex-row items-center gap-2">
-              <Text className="text-black-200 mt-1 font-rubik-medium">
-                ({car?.category.name})
-              </Text>
-            </View>
-          </View>
-
           {user && (
             <View className="w-full mt-4">
               <Text className="text-black-300 text-xl font-rubik-bold">

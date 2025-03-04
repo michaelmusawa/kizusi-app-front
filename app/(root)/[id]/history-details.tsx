@@ -166,39 +166,36 @@ const HistoryDetails = () => {
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
-                onPress={() => router.push("/(root)/(tabs)/history")}
+                onPress={() => router.back()}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
               <View className="flex flex-row items-center gap-3">
-                <Image
-                  source={icons.favorite}
-                  className="size-7"
-                  tintColor={"#191D31"}
-                />
+                <View className="items-center ">
+                  <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
+                    {car?.brand.brandName}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Price text overlay at the bottom of the image */}
+          <View className="absolute -bottom-6 w-full flex justify-center items-center z-50">
+            <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
+
+            <View className="flex flex-row items-center gap-3">
+              <View className="flex flex-row items-center gap-2">
+                <Text className="text-black-200 mt-1 font-rubik-medium">
+                  ({car?.category.name})
+                </Text>
               </View>
             </View>
           </View>
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          <View className="items-start">
-            <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full">
-              {car?.brand.brandName}
-            </Text>
-          </View>
-
-          <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
-
-          <View className="flex flex-row items-center gap-3">
-            <View className="flex flex-row items-center gap-2">
-              <Text className="text-black-200 mt-1 font-rubik-medium">
-                ({car?.category.name})
-              </Text>
-            </View>
-          </View>
-
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
               Directions

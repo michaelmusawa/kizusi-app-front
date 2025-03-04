@@ -43,6 +43,7 @@ export default function AddDirections() {
     price: 0,
   });
   const [error, setError] = useState<string | null>(null);
+  const [viewOptions, setViewOptions] = useState<boolean>(false);
 
   // Sync local state with store updates
   useEffect(() => {
@@ -147,8 +148,47 @@ export default function AddDirections() {
     return (
       <View className="flex-1">
         <Text className="text-lg mb-2">Select book type:</Text>
-        <View className="border border-gray-300 rounded-md">
-          <Picker
+        <View
+          className={` rounded-md gap-2 ${viewOptions ? "" : "border border-gray-300"}`}
+        >
+          {viewOptions ? (
+            <>
+              <TouchableOpacity
+                onPress={() => {
+                  setViewOptions(false);
+                  setBookType({ bookType: "full_day" });
+                }}
+                className="p-2 border border-gray-300 rounded-md"
+              >
+                <Text>Full day</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setViewOptions(false);
+                  setBookType({ bookType: "transfer" });
+                }}
+                className="p-2 border border-gray-300 rounded-md"
+              >
+                <Text>Transfer</Text>
+              </TouchableOpacity>
+            </>
+          ) : bookType ? (
+            <TouchableOpacity
+              onPress={() => setViewOptions(true)}
+              className="p-2"
+            >
+              <Text>{bookType === "transfer" ? "Transfer" : "Full day"}</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              onPress={() => setViewOptions(true)}
+              className="p-2"
+            >
+              <Text>Select</Text>
+            </TouchableOpacity>
+          )}
+
+          {/* <Picker
             selectedValue={localBookType}
             onValueChange={(itemValue, index) =>
               setBookType({ bookType: itemValue || "" })
@@ -158,7 +198,7 @@ export default function AddDirections() {
             <Picker.Item label="Select book type" value={null} />
             <Picker.Item label="Full Day" value="full_day" />
             <Picker.Item label="Transfer" value="transfer" />
-          </Picker>
+          </Picker> */}
         </View>
       </View>
     );

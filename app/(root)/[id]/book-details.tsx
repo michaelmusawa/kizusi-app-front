@@ -101,9 +101,11 @@ const BookDetails = () => {
   const addonsAmount = calculateAddonsAmount();
 
   if (bookType === "full_day") {
-    rideAmount = car?.price || 0;
+    rideAmount = Number((Number(car?.price) || 0).toFixed(2));
   } else if (rideDetails?.time && car?.price) {
-    rideAmount = (rideDetails.time * car?.price) / 1440;
+    rideAmount = Number(
+      ((rideDetails.time * Number(car?.price)) / 1440).toFixed(2)
+    );
   }
 
   useEffect(() => {
@@ -301,13 +303,17 @@ const BookDetails = () => {
                   )}
 
                   {/* Date and book type */}
-                  <View className="flex flex-row items-center justify-between mt-2 w-full">
-                    <View className="flex flex-row items-center justify-between mt-2">
+                  <View className="flex items-start justify-between w-full gap-1">
+                    <View className="flex flex-row items-center justify-between">
                       <Text className="text-base font-rubik-bold text-secondary-100">
+                        <Image source={icons.list} className="h-5 w-5" />
+                        {"   "}
                         {bookType === "full_day" ? "Full day" : "Transfer"}
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
+                      <Image source={icons.calender} className="h-5 w-5" />
+                      {"   "}
                       {new Date(date).toLocaleDateString()},{" "}
                       {new Date(date).toLocaleTimeString()}
                     </Text>
@@ -429,11 +435,7 @@ const BookDetails = () => {
               Terms & conditions
             </Text>
 
-            <Checkbox
-              label="I consent to the terms and conditions associated with use of this application and payment procedures"
-              checked={isAgreed}
-              onChange={handleCheckboxChange}
-            />
+            <Checkbox checked={isAgreed} onChange={handleCheckboxChange} />
             {error && (
               <Text className="text-red-500 text-base font-rubik-semiBold">
                 {error}
@@ -447,13 +449,13 @@ const BookDetails = () => {
         <View className="flex flex-row items-center justify-between gap-10">
           <View className="flex flex-col items-start">
             <Text className="text-black-200 text-xs font-rubik-medium">
-              Price
+              Total price
             </Text>
             <Text
               numberOfLines={1}
               className="text-secondary-100 text-start text-2xl font-rubik-bold"
             >
-              ${paymentAmount}
+              Ksh.{paymentAmount}
             </Text>
           </View>
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { Modal, Text, TouchableOpacity, View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import GoogleTextInput from "@/components/GoogleTextInput";
 import RideLayout from "@/components/RideLayout";
@@ -146,67 +146,59 @@ export default function AddDirections() {
 
   const SelectComponent = () => {
     return (
-      <View className="flex-1">
+      <View className="flex-1 p-4">
         <Text className="text-lg mb-2">Select book type:</Text>
-        <View
-          className={` rounded-md gap-2 ${viewOptions ? "" : "border border-gray-300"}`}
+        <TouchableOpacity
+          onPress={() => setViewOptions(true)}
+          className="p-2 border border-gray-300 rounded-md"
         >
-          {viewOptions ? (
-            <>
+          <Text>
+            {bookType
+              ? bookType === "transfer"
+                ? "Transfer"
+                : "Full day"
+              : "Select"}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Modal Popup */}
+        <Modal
+          visible={viewOptions}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => {}}
+        >
+          <View className="flex-1 justify-center items-center bg-gray-800/60">
+            <View className="bg-white p-6 rounded-md shadow-lg">
+              <Text className="text-lg mb-4">Select book type:</Text>
               <TouchableOpacity
                 onPress={() => {
-                  setViewOptions(false);
                   setBookType({ bookType: "full_day" });
+                  setViewOptions(false);
                 }}
-                className="p-2 border border-gray-300 rounded-md"
+                className="p-2 border border-gray-300 rounded-md mb-2"
               >
                 <Text>Full day</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => {
-                  setViewOptions(false);
                   setBookType({ bookType: "transfer" });
+                  setViewOptions(false);
                 }}
                 className="p-2 border border-gray-300 rounded-md"
               >
                 <Text>Transfer</Text>
               </TouchableOpacity>
-            </>
-          ) : bookType ? (
-            <TouchableOpacity
-              onPress={() => setViewOptions(true)}
-              className="p-2"
-            >
-              <Text>{bookType === "transfer" ? "Transfer" : "Full day"}</Text>
-            </TouchableOpacity>
-          ) : (
-            <TouchableOpacity
-              onPress={() => setViewOptions(true)}
-              className="p-2"
-            >
-              <Text>Select</Text>
-            </TouchableOpacity>
-          )}
-
-          {/* <Picker
-            selectedValue={localBookType}
-            onValueChange={(itemValue, index) =>
-              setBookType({ bookType: itemValue || "" })
-            }
-            style={{ width: 140, height: 46 }}
-          >
-            <Picker.Item label="Select book type" value={null} />
-            <Picker.Item label="Full Day" value="full_day" />
-            <Picker.Item label="Transfer" value="transfer" />
-          </Picker> */}
-        </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   };
 
   return (
     <>
-      <RideLayout title="Car details" snapPoints={["45%", "85%"]}>
+      <RideLayout title="Car details" snapPoints={["50%", "85%"]}>
         {error && <Text className="text-red-500 text-center">{error}</Text>}
         <View className="flex flex-row">
           <View className="flex-1">
@@ -283,8 +275,11 @@ export default function AddDirections() {
                 numberOfLines={1}
                 className="text-secondary-100 text-start text-2xl font-rubik-bold"
               >
-                $
-                {((car?.price ?? 0 / 1440) * (rideDetails?.time ?? 0)).toFixed(
+                Ksh.
+                {(
+                  ((car?.price ?? 0) / 1440) *
+                  (rideDetails?.time ?? 0)
+                ).toFixed(
                   // eslint-disable-next-line prettier/prettier
                   2
                 )}
@@ -294,7 +289,7 @@ export default function AddDirections() {
                 numberOfLines={1}
                 className="text-secondary-100 text-start text-2xl font-rubik-bold"
               >
-                ${car?.price}
+                Ksh.{car?.price}
               </Text>
             )}
           </View>

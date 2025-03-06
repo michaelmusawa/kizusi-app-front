@@ -7,6 +7,7 @@ import {
   View,
   Dimensions,
   Platform,
+  Modal,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import {
@@ -33,6 +34,7 @@ const HistoryDetails = () => {
     callback?: string;
     completePayment?: string;
   }>();
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [cancelBooking, setCancelBooking] = useState(false);
@@ -131,6 +133,15 @@ const HistoryDetails = () => {
       console.error("Payment initiation failed:", error);
     }
   };
+  // Open the confirmation modal
+  const openConfirmationModal = () => {
+    setShowConfirmationModal(true);
+  };
+
+  // Close the confirmation modal without cancelling
+  const closeConfirmationModal = () => {
+    setShowConfirmationModal(false);
+  };
 
   return (
     <View className="h-full">
@@ -166,7 +177,7 @@ const HistoryDetails = () => {
           >
             <View className="flex flex-row items-center w-full justify-between">
               <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => router.push("/(root)/(tabs)/history")}
                 className="flex flex-row bg-primary-200 rounded-full size-11 items-center justify-center"
               >
                 <Image source={icons.backArrow} className="size-5" />
@@ -228,16 +239,22 @@ const HistoryDetails = () => {
                   )}
 
                   {/* Date and book type */}
-                  <View className="flex flex-row items-center justify-between mt-2 w-full">
-                    <View className="flex flex-row items-center justify-between mt-2">
+                  <View className="flex items-start justify-between w-full gap-1">
+                    <View className="flex flex-row items-center justify-between">
                       <Text className="text-base font-rubik-bold text-secondary-100">
+                        <Image source={icons.list} className="h-5 w-5" />
+                        {"   "}
                         {booking?.bookType === "full_day"
                           ? "Full day"
                           : "Transfer"}
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
-                      {new Date(booking?.bookingDate).toLocaleDateString()},{" "}
+                      <Image source={icons.calender} className="h-5 w-5" />
+                      {"   "}
+                      {new Date(
+                        booking?.bookingDate
+                      ).toLocaleDateString()},{" "}
                       {new Date(booking?.bookingDate).toLocaleTimeString()}
                     </Text>
                   </View>
@@ -387,8 +404,20 @@ const HistoryDetails = () => {
       <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 py-4 px-7">
         <View className="flex flex-row items-center justify-between gap-10">
           <View className="flex flex-col items-center">
-            <Text className="text-green-600 text-xs font-rubik-medium text-center">
-              {booking?.paymentStatus} PAYMENT
+            <Text className="text-primary-100 text-xs font-rubik-medium text-center">
+              PAYMENT
+              {
+                <Text>
+                  {" "}
+                  {booking?.paymentStatus === "CONFIRMED" ? (
+                    <Text className="text-secondary-100">Success</Text>
+                  ) : booking?.paymentStatus === "PENDING" ? (
+                    <Text className="text-primary-100">Processing...</Text>
+                  ) : (
+                    <Text className="text-red-500">Failed</Text>
+                  )}
+                </Text>
+              }{" "}
             </Text>
             <Text
               numberOfLines={1}
@@ -400,8 +429,9 @@ const HistoryDetails = () => {
 
           <TouchableOpacity
             onPress={
-              booking?.bookingStatus !== "CANCELLED"
-                ? handleCancelBooking
+              booking?.bookingStatus !== "CANCELLED" &&
+              booking?.paymentStatus === "CONFIRMED"
+                ? openConfirmationModal
                 : () => {}
             }
             className={`flex-1 flex flex-row items-center justify-center py-2 rounded-full shadow-md shadow-zinc-400 ${booking?.bookingStatus !== "CANCELLED" ? "bg-secondary-100" : "bg-gray-100"}`}
@@ -409,9 +439,12 @@ const HistoryDetails = () => {
             <Text
               className={` text-lg text-center font-rubik-bold ${booking?.bookingStatus !== "CANCELLED" ? "text-white" : "text-red-500"}`}
             >
-              {booking?.bookingStatus !== "CANCELLED"
+              {booking?.bookingStatus !== "CANCELLED" &&
+              booking?.paymentStatus === "CONFIRMED"
                 ? "Cancel booking"
-                : "Booking cancelled"}
+                : booking?.paymentStatus === "PENDING"
+                  ? "Awaiting payment..."
+                  : "Booking cancelled"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -444,7 +477,7 @@ const HistoryDetails = () => {
                 : params.callback === "true"
                   ? "Your booking has been place successfully. You will be contacted soon by the admin."
                   : "You have completed your booking payment successfully."
-              : "Error occurred"}
+              : "Error occurred during processing of your booking. Go to profile -> Help to contact the admin for assistance"}
           </Text>
 
           <CustomButton
@@ -466,6 +499,17 @@ const HistoryDetails = () => {
             }}
             className="mt-5"
           />
+          {booking?.paymentStatus !== "CONFIRMED" && cancelBooking !== true && (
+            <CustomButton
+              title="Cancel"
+              onPress={() => {
+                setShowSuccessModal(false);
+
+                router.back();
+              }}
+              className="mt-5"
+            />
+          )}
         </View>
       </ReactNativeModal>
 
@@ -495,6 +539,37 @@ const HistoryDetails = () => {
             }}
             className="mt-5"
           />
+        </View>
+      </ReactNativeModal>
+      <ReactNativeModal
+        visible={showConfirmationModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={closeConfirmationModal}
+      >
+        <View className="flex-1 inset-0 top-0 left-0 justify-center items-center bg-gray-800/70">
+          <View className="bg-white p-6 rounded-lg w-80">
+            <Text className="text-xl mb-4 text-center">
+              Are you sure you want to cancel the booking?
+            </Text>
+            <View className="flex-row justify-between">
+              <TouchableOpacity
+                className="bg-red-500 p-3 rounded-lg w-24 items-center"
+                onPress={closeConfirmationModal}
+              >
+                <Text className="text-white font-bold">No</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="bg-green-500 p-3 rounded-lg w-24 items-center"
+                onPress={() => {
+                  handleCancelBooking();
+                  closeConfirmationModal();
+                }}
+              >
+                <Text className="text-white font-bold">Yes</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ReactNativeModal>
     </View>

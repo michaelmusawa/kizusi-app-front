@@ -40,6 +40,18 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
                   ? "Full payment"
                   : "Half payment"}
               </Text>
+              <Text>
+                {" "}
+                (
+                {booking.paymentStatus === "CONFIRMED" ? (
+                  <Text className="text-secondary-100">Success</Text>
+                ) : booking.paymentStatus === "PENDING" ? (
+                  <Text className="text-primary-100">Processing...</Text>
+                ) : (
+                  <Text className="text-red-500">Failed</Text>
+                )}
+                )
+              </Text>
             </Text>
             <Text className="text-gray-700">
               <Text className="font-bold">Amount: </Text>

@@ -26,8 +26,6 @@ const HistoryDisplay = ({ query, id }: { query: string; id: string }) => {
 
   const bookings = response?.data || [];
 
-  console.log("bookings:", bookings);
-
   // Refetch data with updated parameters when filter or query changes
   useEffect(() => {
     const fetchUrl = `/(api)/booking?${new URLSearchParams({

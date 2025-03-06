@@ -1,16 +1,12 @@
+import { router } from "expo-router";
 import { View, Text, TouchableOpacity } from "react-native";
 
 interface CheckboxProps {
-  label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
 }
 
-export const Checkbox: React.FC<CheckboxProps> = ({
-  label,
-  checked,
-  onChange,
-}) => (
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => (
   <TouchableOpacity
     onPress={() => onChange(!checked)}
     className="flex-row items-center my-3"
@@ -23,7 +19,15 @@ export const Checkbox: React.FC<CheckboxProps> = ({
       {checked && <View className="h-3 w-3 rounded-md bg-white" />}
     </View>
     <Text className="text-secondary-600 text-base font-rubik mt-2">
-      {label}
+      I consent to the
+      <Text
+        className="text-primary-100"
+        onPress={() => router.push("(root)/help")}
+      >
+        {" "}
+        terms and conditions{" "}
+      </Text>
+      associated with use of this application and payment procedures
     </Text>
   </TouchableOpacity>
 );

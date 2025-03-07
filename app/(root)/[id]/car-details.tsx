@@ -21,10 +21,7 @@ const CarDetails = () => {
 
   const windowHeight = Dimensions.get("window").height;
 
-  const { userAddons, setUserAddons } = useLocationStore();
-
   const [addons, setAddons] = useState<string[]>([]);
-  const [addonsAmount, setAddonsAmount] = useState(0);
 
   const {
     data: response,
@@ -35,35 +32,6 @@ const CarDetails = () => {
   });
 
   const car = response?.data || null;
-
-  const handleAddonPress = (addonLabel: string) => {
-    setAddons((prev) => {
-      const updatedAddons = prev.includes(addonLabel)
-        ? prev.filter((label) => label !== addonLabel)
-        : [...prev, addonLabel];
-
-      setUserAddons(updatedAddons);
-      return updatedAddons;
-    });
-  };
-
-  useEffect(() => {
-    if (!(userAddons && car?.addons)) {
-      return;
-    }
-    if (userAddons?.length > 0 && car?.addons?.length > 0) {
-      setAddonsAmount(() => {
-        const totalAmount = car?.addons.reduce((total, addon) => {
-          if (userAddons.includes(addon.addonName)) {
-            return total + parseFloat(addon.addonValue);
-          }
-          return total;
-        }, 0);
-
-        return totalAmount;
-      });
-    }
-  }, [car?.addons, userAddons]);
 
   if (carLoading) {
     return <Text className="text-center mt-4">Loading...</Text>;
@@ -177,7 +145,7 @@ const CarDetails = () => {
 
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
-              Select addons
+              Available addons
             </Text>
 
             <View className="flex-row mt-4">
@@ -187,8 +155,7 @@ const CarDetails = () => {
                   "❓";
 
                 return (
-                  <TouchableOpacity
-                    onPress={() => handleAddonPress(addon.addonName)}
+                  <View
                     key={index}
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
@@ -196,11 +163,7 @@ const CarDetails = () => {
                       +{addon.addonValue}
                     </Text>
                     <View
-                      className={`size-14 rounded-full flex items-center justify-center ${
-                        addons?.includes(addon.addonName)
-                          ? "border bg-primary-100"
-                          : "bg-primary-100/50"
-                      }`}
+                      className={`size-14 rounded-full flex items-center justify-center bg-primary-100`}
                     >
                       <Text className="text-lg">{icon}</Text>
                     </View>
@@ -212,15 +175,10 @@ const CarDetails = () => {
                     >
                       {addon.addonName}
                     </Text>
-                  </TouchableOpacity>
+                  </View>
                 );
               })}
             </View>
-            {addons.length > 0 && (
-              <Text className="text-secondary-100 text-sm text-center font-rubik mt-2">
-                Addons amount: +{addonsAmount}/=
-              </Text>
-            )}
           </View>
         </View>
       </ScrollView>

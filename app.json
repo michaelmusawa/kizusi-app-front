@@ -4,7 +4,7 @@
     "slug": "kizusi cab",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/splash.png",
+    "icon": "./assets/images/logo.png",
     "scheme": "kizusi.app",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

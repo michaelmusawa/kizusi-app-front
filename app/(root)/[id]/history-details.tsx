@@ -26,6 +26,8 @@ import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
+import { calculateCancellationDetails } from "@/lib/utils";
+import { HistoryMapWithMarkers, MapWithMarkers } from "@/components/Geoapify";
 
 const HistoryDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -44,6 +46,7 @@ const HistoryDetails = () => {
     if (params.callback === "true" || params.completePayment === "true") {
       setShowSuccessModal(true);
     }
+    setShowSuccessModal(false);
   }, [params]);
 
   const {
@@ -85,9 +88,12 @@ const HistoryDetails = () => {
 
   const windowHeight = Dimensions.get("window").height;
 
+  const { daysDiff, cancellationFee, refundAmount } =
+    calculateCancellationDetails(booking?.bookingDate, booking?.amount);
+
   const handleCancelBooking = async () => {
     const cancelBookingData = {
-      amount: booking?.amount,
+      amount: refundAmount,
       remarks: "Cancel booking",
       first_name: user?.firstName,
       last_name: user?.lastName,
@@ -182,6 +188,7 @@ const HistoryDetails = () => {
               >
                 <Image source={icons.backArrow} className="size-5" />
               </TouchableOpacity>
+
               <View className="flex flex-row items-center gap-3">
                 <View className="items-center ">
                   <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
@@ -215,12 +222,14 @@ const HistoryDetails = () => {
             <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
-                <Image
-                  source={{
-                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${booking.destinationLongitude || booking.departureLongitude},${booking.destinationLatitude || booking.departureLatitude}&zoom=14&marker=lonlat:${booking.departureLongitude},${booking.departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${booking.destinationLongitude && booking.destinationLatitude ? `&marker=lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${booking.departureLongitude},${booking.departureLatitude}|lonlat:${booking.destinationLongitude},${booking.destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
-                  }}
-                  className="w-1/3 h-32 rounded-lg"
-                />
+                <View className="flex-1">
+                  <HistoryMapWithMarkers
+                    departureLatitude={booking?.departureLatitude}
+                    destinationLatitude={booking?.destinationLatitude}
+                    departureLongitude={booking?.departureLongitude}
+                    destinationLongitude={booking?.destinationLongitude}
+                  />
+                </View>
 
                 <View className="flex-1 ml-4">
                   <View className="flex-row items-center mb-2">
@@ -541,16 +550,42 @@ const HistoryDetails = () => {
           />
         </View>
       </ReactNativeModal>
-      <ReactNativeModal
+      <Modal
         visible={showConfirmationModal}
         transparent={true}
         animationType="fade"
-        onRequestClose={closeConfirmationModal}
+        onRequestClose={() => {}}
       >
         <View className="flex-1 inset-0 top-0 left-0 justify-center items-center bg-gray-800/70">
           <View className="bg-white p-6 rounded-lg w-80">
             <Text className="text-xl mb-4 text-center">
               Are you sure you want to cancel the booking?
+            </Text>
+            <Text className="text-sm mb-4 text-center">
+              View
+              <Text
+                className="text-primary-100"
+                onPress={() => router.push("(root)/help")}
+              >
+                {" "}
+                Cancellation Policy{" "}
+              </Text>{" "}
+              for more details.
+            </Text>
+            <Text className="mb-2">
+              Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}
+            </Text>
+            <Text className="mb-2">
+              Days Until Pickup:{" "}
+              {daysDiff > 0
+                ? Number(daysDiff).toFixed(0)
+                : "Pickup day is today"}
+            </Text>
+            <Text className="mb-2">
+              Cancellation Fee: ${Number(cancellationFee ?? 0).toFixed(2)}
+            </Text>
+            <Text className="mb-4">
+              Refund Amount: ${Number(refundAmount ?? 0).toFixed(2)}
             </Text>
             <View className="flex-row justify-between">
               <TouchableOpacity
@@ -571,7 +606,7 @@ const HistoryDetails = () => {
             </View>
           </View>
         </View>
-      </ReactNativeModal>
+      </Modal>
     </View>
   );
 };

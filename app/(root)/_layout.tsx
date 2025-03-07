@@ -11,6 +11,7 @@ export default function Layout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="profileForm" options={{ headerShown: false }} />
         <Stack.Screen name="help" options={{ headerShown: false }} />
+        <Stack.Screen name="paymentWebView" options={{ headerShown: false }} />
         <Stack.Screen
           name="[id]/book-details"
           options={{ headerShown: false }}

@@ -23,9 +23,11 @@ export default function Onboarding() {
         {/* Skip Button */}
         <TouchableOpacity
           onPress={() => router.replace("/(root)/(tabs)")}
-          className="flex justify-center items-center rounded-lg mt-2 self-end border border-gray-300 px-2 py-1"
+          className="flex justify-center items-center rounded-lg mt-2 self-end px-2 py-1"
         >
-          <Text className="text-black-400 text-md font-bold">Skip</Text>
+          <Text className="text-gray-700 text-md font-JakartaExtraBold">
+            Skip
+          </Text>
         </TouchableOpacity>
 
         {/* Swiper */}

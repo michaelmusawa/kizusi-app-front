@@ -21,6 +21,7 @@ import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
+import { MapWithMarkers } from "@/components/Geoapify";
 
 const BookDetails = () => {
   const { user } = useUser();
@@ -31,9 +32,11 @@ const BookDetails = () => {
   const [isAgreed, setIsAgreed] = useState<boolean>(false);
   const [paymentAmount, setPaymentAmount] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [addons, setAddons] = useState<string[]>([]);
 
   const {
     userAddons,
+    setUserAddons,
     date,
     departureLatitude,
     departureLongitude,
@@ -77,6 +80,17 @@ const BookDetails = () => {
 
   const handleSelectPaymentType = (value: string) => {
     setPaymentType(value);
+  };
+
+  const handleAddonPress = (addonLabel: string) => {
+    setAddons((prev) => {
+      const updatedAddons = prev.includes(addonLabel)
+        ? prev.filter((label) => label !== addonLabel)
+        : [...prev, addonLabel];
+
+      setUserAddons(updatedAddons);
+      return updatedAddons;
+    });
   };
 
   const calculateAddonsAmount = () => {
@@ -153,7 +167,13 @@ const BookDetails = () => {
     };
 
     try {
-      await initiatePayment(paymentData);
+      const response = await initiatePayment(paymentData);
+
+      if (response.redirect_url) {
+        router.push(
+          `(root)/paymentWebView?callbackUrl=${response.redirect_url}`
+        );
+      }
     } catch (error) {
       console.error("Payment initiation failed:", error);
     }
@@ -279,11 +299,11 @@ const BookDetails = () => {
             <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
-                <Image
-                  source={{
-                    uri: `https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:${destinationLongitude || departureLongitude},${destinationLatitude || departureLatitude}&zoom=14&marker=lonlat:${departureLongitude},${departureLatitude}&icon=${encodeURIComponent("https://api.geoapify.com/v1/icon/?icon=location-pin&color=%23FF0000&size=medium&type=awesome&apiKey=YOUR_API_KEY")}${destinationLongitude && destinationLatitude ? `&marker=lonlat:${destinationLongitude},${destinationLatitude}&icon=${encodeURIComponent(`https://api.geoapify.com/v1/icon/?icon=location-pin&color=%2300FF00&size=medium&type=awesome&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`)}` : ""}&path=lonlat:${departureLongitude},${departureLatitude}|lonlat:${destinationLongitude},${destinationLatitude}&apiKey=${process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY}`,
-                  }}
-                  className="w-1/3 h-32 rounded-lg border"
+                <MapWithMarkers
+                  departureLatitude={departureLatitude}
+                  destinationLatitude={destinationLatitude}
+                  departureLongitude={departureLongitude}
+                  destinationLongitude={destinationLongitude}
                 />
 
                 <View className="flex-1 mx-4">
@@ -325,14 +345,18 @@ const BookDetails = () => {
 
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
-              Addons
+              Select addons
             </Text>
+
             <View className="flex-row mt-4">
               {car?.addons?.map((addon, index) => {
-                const icon = addonIcons[addon.addonName] || "❓";
+                const icon =
+                  addonIcons[addon.addonName as keyof typeof addonIcons] ||
+                  "❓";
 
                 return (
                   <TouchableOpacity
+                    onPress={() => handleAddonPress(addon.addonName)}
                     key={index}
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
@@ -341,8 +365,8 @@ const BookDetails = () => {
                     </Text>
                     <View
                       className={`size-14 rounded-full flex items-center justify-center ${
-                        userAddons?.includes(addon.addonName)
-                          ? "border border-gray-300 bg-primary-100"
+                        addons?.includes(addon.addonName)
+                          ? "border bg-primary-100"
                           : "bg-primary-100/50"
                       }`}
                     >
@@ -360,9 +384,9 @@ const BookDetails = () => {
                 );
               })}
             </View>
-            {userAddons.length > 0 && (
+            {addons.length > 0 && (
               <Text className="text-secondary-100 text-sm text-center font-rubik mt-2">
-                Addons amount: {addonsAmount}/=
+                Addons amount: +{addonsAmount}/=
               </Text>
             )}
           </View>
@@ -444,7 +468,6 @@ const BookDetails = () => {
           </View>
         </View>
       </ScrollView>
-
       <View className="absolute bg-white bottom-0 w-full rounded-t-2xl border-t border-r border-l border-primary-200 p-7">
         <View className="flex flex-row items-center justify-between gap-10">
           <View className="flex flex-col items-start">

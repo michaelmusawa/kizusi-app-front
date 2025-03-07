@@ -53,3 +53,32 @@ export const validatePassword = (password: string) => {
 
   return "";
 };
+
+export const calculateCancellationDetails = (
+  bookingDate: string,
+  amount: number
+) => {
+  const currentDate = new Date();
+  const bookingDateObj = new Date(bookingDate);
+  const timeDiff = bookingDateObj - currentDate;
+  const daysDiff = timeDiff / (1000 * 3600 * 24);
+
+  let cancellationFee = 0;
+  let refundAmount = amount;
+
+  if (daysDiff > 2) {
+    // More than 2 days prior: No fee
+    cancellationFee = 0;
+    refundAmount = amount;
+  } else if (daysDiff === 1) {
+    // 1 day prior: 20% fee based on 50% of the amount
+    cancellationFee = 0.2 * 0.5 * amount;
+    refundAmount = amount - cancellationFee;
+  } else if (daysDiff <= 0) {
+    // Same day or no-show: No refund
+    cancellationFee = amount;
+    refundAmount = 0;
+  }
+
+  return { daysDiff, cancellationFee, refundAmount };
+};

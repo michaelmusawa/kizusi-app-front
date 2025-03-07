@@ -97,11 +97,13 @@ export const initiatePayment = async (paymentData: PaymentData) => {
 
     console.log("The call back response url", response);
     // Redirect the user using Linking
-    if (response.redirect_url) {
-      await Linking.openURL(response.redirect_url);
-    } else {
-      throw new Error("Redirect URL not found in response");
-    }
+    // if (response.redirect_url) {
+    //   await Linking.openURL(response.redirect_url);
+    // } else {
+    //   throw new Error("Redirect URL not found in response");
+    // }
+
+    return response;
   } catch (error) {
     console.error("Error initiating payment:", error);
     throw error;

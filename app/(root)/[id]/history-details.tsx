@@ -438,22 +438,61 @@ const HistoryDetails = () => {
 
           <TouchableOpacity
             onPress={
-              booking?.bookingStatus !== "CANCELLED" &&
-              booking?.paymentStatus === "CONFIRMED"
+              !["CANCELLED", "REFUNDED", "PROCEEDED", "NO SHOW"].includes(
+                booking?.bookingStatus
+              ) && booking?.paymentStatus === "CONFIRMED"
                 ? openConfirmationModal
                 : () => {}
             }
-            className={`flex-1 flex flex-row items-center justify-center py-2 rounded-full shadow-md shadow-zinc-400 ${booking?.bookingStatus !== "CANCELLED" ? "bg-secondary-100" : "bg-gray-100"}`}
+            className={`flex-1 flex flex-row items-center justify-center py-2 rounded-full shadow-md shadow-zinc-400 ${
+              booking?.bookingStatus === "CANCELLED"
+                ? "bg-gray-200"
+                : booking?.bookingStatus === "PENDING"
+                  ? "bg-primary-100/70"
+                  : booking?.bookingStatus === "PROCEEDED"
+                    ? "bg-secondary-100"
+                    : booking?.bookingStatus === "REFUNDED"
+                      ? "bg-gray-200"
+                      : booking?.bookingStatus === "NO SHOW"
+                        ? "bg-red-400"
+                        : "bg-secondary-100"
+            }`}
           >
             <Text
-              className={` text-lg text-center font-rubik-bold ${booking?.bookingStatus !== "CANCELLED" ? "text-white" : "text-red-500"}`}
+              className={`text-lg text-center font-rubik-bold ${
+                booking?.bookingStatus === "CANCELLED"
+                  ? "text-red-500"
+                  : booking?.bookingStatus === "PENDING"
+                    ? "text-gray-700"
+                    : booking?.bookingStatus === "PROCEEDED"
+                      ? "text-gray-100"
+                      : booking?.bookingStatus === "REFUNDED"
+                        ? "text-gray-600"
+                        : booking?.bookingStatus === "NO SHOW"
+                          ? "text-gray-100"
+                          : "text-white"
+              }`}
             >
-              {booking?.bookingStatus !== "CANCELLED" &&
-              booking?.paymentStatus === "CONFIRMED"
+              {booking?.paymentStatus === "CONFIRMED" &&
+              ![
+                "CANCELLED",
+                "PENDING",
+                "PROCEEDED",
+                "REFUNDED",
+                "NO SHOW",
+              ].includes(booking?.bookingStatus)
                 ? "Cancel booking"
-                : booking?.paymentStatus === "PENDING"
+                : booking?.bookingStatus === "PENDING"
                   ? "Awaiting payment..."
-                  : "Booking cancelled"}
+                  : booking?.bookingStatus === "PROCEEDED"
+                    ? "Hope you enjoyed your ride"
+                    : booking?.bookingStatus === "REFUNDED"
+                      ? "Sorry you changed your mind"
+                      : booking?.bookingStatus === "CANCELLED"
+                        ? "Wait for refund"
+                        : booking?.bookingStatus === "NO SHOW"
+                          ? "You missed your ride"
+                          : "Booking cancelled"}
             </Text>
           </TouchableOpacity>
         </View>

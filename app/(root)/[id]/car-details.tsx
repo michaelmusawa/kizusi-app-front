@@ -83,7 +83,7 @@ const CarDetails = () => {
               <View className="flex flex-row items-center gap-3">
                 <View className="items-center ">
                   <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
-                    {car?.brand.brandName}
+                    {car?.brand?.brandName}
                   </Text>
                 </View>
               </View>
@@ -97,7 +97,7 @@ const CarDetails = () => {
             <View className="flex flex-row items-center gap-3">
               <View className="flex flex-row items-center gap-2">
                 <Text className="text-black-200 mt-1 font-rubik-medium">
-                  ({car?.category.name})
+                  ({car?.category?.name})
                 </Text>
               </View>
             </View>
@@ -127,7 +127,7 @@ const CarDetails = () => {
                     <Image source={icon} className="size-4" />
                   </View>
                   <Text className="text-black-300 text-center text-sm font-rubik-medium ml-2">
-                    {feature.featureValue} {feature.featureName}
+                    {feature?.featureValue} {feature?.featureName}
                   </Text>
                 </View>
               );

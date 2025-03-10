@@ -6,7 +6,6 @@ import RideLayout from "@/components/RideLayout";
 import { icons } from "@/constants";
 import { useLocationStore } from "@/store";
 import { DateTimePickerComponent } from "@/components/DateTimePicker";
-import { Picker } from "@react-native-picker/picker";
 import { calculateTimes } from "@/lib/map";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
@@ -169,26 +168,30 @@ export default function AddDirections() {
           onRequestClose={() => {}}
         >
           <View className="flex-1 justify-center items-center bg-gray-800/60">
-            <View className="bg-white p-6 rounded-md shadow-lg">
-              <Text className="text-lg mb-4">Select book type:</Text>
-              <TouchableOpacity
-                onPress={() => {
-                  setBookType({ bookType: "full_day" });
-                  setViewOptions(false);
-                }}
-                className="p-2 border border-gray-300 rounded-md mb-2"
-              >
-                <Text>Full day</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={() => {
-                  setBookType({ bookType: "transfer" });
-                  setViewOptions(false);
-                }}
-                className="p-2 border border-gray-300 rounded-md"
-              >
-                <Text>Transfer</Text>
-              </TouchableOpacity>
+            <View className="bg-gray-100 w-[80%] px-6 py-11 rounded-md shadow-lg">
+              <Text className="text-lg mb-4 text-center">
+                Select book type:
+              </Text>
+              <View className="flex-row gap-2">
+                <TouchableOpacity
+                  onPress={() => {
+                    setBookType({ bookType: "full_day" });
+                    setViewOptions(false);
+                  }}
+                  className="flex-1 p-2 border border-gray-300 rounded-md bg-primary-100/30"
+                >
+                  <Text className="text-center">Full day</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setBookType({ bookType: "transfer" });
+                    setViewOptions(false);
+                  }}
+                  className="flex-1 p-2 border border-gray-300 rounded-md bg-secondary-100/30"
+                >
+                  <Text className="text-center">Transfer</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </Modal>

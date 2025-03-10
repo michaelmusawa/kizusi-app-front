@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://localhost:3000";
 
 export async function GET(request: Request) {
   try {
     // Build the API request URL with query parameters
-    const response = await axios.get(`${API_BASE_URL}/categories`);
+    const response = await axios.get(`${API_BASE_URL}/api/categories`);
 
     const categories = response.data;
 

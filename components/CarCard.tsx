@@ -12,35 +12,35 @@ export const Card = ({ car, onPress }: { car: Car; onPress?: () => void }) => {
       <View className="flex flex-row items-center absolute px-2 top-5 right-5 bg-white/90 p-1 rounded-full z-50">
         <Image source={icons.star} className="size-2.5" />
         <Text className="text-xs font-rubik-bold text-secondary-100 ml-0.5">
-          {car.brand.brandName}
+          {car?.brand?.brandName}
         </Text>
       </View>
 
       <Image
         source={{
-          uri: car.image,
+          uri: car?.image,
         }}
         className="w-full h-32 rounded-lg"
       />
 
       <View className="mt-2 gap-1 p-2">
         <Text className="text-xs font-rubik-bold text-gray-500 text-black-100 border border-gray-300 rounded-lg py-1 px-2 self-start">
-          {car.category.categoryName}
+          {car.category?.categoryName}
         </Text>
 
         <Text className="text-base font-rubik-bold text-black-300">
-          {car.name || "Unknown Car"}
+          {car?.name || "Unknown Car"}
         </Text>
         <Text
           className="text-xs font-rubik-bold text-gray-500"
           numberOfLines={1}
         >
-          {car.description}
+          {car?.description}
         </Text>
 
         <View className="flex flex-row items-center justify-between mt-2">
           <Text className="text-base font-rubik-bold text-secondary-100">
-            Ksh.{car.price || "0"}
+            Ksh.{car?.price || "0"}
           </Text>
           <Image
             source={icons.favorite}
@@ -67,7 +67,7 @@ export const CategoryCard = ({
     >
       <Image
         source={{
-          uri: category.image,
+          uri: category?.image,
         }}
         className="size-full rounded-2xl"
       />
@@ -87,7 +87,7 @@ export const CategoryCard = ({
           className="text-xl font-rubik-extrabold text-white"
           numberOfLines={1}
         >
-          {category.name}
+          {category?.name}
         </Text>
         <Text className="text-base font-rubik text-white">
           Brands:{" "}
@@ -100,7 +100,7 @@ export const CategoryCard = ({
 
         <View className="flex flex-row items-center justify-between w-full">
           <Text className="text-xl font-rubik-extrabold text-white">
-            Ksh.{category.price}
+            Ksh.{category?.price}
           </Text>
           <Image source={icons.favorite} className="size-5" />
         </View>

@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://localhost:3000";
 
 export async function GET(request: Request) {
   try {
@@ -11,7 +11,7 @@ export async function GET(request: Request) {
     const limit = url.searchParams.get("limit") || "6";
 
     // Build the API request URL with query parameters
-    const response = await axios.get(`${API_BASE_URL}/cars`, {
+    const response = await axios.get(`${API_BASE_URL}/api/cars`, {
       params: {
         filter,
         query,
@@ -20,6 +20,8 @@ export async function GET(request: Request) {
     });
 
     const cars = response.data;
+
+    console.log(response.data);
 
     return new Response(JSON.stringify({ data: cars }), {
       headers: { "Content-Type": "application/json" },

@@ -1,14 +1,13 @@
 import axios from "axios";
 
-const BACKEND_URL = "http://localhost:5000";
+const BACKEND_URL = "http://localhost:3000";
 
 export async function POST(request: Request) {
   try {
     const paymentData = await request.json();
 
-    // Forward the payment initiation data to your backend
     const response = await axios.post(
-      `${BACKEND_URL}/payments/initiate`,
+      `${BACKEND_URL}/api/payments`,
       paymentData,
       {
         headers: {

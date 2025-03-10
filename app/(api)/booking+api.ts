@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://localhost:3000";
 
 export async function GET(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
     const query = url.searchParams.get("query") || "";
 
     // Build the API request URL with query parameters
-    const response = await axios.get(`${API_BASE_URL}/bookings`, {
+    const response = await axios.get(`${API_BASE_URL}/api/bookings`, {
       params: {
         filter,
         query,

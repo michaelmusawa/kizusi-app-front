@@ -77,14 +77,18 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             {formatDate(booking.bookingDate.toLocaleString())}
           </Text>
 
-          <View className="flex flex-row mt-6 mb-8 gap-2 justify-center items-center">
+          <View className="flex flex-col mt-6 mb-8 gap-2 justify-center items-center">
             <View
               className={
                 booking.bookingStatus === "PENDING"
                   ? "bg-amber-200 p-2 rounded-lg"
                   : booking.bookingStatus === "CANCELLED"
-                    ? "bg-red-500 p-2 rounded-lg"
-                    : "bg-secondary-100 p-2 rounded-lg"
+                    ? "bg-orange-500 p-2 rounded-lg"
+                    : booking.bookingStatus === "REFUNDED"
+                      ? "bg-gray-100 p-2 rounded-lg"
+                      : booking.bookingStatus === "NO SHOW"
+                        ? "bg-red-500 p-2 rounded-lg"
+                        : "bg-secondary-100 p-2 rounded-lg"
               }
             >
               <Text
@@ -93,12 +97,19 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
                     ? "text-gray-700 font-JakartaSemiBold"
                     : booking.bookingStatus === "CANCELLED"
                       ? "text-gray-100 font-JakartaSemiBold"
-                      : "text-white font-JakartaSemiBold"
+                      : booking.bookingStatus === "REFUNDED"
+                        ? "text-gray-500 font-JakartaSemiBold"
+                        : "text-white font-JakartaSemiBold"
                 }
               >
                 {booking.bookingStatus}
               </Text>
             </View>
+            {booking.bookingStatus === "CANCELLED" && (
+              <Text className="text-xs text-secondary-600">
+                Awaiting refund...
+              </Text>
+            )}
           </View>
         </View>
       </View>

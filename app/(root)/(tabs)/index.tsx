@@ -175,25 +175,43 @@ const Home = () => {
             <View className="flex flex-row items-center justify-between mt-5">
               <View className="flex flex-row justify-between w-full">
                 <View className="flex flex-row">
-                  <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
-                    {userLoading ? (
-                      <Text className="text-xs">Loading..</Text>
-                    ) : (
-                      <Image
-                        source={
-                          user
-                            ? {
-                                uri:
-                                  returnedUser?.image ??
-                                  user?.externalAccounts?.[0]?.imageUrl ??
-                                  user?.imageUrl,
-                              }
-                            : icons.person
-                        }
-                        className="size-8 rounded-full"
-                      />
-                    )}
-                  </View>
+                  <TouchableOpacity
+                    onPress={
+                      user
+                        ? handleSignOut
+                        : () => router.push("/(auth)/sign-in")
+                    }
+                  >
+                    <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
+                      {userLoading ? (
+                        <Text className="text-xs">Loading..</Text>
+                      ) : (
+                        <View>
+                          <Image
+                            source={
+                              user
+                                ? {
+                                    uri:
+                                      returnedUser?.image ??
+                                      user?.externalAccounts?.[0]?.imageUrl ??
+                                      user?.imageUrl,
+                                  }
+                                : icons.login
+                            }
+                            className={
+                              user
+                                ? "size-8 rounded-full"
+                                : "size-5 rounded-full"
+                            }
+                          />
+                        </View>
+                      )}
+                    </View>
+
+                    <Text className="text-xs mt-1 font-rubik text-secondary-100 text-center">
+                      {user ? "Logout" : "Login"}
+                    </Text>
+                  </TouchableOpacity>
 
                   <View className="flex flex-col items-start ml-2 justify-center">
                     <Text className="text-xs font-rubik text-black-100">
@@ -208,29 +226,6 @@ const Home = () => {
                     </Text>
                   </View>
                 </View>
-
-                <TouchableOpacity
-                  onPress={
-                    user ? handleSignOut : () => router.push("/(auth)/sign-in")
-                  }
-                  className="flex flex-col justify-center items-center gap-1"
-                >
-                  <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
-                    <Image
-                      source={user ? icons.out : icons.login}
-                      className={
-                        user
-                          ? "rounded-full size-5 rotate-180"
-                          : "rounded-full size-6"
-                      }
-                    />
-                  </View>
-                  {!user && (
-                    <Text className="text-xs font-rubik text-secondary-100">
-                      Login
-                    </Text>
-                  )}
-                </TouchableOpacity>
               </View>
             </View>
 

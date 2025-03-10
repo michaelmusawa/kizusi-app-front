@@ -1,11 +1,11 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:5000";
+const API_BASE_URL = "http://localhost:3000";
 
 export async function GET(request: Request, { id }: Record<string, string>) {
   try {
     // Fetch the user by ID from the API
-    const response = await axios.get(`${API_BASE_URL}/bookings/${id}`);
+    const response = await axios.get(`${API_BASE_URL}/api/bookings/${id}`);
 
     const booking = response.data;
 
@@ -29,7 +29,7 @@ export async function POST(request: Request, { id }: Record<string, string>) {
     const refundData = await request.json();
 
     const response = await axios.post(
-      `${API_BASE_URL}/bookings/cancel/${id}`,
+      `${API_BASE_URL}/api/bookings/cancel/${id}`,
       refundData,
       {
         headers: {

@@ -34,22 +34,10 @@ export default function AddDirections() {
   const [localDestinationAddress, setLocalDestinationAddress] =
     useState(destinationAddress);
   const [localBookType, setLocalBookType] = useState(bookType);
-  const [localRideDetails, setLocalRideDetails] = useState<{
-    time: number | null;
-    price: number | null;
-  }>({
-    time: 0,
-    price: 0,
-  });
   const [error, setError] = useState<string | null>(null);
   const [viewOptions, setViewOptions] = useState<boolean>(false);
 
   // Sync local state with store updates
-  useEffect(() => {
-    if (rideDetails) {
-      setLocalRideDetails(rideDetails);
-    }
-  }, [rideDetails]);
 
   useEffect(() => {
     setLocalDestinationAddress(destinationAddress);
@@ -264,7 +252,7 @@ export default function AddDirections() {
                 numberOfLines={1}
                 className="text-red-500 text-start text-2xl font-rubik-bold"
               >
-                Loading...
+                {carError}
               </Text>
             ) : carLoading ? (
               <Text

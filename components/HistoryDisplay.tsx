@@ -35,6 +35,7 @@ const HistoryDisplay = ({ query, id }: { query: string; id: string }) => {
 
     setUrl(fetchUrl); // Update the URL state
     refetch(); // Refetch with the updated URL
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, query]);
 
   if (loading) {

@@ -16,7 +16,6 @@ export default function Layout() {
           name="[id]/book-details"
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="cancel-order" options={{ headerShown: false }} />
         <Stack.Screen
           name="[id]/car-details"
           options={{ headerShown: false }}

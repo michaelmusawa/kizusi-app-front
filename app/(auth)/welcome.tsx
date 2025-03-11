@@ -8,7 +8,7 @@ import Swiper from "react-native-swiper";
 import { LinearGradient } from "expo-linear-gradient";
 
 export default function Onboarding() {
-  const swiperRef = useRef(null);
+  const swiperRef = useRef<Swiper | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const isLastSlide = activeIndex === onboarding.length - 1;
 

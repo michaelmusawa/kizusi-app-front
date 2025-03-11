@@ -9,6 +9,7 @@ export async function POST(request: Request) {
     if (!name || !email || !clerkId || phone) {
       return Response.json(
         { error: "Missing required fields" },
+        // eslint-disable-next-line prettier/prettier
         { status: 400 }
       );
     }

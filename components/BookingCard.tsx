@@ -3,7 +3,7 @@ import { Booking } from "@/lib/definitions";
 import { formatDate } from "@/lib/utils";
 import { router } from "expo-router";
 import { TouchableOpacity, Text, Image, View } from "react-native";
-import MapWithMarkers, { HistoryMapWithMarkers } from "./Geoapify";
+import { HistoryMapWithMarkers } from "./Geoapify";
 
 const BookingCard = ({ booking }: { booking: Booking }) => {
   return (
@@ -22,10 +22,10 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
       <View className="flex-row mt-4">
         <View className="flex-1">
           <HistoryMapWithMarkers
-            departureLatitude={booking.departureLatitude}
-            destinationLatitude={booking?.destinationLatitude}
-            departureLongitude={booking.departureLongitude}
-            destinationLongitude={booking?.destinationLongitude}
+            departureLatitude={Number(booking.departureLatitude)}
+            destinationLatitude={Number(booking?.destinationLatitude)}
+            departureLongitude={Number(booking.departureLongitude)}
+            destinationLongitude={Number(booking?.destinationLongitude)}
           />
           <View className="mt-4 flex flex-col gap-2">
             <Text className="text-gray-700">

@@ -1,30 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Linking } from "react-native";
-
-type PaymentData = {
-  amount: number;
-  first_name: string | undefined | null;
-  last_name: string | undefined | null;
-  email: string | undefined | null;
-  phoneNumber: string | undefined | null | any;
-  image: string | undefined | null;
-  carId: number;
-  reference: string;
-  userId: string | undefined | null;
-  bookingDate: string;
-  departureLatitude: string | undefined | null;
-  departureLongitude: string | undefined | null;
-  destinationLatitude: string;
-  destinationLongitude: string;
-  departure: string;
-  destination: string;
-  bookType: string;
-  paymentType: string;
-  addons: string;
-  description: string;
-  callbackUrl: string;
-  [key: string]: any; // Allow additional optional fields if needed
-};
+import { PaymentData, RefundData } from "./definitions";
 
 export const fetchAPI = async (url: string, options?: RequestInit) => {
   try {
@@ -43,6 +18,7 @@ export const fetchAPI = async (url: string, options?: RequestInit) => {
 export const useFetch = <T>(
   endpoint: string,
   initialOptions?: RequestInit,
+  // eslint-disable-next-line prettier/prettier
   params?: Record<string, string>
 ) => {
   const [url, setUrl] = useState(() => {
@@ -70,6 +46,7 @@ export const useFetch = <T>(
         setLoading(false);
       }
     },
+    // eslint-disable-next-line prettier/prettier
     [url, options]
   );
 
@@ -110,7 +87,7 @@ export const initiatePayment = async (paymentData: PaymentData) => {
   }
 };
 
-export const initiateRefund = async (id: string, paymentData: PaymentData) => {
+export const initiateRefund = async (id: string, paymentData: RefundData) => {
   try {
     const response = await fetchAPI(`/(api)/booking/${id}`, {
       method: "POST",

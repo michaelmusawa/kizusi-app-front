@@ -24,6 +24,7 @@ const AutocompleteSearch = ({
 
   useEffect(() => {
     handleSearch(searchTerm);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   const handleSearch = (text: string) => {
@@ -33,9 +34,14 @@ const AutocompleteSearch = ({
       const filtered = cars.filter(
         (car) =>
           car.name.toLowerCase().includes(text.toLowerCase()) ||
-          car.category.toLowerCase().includes(text.toLowerCase()) ||
+          car.category.categoryName
+            .toLowerCase()
+            .includes(text.toLowerCase()) ||
           (car.name.toLowerCase().includes(text.toLowerCase()) &&
-            car.category.toLowerCase().includes(text.toLowerCase()))
+            car.category.categoryName
+              .toLowerCase()
+              // eslint-disable-next-line prettier/prettier
+              .includes(text.toLowerCase()))
       );
       if (searchTerm !== "") {
         setReturnCars(filtered);
@@ -83,14 +89,14 @@ const AutocompleteSearch = ({
       {query !== "" && searchTerm === "" && (
         <FlatList
           data={filteredCars}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => `${item.id}`}
           renderItem={({ item }) => (
             <TouchableOpacity
               className="py-3 px-4 border-b border-gray-300"
               onPress={() => handleSelectCar(item)}
             >
               <Text className="text-lg text-gray-800">
-                {item.name}, {item.category}
+                {item.name}, {item.category.categoryName}
               </Text>
             </TouchableOpacity>
           )}

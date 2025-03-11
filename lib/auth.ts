@@ -30,11 +30,13 @@ export const tokenCache = {
 
 export const googleOAuth = async (
   startOAuthFlow: (options: { redirectUrl: string }) => Promise<any>,
+  // eslint-disable-next-line prettier/prettier
   id: string | undefined
 ) => {
   try {
     const { createdSessionId, setActive, signUp } = await startOAuthFlow({
       redirectUrl: Linking.createURL(
+        // eslint-disable-next-line prettier/prettier
         id ? `/(root)/${id}/book-details` : "/(root)/(tabs)"
       ),
     });

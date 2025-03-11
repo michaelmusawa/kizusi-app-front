@@ -13,6 +13,7 @@ export async function POST(request: Request) {
         headers: {
           "Content-Type": "application/json",
         },
+        // eslint-disable-next-line prettier/prettier
       }
     );
 
@@ -28,6 +29,7 @@ export async function POST(request: Request) {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
+        // eslint-disable-next-line prettier/prettier
       }
     );
   }

@@ -16,7 +16,7 @@ import {
   initiateRefund,
   useFetch,
 } from "@/lib/fetch";
-import { Booking, Car } from "@/lib/definitions";
+import { Booking, Car, User } from "@/lib/definitions";
 import { icons, images } from "@/constants";
 
 import ReactNativeModal from "react-native-modal";
@@ -27,7 +27,8 @@ import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
 import { calculateCancellationDetails } from "@/lib/utils";
-import { HistoryMapWithMarkers, MapWithMarkers } from "@/components/Geoapify";
+import { MapWithMarkers } from "@/components/Geoapify";
+import { addonIcons } from "@/constants/data";
 
 const HistoryDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -61,7 +62,7 @@ const HistoryDetails = () => {
     data: carResponse,
     loading: carLoading,
     error: carError,
-  } = useFetch<Car>(`/(api)/car/${params.query}`, {
+  } = useFetch<{ data: Car }>(`/(api)/car/${params.query}`, {
     method: "GET",
   });
 
@@ -71,7 +72,7 @@ const HistoryDetails = () => {
     data: userResponse,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
+  } = useFetch<{ data: User }>(`/(api)/user/${user?.id || ""}`, {
     method: "GET",
   });
 
@@ -89,7 +90,7 @@ const HistoryDetails = () => {
   const windowHeight = Dimensions.get("window").height;
 
   const { daysDiff, cancellationFee, refundAmount } =
-    calculateCancellationDetails(booking?.bookingDate, booking?.amount);
+    calculateCancellationDetails(booking?.bookingDate, booking?.amount ?? 0);
 
   const handleCancelBooking = async () => {
     const cancelBookingData = {
@@ -100,7 +101,7 @@ const HistoryDetails = () => {
     };
 
     try {
-      const response = await initiateRefund(id, cancelBookingData);
+      const response = await initiateRefund(id ?? "", cancelBookingData);
 
       if (response.refundResponses[0].status === "200") {
         setShowSuccessModal(true);
@@ -124,9 +125,10 @@ const HistoryDetails = () => {
       last_name: user?.lastName,
       userId: user?.id,
       email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress,
-      phoneNumber: returnedUser?.phone ?? user?.primaryPhoneNumber,
+      phoneNumber: returnedUser?.phone ?? user?.primaryPhoneNumber?.phoneNumber,
       description: "Complete car rental payment",
       callbackUrl: Linking.createURL(
+        // eslint-disable-next-line prettier/prettier
         `/(root)/${id}/history-details?query=${params.query}&completePayment=true`
       ),
     };
@@ -190,26 +192,58 @@ const HistoryDetails = () => {
               </TouchableOpacity>
 
               <View className="flex flex-row items-center gap-3">
-                <View className="items-center ">
-                  <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
-                    {car?.brand.brandName}
+                {userLoading && !userError && (
+                  <Text
+                    numberOfLines={1}
+                    className="text-secondary-100 text-start text-2xl font-rubik-bold"
+                  >
+                    Loading...
                   </Text>
-                </View>
+                )}
+              </View>
+
+              <View className="flex flex-row items-center gap-3">
+                {carLoading && !carError ? (
+                  <Text
+                    numberOfLines={1}
+                    className="text-secondary-100 text-start text-2xl font-rubik-bold"
+                  >
+                    Loading...
+                  </Text>
+                ) : (
+                  <View className="items-center ">
+                    <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full self-start">
+                      {car?.brand.brandName}
+                    </Text>
+                  </View>
+                )}
               </View>
             </View>
           </View>
 
           {/* Price text overlay at the bottom of the image */}
           <View className="absolute -bottom-6 w-full flex justify-center items-center z-50">
-            <Text className="text-2xl font-rubik-extrabold">{car?.name}</Text>
-
-            <View className="flex flex-row items-center gap-3">
-              <View className="flex flex-row items-center gap-2">
-                <Text className="text-black-200 mt-1 font-rubik-medium">
-                  ({car?.category.name})
+            {carLoading && !carError ? (
+              <Text
+                numberOfLines={1}
+                className="text-secondary-100 text-start text-2xl font-rubik-bold"
+              >
+                Loading...
+              </Text>
+            ) : (
+              <>
+                <View className="flex flex-row items-center gap-3">
+                  <View className="flex flex-row items-center gap-2">
+                    <Text className="text-black-200 mt-1 font-rubik-medium">
+                      ({car?.category.categoryName})
+                    </Text>
+                  </View>
+                </View>{" "}
+                <Text className="text-2xl font-rubik-extrabold">
+                  {car?.name}
                 </Text>
-              </View>
-            </View>
+              </>
+            )}
           </View>
         </View>
 
@@ -222,14 +256,13 @@ const HistoryDetails = () => {
             <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
-                <View className="flex-1">
-                  <HistoryMapWithMarkers
-                    departureLatitude={booking?.departureLatitude}
-                    destinationLatitude={booking?.destinationLatitude}
-                    departureLongitude={booking?.departureLongitude}
-                    destinationLongitude={booking?.destinationLongitude}
-                  />
-                </View>
+
+                <MapWithMarkers
+                  departureLatitude={Number(booking?.departureLatitude)}
+                  destinationLatitude={Number(booking?.destinationLatitude)}
+                  departureLongitude={Number(booking?.departureLongitude)}
+                  destinationLongitude={Number(booking?.destinationLongitude)}
+                />
 
                 <View className="flex-1 ml-4">
                   <View className="flex-row items-center mb-2">
@@ -251,7 +284,7 @@ const HistoryDetails = () => {
                   <View className="flex items-start justify-between w-full gap-1">
                     <View className="flex flex-row items-center justify-between">
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        <Image source={icons.list} className="h-5 w-5" />
+                        <Image source={icons.map} className="h-5 w-5" />
                         {"   "}
                         {booking?.bookType === "full_day"
                           ? "Full day"
@@ -262,9 +295,14 @@ const HistoryDetails = () => {
                       <Image source={icons.calender} className="h-5 w-5" />
                       {"   "}
                       {new Date(
-                        booking?.bookingDate
-                      ).toLocaleDateString()},{" "}
-                      {new Date(booking?.bookingDate).toLocaleTimeString()}
+                        // eslint-disable-next-line prettier/prettier
+                        booking?.bookingDate ?? ""
+                      ).toLocaleDateString()}
+                      ,{" "}
+                      {new Date(
+                        // eslint-disable-next-line prettier/prettier
+                        booking?.bookingDate ?? ""
+                      ).toLocaleTimeString()}
                     </Text>
                   </View>
                 </View>
@@ -272,12 +310,12 @@ const HistoryDetails = () => {
             </View>
           </View>
 
-          {/* <View className="mt-7">
+          <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
               Addons
             </Text>
             <View className="flex-row justify-between mt-4">
-              {car?.addons?.map((addon, index) => {
+              {booking?.addons?.map((addon, index) => {
                 const icon = addonIcons[addon.addonName] || "❓";
 
                 return (
@@ -286,14 +324,10 @@ const HistoryDetails = () => {
                     className="flex flex-1 flex-col items-center min-w-16 max-w-20"
                   >
                     <Text className="text-xs text-secondary-600 font-rubik-medium">
-                      +20/=
+                      {addon.addonValue}
                     </Text>
                     <View
-                      className={`size-14 rounded-full flex items-center justify-center ${
-                        userAddons?.includes(addon.addonName)
-                          ? "border bg-primary-100"
-                          : "bg-primary-100/50"
-                      }`}
+                      className={`size-14 rounded-full flex items-center justify-center ${"border bg-primary-100"}`}
                     >
                       <Text className="text-lg">{icon}</Text>
                     </View>
@@ -309,12 +343,23 @@ const HistoryDetails = () => {
                 );
               })}
             </View>
-            {userAddons.length > 0 && (
-              <Text className="text-secondary-100 text-sm text-center font-rubik mt-2">
-                Addons amount: {addonsAmount}/=
-              </Text>
-            )}
-          </View> */}
+
+            <Text className="text-secondary-100 text-sm text-center font-rubik mt-2">
+              Addons amount:{" "}
+              {
+                booking?.addons
+                  ? booking.addons
+                      .filter((addon) => addon.addonValue !== null) // Ensure null values are excluded
+                      .reduce(
+                        (total, addon) => total + (addon.addonValue || 0),
+                        // eslint-disable-next-line prettier/prettier
+                        0
+                      )
+                  : 0
+                // Sum up all the addon values
+              }
+            </Text>
+          </View>
 
           <View className="mt-7">
             <Text className="text-black-300 text-xl font-rubik-bold">
@@ -439,7 +484,8 @@ const HistoryDetails = () => {
           <TouchableOpacity
             onPress={
               !["CANCELLED", "REFUNDED", "PROCEEDED", "NO SHOW"].includes(
-                booking?.bookingStatus
+                // eslint-disable-next-line prettier/prettier
+                booking?.bookingStatus ?? ""
               ) && booking?.paymentStatus === "CONFIRMED"
                 ? openConfirmationModal
                 : () => {}
@@ -473,16 +519,16 @@ const HistoryDetails = () => {
                           : "text-white"
               }`}
             >
-              {booking?.paymentStatus === "CONFIRMED" &&
+              {booking?.bookingStatus === "PENDING" &&
               ![
                 "CANCELLED",
                 "PENDING",
                 "PROCEEDED",
                 "REFUNDED",
                 "NO SHOW",
-              ].includes(booking?.bookingStatus)
+              ].includes(booking?.paymentStatus)
                 ? "Cancel booking"
-                : booking?.bookingStatus === "PENDING"
+                : booking?.paymentStatus === "PENDING"
                   ? "Awaiting payment..."
                   : booking?.bookingStatus === "PROCEEDED"
                     ? "Hope you enjoyed your ride"
@@ -542,7 +588,7 @@ const HistoryDetails = () => {
               router.push(
                 booking?.paymentStatus === "CONFIRMED"
                   ? `/(root)/${id}/history-details?query=${params.query}`
-                  : `/(root)//${params.query}/book-details`
+                  : `/(root)/${params.query}/book-details`
               );
             }}
             className="mt-5"
@@ -604,7 +650,7 @@ const HistoryDetails = () => {
               View
               <Text
                 className="text-primary-100"
-                onPress={() => router.push("(root)/help")}
+                onPress={() => router.push("/(root)/help")}
               >
                 {" "}
                 Cancellation Policy{" "}
@@ -612,7 +658,8 @@ const HistoryDetails = () => {
               for more details.
             </Text>
             <Text className="mb-2">
-              Booking Date: {new Date(booking.bookingDate).toLocaleDateString()}
+              Booking Date:{" "}
+              {new Date(booking?.bookingDate ?? "").toLocaleDateString()}
             </Text>
             <Text className="mb-2">
               Days Until Pickup:{" "}

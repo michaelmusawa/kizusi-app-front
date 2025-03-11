@@ -25,6 +25,7 @@ export default function RootLayout() {
 
   if (!publishableKey) {
     throw new Error(
+      // eslint-disable-next-line prettier/prettier
       "Missing Publishable Key. Please set EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY in your .env"
     );
   }

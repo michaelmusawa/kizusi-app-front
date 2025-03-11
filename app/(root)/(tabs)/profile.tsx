@@ -1,5 +1,4 @@
 import {
-  Alert,
   Dimensions,
   Image,
   ImageSourcePropType,
@@ -63,7 +62,7 @@ const Profile = () => {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id || ""}`, {
+  } = useFetch<{ data: User }>(`/(api)/user/${user?.id || ""}`, {
     method: "GET",
   });
 
@@ -120,7 +119,7 @@ const Profile = () => {
             {/* User Phone */}
             <Text className="text-lg font-medium mt-2 text-gray-600">
               {returnedUser?.phone ??
-                user?.primaryPhoneNumber ??
+                user?.primaryPhoneNumber?.phoneNumber ??
                 "No phone number"}
             </Text>
           </View>

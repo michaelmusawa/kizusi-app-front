@@ -33,6 +33,7 @@ const Search = ({ cars }: { cars: Car[] }) => {
           car.category.categoryName
             .toLowerCase()
             .includes(text.toLowerCase()) ||
+          // eslint-disable-next-line prettier/prettier
           car.brand.brandName.toLowerCase().includes(text.toLowerCase())
       );
       if (search !== "") {

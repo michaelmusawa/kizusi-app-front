@@ -1,6 +1,5 @@
 import { WebView } from "react-native-webview";
-import Constants from "expo-constants";
-import { StyleSheet, View, Text } from "react-native";
+import { View, Text } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 
 export default function App() {

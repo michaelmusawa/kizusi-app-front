@@ -20,9 +20,9 @@ export const featureIcons = {
   fuel: icons.fuel,
 };
 
-export const addonIcons = {
+export const addonIcons: { [key: string]: string } = {
   Add: "➕",
   Bluetooth: "📶",
   Water: "💧",
-  Charger: "⚡",
+  Charger: "🔋",
 };

@@ -26,7 +26,7 @@ const GoogleTextInput = ({
     setInput(initialLocation || "");
   }, [initialLocation]);
 
-  const onInputChange = (text) => {
+  const onInputChange = (text: string) => {
     setInput(text);
     fetchSuggestions(text);
   };

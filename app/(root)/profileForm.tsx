@@ -1,7 +1,7 @@
 import CustomButton from "@/components/CustomButton";
 import ImagePickerExample from "@/components/ImagePicker";
 import InputField from "@/components/InputField";
-import { icons, images } from "@/constants";
+import { icons } from "@/constants";
 import { User } from "@/lib/definitions";
 import { fetchAPI, useFetch } from "@/lib/fetch";
 import { useUser } from "@clerk/clerk-expo";
@@ -13,7 +13,6 @@ import {
   Image,
   Dimensions,
   ScrollView,
-  Alert,
   TouchableOpacity,
   Platform,
 } from "react-native";
@@ -29,7 +28,7 @@ export default function ProfileForm() {
     data: response,
     loading: userLoading,
     error: userError,
-  } = useFetch<User>(`/(api)/user/${user?.id}`, {
+  } = useFetch<{ data: User }>(`/(api)/user/${user?.id}`, {
     method: "GET",
   });
 
@@ -41,7 +40,7 @@ export default function ProfileForm() {
     name: returnedUser?.name ?? user?.fullName ?? "",
     email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress ?? "",
     password: returnedUser?.password ?? "",
-    phone: returnedUser?.phone ?? user?.primaryPhoneNumber ?? "",
+    phone: returnedUser?.phone ?? user?.primaryPhoneNumber?.phoneNumber ?? "",
     image:
       pickedImage ??
       returnedUser?.image ??
@@ -54,7 +53,7 @@ export default function ProfileForm() {
     if (pickedImage !== null) {
       setForm({ ...form, image: pickedImage });
     }
-  }, [pickedImage]);
+  }, [form, pickedImage]);
 
   if (userLoading) {
     return <Text className="text-center mt-4">Loading...</Text>;

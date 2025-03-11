@@ -22,7 +22,7 @@ export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange }) => (
       I consent to the
       <Text
         className="text-primary-100"
-        onPress={() => router.push("(root)/help")}
+        onPress={() => router.push("/(root)/help")}
       >
         {" "}
         terms and conditions{" "}

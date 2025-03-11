@@ -8,7 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
-import { icons, images } from "@/constants";
+import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { Car, User } from "@/lib/definitions";
 import { useEffect, useState } from "react";
@@ -118,6 +118,7 @@ const BookDetails = () => {
     rideAmount = Number((Number(car?.price) || 0).toFixed(2));
   } else if (rideDetails?.time && car?.price) {
     rideAmount = Number(
+      // eslint-disable-next-line prettier/prettier
       ((rideDetails.time * Number(car?.price)) / 1440).toFixed(2)
     );
   }
@@ -147,7 +148,7 @@ const BookDetails = () => {
         returnedUser?.image ??
         user?.externalAccounts?.[0]?.imageUrl ??
         user?.imageUrl,
-      carId: id,
+      carId: Number(id),
       reference: reference,
       userId: user?.id,
       bookingDate: date,
@@ -162,6 +163,7 @@ const BookDetails = () => {
       addons: userAddons,
       description: "Car Rental Payment",
       callbackUrl: Linking.createURL(
+        // eslint-disable-next-line prettier/prettier
         `/(root)/${reference}/history-details?query=${id}&callback=true`
       ),
     };
@@ -171,7 +173,8 @@ const BookDetails = () => {
 
       if (response.redirect_url) {
         router.push(
-          `(root)/paymentWebView?callbackUrl=${response.redirect_url}`
+          // eslint-disable-next-line prettier/prettier
+          `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
         );
       }
     } catch (error) {
@@ -243,7 +246,7 @@ const BookDetails = () => {
             <View className="flex flex-row items-center gap-3">
               <View className="flex flex-row items-center gap-2">
                 <Text className="text-black-200 mt-1 font-rubik-medium">
-                  ({car?.category.name})
+                  ({car?.category.categoryName})
                 </Text>
               </View>
             </View>
@@ -251,44 +254,53 @@ const BookDetails = () => {
         </View>
 
         <View className="px-5 mt-7 flex gap-2">
-          {user && (
-            <View className="w-full mt-4">
-              <Text className="text-black-300 text-xl font-rubik-bold">
-                Your details
-              </Text>
+          {userLoading && !userError ? (
+            <Text
+              numberOfLines={1}
+              className="text-secondary-100 text-start text-2xl font-rubik-bold"
+            >
+              Loading...
+            </Text>
+          ) : (
+            user && (
+              <View className="w-full mt-4">
+                <Text className="text-black-300 text-xl font-rubik-bold">
+                  Your details
+                </Text>
 
-              <View className="flex flex-row items-center justify-between mt-4">
-                <View className="flex flex-row items-center">
-                  <Image
-                    source={{
-                      uri:
-                        returnedUser?.image ??
-                        user?.externalAccounts?.[0]?.imageUrl ??
-                        user?.imageUrl,
-                    }}
-                    className="size-14 rounded-full border border-secondary-100"
-                  />
+                <View className="flex flex-row items-center justify-between mt-4">
+                  <View className="flex flex-row items-center">
+                    <Image
+                      source={{
+                        uri:
+                          returnedUser?.image ??
+                          user?.externalAccounts?.[0]?.imageUrl ??
+                          user?.imageUrl,
+                      }}
+                      className="size-14 rounded-full border border-secondary-100"
+                    />
 
-                  <View className="flex flex-col items-start justify-center ml-7">
-                    <Text className="text-lg text-black-300 text-start font-rubik-bold">
-                      {returnedUser?.name ??
-                        user?.fullName ??
-                        "No name available"}
-                    </Text>
-                    <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                      {returnedUser?.email ??
-                        user?.primaryEmailAddress?.emailAddress ??
-                        "No email address"}
-                    </Text>
-                    <Text className="text-sm text-black-200 text-start font-rubik-medium">
-                      {returnedUser?.phone ??
-                        user?.primaryPhoneNumber ??
-                        "No phone number available"}
-                    </Text>
+                    <View className="flex flex-col items-start justify-center ml-7">
+                      <Text className="text-lg text-black-300 text-start font-rubik-bold">
+                        {returnedUser?.name ??
+                          user?.fullName ??
+                          "No name available"}
+                      </Text>
+                      <Text className="text-sm text-black-200 text-start font-rubik-medium">
+                        {returnedUser?.email ??
+                          user?.primaryEmailAddress?.emailAddress ??
+                          "No email address"}
+                      </Text>
+                      <Text className="text-lg font-medium mt-2 text-gray-600">
+                        {returnedUser?.phone ??
+                          user?.primaryPhoneNumber?.phoneNumber ??
+                          "No phone number"}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>
-            </View>
+            )
           )}
 
           <View className="mt-7">
@@ -300,10 +312,10 @@ const BookDetails = () => {
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
                 <MapWithMarkers
-                  departureLatitude={departureLatitude}
-                  destinationLatitude={destinationLatitude}
-                  departureLongitude={departureLongitude}
-                  destinationLongitude={destinationLongitude}
+                  departureLatitude={departureLatitude ?? -1.32}
+                  destinationLatitude={destinationLatitude ?? -0.98}
+                  departureLongitude={departureLongitude ?? 36.91}
+                  destinationLongitude={destinationLongitude ?? 37.08}
                 />
 
                 <View className="flex-1 mx-4">
@@ -334,8 +346,8 @@ const BookDetails = () => {
                     <Text className="text-base font-rubik-bold text-secondary-100">
                       <Image source={icons.calender} className="h-5 w-5" />
                       {"   "}
-                      {new Date(date).toLocaleDateString()},{" "}
-                      {new Date(date).toLocaleTimeString()}
+                      {new Date(date ?? "").toLocaleDateString()},{" "}
+                      {new Date(date ?? "").toLocaleTimeString()}
                     </Text>
                   </View>
                 </View>

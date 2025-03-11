@@ -34,7 +34,6 @@ const Home = () => {
 
   const { setUserLocation } = useLocationStore();
 
-  const [hasPermissions, setHasPermissions] = useState(false);
   const [fetchLimit, setFetchLimit] = useState("6");
   const [seeAll, setSeeAll] = useState(true);
 
@@ -43,9 +42,8 @@ const Home = () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
 
       if (status !== "granted") {
-        setHasPermissions(false);
         return;
-      } else setHasPermissions(true);
+      }
 
       let location = await Location.getCurrentPositionAsync();
 
@@ -61,7 +59,7 @@ const Home = () => {
       });
     };
     requestLocation();
-  }, []);
+  }, [setUserLocation]);
 
   const params = useLocalSearchParams<{ query?: string; filter?: string }>();
 
@@ -104,15 +102,16 @@ const Home = () => {
       limit: fetchLimit,
     }).toString()}`;
 
-    setUrl(fetchUrl); // Update the URL state
-    refetch(); // Refetch with the updated URL
+    setUrl(fetchUrl);
+    refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.filter, params.query, fetchLimit]);
 
   const debouncedSearch = useDebouncedCallback((text: string) => {
     router.setParams({ query: text });
   });
 
-  const handleCardPress = (id: string) => router.push(`/${id}/car-details`);
+  const handleCardPress = (id: number) => router.push(`/${id}/car-details`);
   const handleCategoryPress = (name: string) => {
     debouncedSearch(name);
   };
@@ -159,12 +158,12 @@ const Home = () => {
         renderItem={({ item }) => (
           <Card car={item} onPress={() => handleCardPress(item.id)} />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => `${item.id}`}
         contentContainerClassName="pb-32"
         columnWrapperClassName="flex gap-5 px-5"
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          carsLoading ? (
+          carsLoading && !carsError ? (
             <ActivityIndicator size="large" className="text-primary-300 mt-5" />
           ) : (
             <NoResults />
@@ -183,7 +182,7 @@ const Home = () => {
                     }
                   >
                     <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
-                      {userLoading ? (
+                      {userLoading && !userError ? (
                         <Text className="text-xs">Loading..</Text>
                       ) : (
                         <View>
@@ -239,7 +238,7 @@ const Home = () => {
                   </Text>
                 </View>
 
-                {categoriesLoading ? (
+                {categoriesLoading && !categoriesError ? (
                   <ActivityIndicator
                     size="large"
                     className="text-primary-300"

@@ -11,8 +11,6 @@ import { router, useLocalSearchParams } from "expo-router";
 import { icons } from "@/constants";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
-import { useEffect, useState } from "react";
-import { useLocationStore } from "@/store";
 import { addonIcons, featureIcons } from "@/constants/data";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -20,8 +18,6 @@ const CarDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
 
   const windowHeight = Dimensions.get("window").height;
-
-  const [addons, setAddons] = useState<string[]>([]);
 
   const {
     data: response,
@@ -97,7 +93,7 @@ const CarDetails = () => {
             <View className="flex flex-row items-center gap-3">
               <View className="flex flex-row items-center gap-2">
                 <Text className="text-black-200 mt-1 font-rubik-medium">
-                  ({car?.category?.name})
+                  ({car?.category?.categoryName})
                 </Text>
               </View>
             </View>

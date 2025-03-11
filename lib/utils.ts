@@ -55,12 +55,15 @@ export const validatePassword = (password: string) => {
 };
 
 export const calculateCancellationDetails = (
-  bookingDate: string,
+  bookingDate: Date | undefined,
+  // eslint-disable-next-line prettier/prettier
   amount: number
 ) => {
   const currentDate = new Date();
-  const bookingDateObj = new Date(bookingDate);
-  const timeDiff = bookingDateObj - currentDate;
+  const bookingDateObj = new Date(bookingDate ?? "");
+
+  // Ensure we're working with numbers for the time difference
+  const timeDiff = bookingDateObj.getTime() - currentDate.getTime();
   const daysDiff = timeDiff / (1000 * 3600 * 24);
 
   let cancellationFee = 0;

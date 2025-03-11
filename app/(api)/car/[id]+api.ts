@@ -21,6 +21,7 @@ export async function GET(request: Request, { id }: Record<string, string>) {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
+        // eslint-disable-next-line prettier/prettier
       }
     );
   }

@@ -1,13 +1,10 @@
 import HistoryDisplay from "@/components/HistoryDisplay";
 import Search from "@/components/HistorySearch";
-import NoResults from "@/components/NoResults";
 import NoUserPage from "@/components/NoUserPage";
-import { Booking } from "@/lib/definitions";
-import { useFetch } from "@/lib/fetch";
 import { useUser } from "@clerk/clerk-expo";
-import { router, useLocalSearchParams } from "expo-router";
-import React, { useEffect } from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import { useLocalSearchParams } from "expo-router";
+import React from "react";
+import { ScrollView } from "react-native";
 
 const BookingHistory = () => {
   const { user } = useUser();

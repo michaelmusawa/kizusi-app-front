@@ -9,6 +9,7 @@ import { DateTimePickerComponent } from "@/components/DateTimePicker";
 import { calculateTimes } from "@/lib/map";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
+import { calculateDaysBetween } from "@/lib/utils";
 
 export default function AddDirections() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -27,6 +28,7 @@ export default function AddDirections() {
     setBookType,
     setRideDetails,
     date,
+    endDate,
   } = useLocationStore();
 
   const [localDepartureAddress, setLocalDepartureAddress] =
@@ -131,9 +133,16 @@ export default function AddDirections() {
     router.push(`/${id}/book-details`);
   };
 
+  let numberOfDays = 0;
+  if (date && endDate) {
+    numberOfDays = calculateDaysBetween(date, endDate);
+  } else if (date) {
+    numberOfDays = 1;
+  }
+
   const SelectComponent = () => {
     return (
-      <View className="flex-1 p-4">
+      <View className="flex-1">
         <Text className="text-lg mb-2">Select book type:</Text>
         <TouchableOpacity
           onPress={() => setViewOptions(true)}
@@ -191,13 +200,22 @@ export default function AddDirections() {
     <>
       <RideLayout title="Car details" snapPoints={["50%", "85%"]}>
         {error && <Text className="text-red-500 text-center">{error}</Text>}
-        <View className="flex flex-row">
+        <View className="flex flex-row gap-4">
           <View className="flex-1">
             <SelectComponent />
           </View>
 
           <View className="flex-1">
-            <DateTimePickerComponent />
+            {bookType && (
+              <>
+                <DateTimePickerComponent bookType={bookType} />
+                {bookType === "full_day" && (
+                  <Text className="text-gray-500 text-xs text-center mt-1">
+                    Days: {numberOfDays}
+                  </Text>
+                )}
+              </>
+            )}
           </View>
         </View>
 
@@ -280,7 +298,15 @@ export default function AddDirections() {
                 numberOfLines={1}
                 className="text-secondary-100 text-start text-2xl font-rubik-bold"
               >
-                Ksh.{car?.price}
+                Ksh.
+                {numberOfDays === 0 ? (
+                  <Text className="text-xs text-red-500">
+                    {" "}
+                    No date selected
+                  </Text>
+                ) : (
+                  car?.price * numberOfDays
+                )}
               </Text>
             )}
           </View>

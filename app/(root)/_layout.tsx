@@ -28,10 +28,6 @@ export default function Layout() {
           name="[id]/add-directions"
           options={{ headerShown: false }}
         />
-        <Stack.Screen
-          name="payments/[id]/payment"
-          options={{ headerShown: false }}
-        />
       </Stack>
     </LinearGradient>
   );

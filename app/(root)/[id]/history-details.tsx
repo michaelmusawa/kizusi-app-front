@@ -26,7 +26,10 @@ import { useUser } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
-import { calculateCancellationDetails } from "@/lib/utils";
+import {
+  calculateCancellationDetails,
+  calculateDaysBetween,
+} from "@/lib/utils";
 import { MapWithMarkers } from "@/components/Geoapify";
 import { addonIcons } from "@/constants/data";
 
@@ -111,8 +114,6 @@ const HistoryDetails = () => {
     } catch (error) {
       setShowErrorModal(true);
       console.error("Cancelling booking:", error);
-
-      throw error;
     }
   };
 
@@ -150,6 +151,16 @@ const HistoryDetails = () => {
   const closeConfirmationModal = () => {
     setShowConfirmationModal(false);
   };
+
+  let numberOfDays = 0;
+  if (booking?.bookingDate && booking.bookingEndDate) {
+    numberOfDays = calculateDaysBetween(
+      new Date(booking.bookingDate),
+      new Date(booking.bookingEndDate)
+    );
+  } else if (booking?.bookingDate) {
+    numberOfDays = 1;
+  }
 
   return (
     <View className="h-full">
@@ -238,8 +249,9 @@ const HistoryDetails = () => {
                       ({car?.category.categoryName})
                     </Text>
                   </View>
-                </View>{" "}
+                </View>
                 <Text className="text-2xl font-rubik-extrabold">
+                  {" "}
                   {car?.name}
                 </Text>
               </>
@@ -253,8 +265,8 @@ const HistoryDetails = () => {
               Directions
             </Text>
 
-            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
-              <View className="flex flex-row gap-2 items-center">
+            <View className="flex w-full mt-4 py-4 rounded-lg relative">
+              <View className="flex flex-row items-center">
                 {/* Image section */}
 
                 <MapWithMarkers
@@ -264,7 +276,7 @@ const HistoryDetails = () => {
                   destinationLongitude={Number(booking?.destinationLongitude)}
                 />
 
-                <View className="flex-1 ml-4">
+                <View className="flex-1 ml-2">
                   <View className="flex-row items-center mb-2">
                     <Image source={icons.point} className="h-5 w-5" />
                     <Text className="ml-2 font-semibold">
@@ -281,29 +293,43 @@ const HistoryDetails = () => {
                   )}
 
                   {/* Date and book type */}
+
                   <View className="flex items-start justify-between w-full gap-1">
                     <View className="flex flex-row items-center justify-between">
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        <Image source={icons.map} className="h-5 w-5" />
+                        <Image source={icons.list} className="h-5 w-5" />
                         {"   "}
                         {booking?.bookType === "full_day"
-                          ? "Full day"
+                          ? `Full day for ${numberOfDays} day(s)`
                           : "Transfer"}
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
                       <Image source={icons.calender} className="h-5 w-5" />
+                      {booking?.bookingEndDate && "   From:"}
                       {"   "}
                       {new Date(
-                        // eslint-disable-next-line prettier/prettier
                         booking?.bookingDate ?? ""
                       ).toLocaleDateString()}
                       ,{" "}
                       {new Date(
-                        // eslint-disable-next-line prettier/prettier
                         booking?.bookingDate ?? ""
                       ).toLocaleTimeString()}
                     </Text>
+                    {booking?.bookingEndDate && (
+                      <Text className="text-base font-rubik-bold text-secondary-100">
+                        <Image source={icons.calender} className="h-5 w-5" />
+                        {booking?.bookingEndDate && "   To:"}
+                        {"   "}
+                        {new Date(
+                          booking?.bookingEndDate ?? ""
+                        ).toLocaleDateString()}
+                        ,{" "}
+                        {new Date(
+                          booking?.bookingEndDate ?? ""
+                        ).toLocaleTimeString()}
+                      </Text>
+                    )}
                   </View>
                 </View>
               </View>
@@ -351,7 +377,8 @@ const HistoryDetails = () => {
                   ? booking.addons
                       .filter((addon) => addon.addonValue !== null) // Ensure null values are excluded
                       .reduce(
-                        (total, addon) => total + (addon.addonValue || 0),
+                        (total, addon) =>
+                          total + (Number(addon.addonValue) || 0),
                         // eslint-disable-next-line prettier/prettier
                         0
                       )

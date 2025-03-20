@@ -38,6 +38,7 @@ export type Booking = {
   userId: string;
   carId: string;
   bookingDate: Date;
+  bookingEndDate: Date;
   departure: string;
   departureLongitude: string;
   departureLatitude: string;

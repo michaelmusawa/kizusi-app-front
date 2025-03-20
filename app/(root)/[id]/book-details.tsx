@@ -22,6 +22,7 @@ import * as Linking from "expo-linking";
 import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
 import { MapWithMarkers } from "@/components/Geoapify";
+import { calculateDaysBetween } from "@/lib/utils";
 
 const BookDetails = () => {
   const { user } = useUser();
@@ -38,6 +39,7 @@ const BookDetails = () => {
     userAddons,
     setUserAddons,
     date,
+    endDate,
     departureLatitude,
     departureLongitude,
     destinationLatitude,
@@ -111,11 +113,18 @@ const BookDetails = () => {
     return 0;
   };
 
+  let numberOfDays = 0;
+  if (date && endDate) {
+    numberOfDays = calculateDaysBetween(date, endDate);
+  } else if (date) {
+    numberOfDays = 1;
+  }
+
   let rideAmount = 0;
   const addonsAmount = calculateAddonsAmount();
 
   if (bookType === "full_day") {
-    rideAmount = Number((Number(car?.price) || 0).toFixed(2));
+    rideAmount = Number((Number(car?.price * numberOfDays) || 0).toFixed(2));
   } else if (rideDetails?.time && car?.price) {
     rideAmount = Number(
       // eslint-disable-next-line prettier/prettier
@@ -152,6 +161,7 @@ const BookDetails = () => {
       reference: reference,
       userId: user?.id,
       bookingDate: date,
+      bookingEndDate: endDate,
       departureLatitude: departureLatitude,
       departureLongitude: departureLongitude,
       destinationLatitude: destinationLatitude,
@@ -172,10 +182,11 @@ const BookDetails = () => {
       const response = await initiatePayment(paymentData);
 
       if (response.redirect_url) {
-        router.push(
-          // eslint-disable-next-line prettier/prettier
-          `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
-        );
+        Linking.openURL(response.redirect_url);
+        // router.push(
+        //   // eslint-disable-next-line prettier/prettier
+        //   `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
+        // );
       }
     } catch (error) {
       console.error("Payment initiation failed:", error);
@@ -308,17 +319,17 @@ const BookDetails = () => {
               Directions
             </Text>
 
-            <View className="flex w-full mt-4 px-3 py-4 rounded-lg relative">
+            <View className="flex w-full mt-4 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
                 {/* Image section */}
                 <MapWithMarkers
-                  departureLatitude={departureLatitude ?? -1.32}
-                  destinationLatitude={destinationLatitude ?? -0.98}
-                  departureLongitude={departureLongitude ?? 36.91}
-                  destinationLongitude={destinationLongitude ?? 37.08}
+                  departureLatitude={Number(departureLatitude)}
+                  destinationLatitude={Number(destinationLatitude)}
+                  departureLongitude={Number(departureLongitude)}
+                  destinationLongitude={Number(destinationLongitude)}
                 />
 
-                <View className="flex-1 mx-4">
+                <View className="flex-1">
                   <View className="flex-row items-center mb-2">
                     <Image source={icons.point} className="h-5 w-5" />
                     <Text className="ml-2 font-semibold">
@@ -340,15 +351,27 @@ const BookDetails = () => {
                       <Text className="text-base font-rubik-bold text-secondary-100">
                         <Image source={icons.list} className="h-5 w-5" />
                         {"   "}
-                        {bookType === "full_day" ? "Full day" : "Transfer"}
+                        {bookType === "full_day"
+                          ? `Full day for ${numberOfDays}`
+                          : "Transfer"}
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
                       <Image source={icons.calender} className="h-5 w-5" />
+                      {endDate && "   From:"}
                       {"   "}
                       {new Date(date ?? "").toLocaleDateString()},{" "}
                       {new Date(date ?? "").toLocaleTimeString()}
                     </Text>
+                    {endDate && (
+                      <Text className="text-base font-rubik-bold text-secondary-100">
+                        <Image source={icons.calender} className="h-5 w-5" />
+                        {endDate && "   To:"}
+                        {"   "}
+                        {new Date(endDate ?? "").toLocaleDateString()},{" "}
+                        {new Date(endDate ?? "").toLocaleTimeString()}
+                      </Text>
+                    )}
                   </View>
                 </View>
               </View>

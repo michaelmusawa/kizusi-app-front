@@ -2,6 +2,7 @@ import {
   ActivityIndicator,
   FlatList,
   Image,
+  Linking,
   Text,
   TouchableOpacity,
   View,
@@ -225,6 +226,13 @@ const Home = () => {
                     </Text>
                   </View>
                 </View>
+                <TouchableOpacity
+                  onPress={() => Linking.openURL("https://google.com")}
+                >
+                  <Text className="font-rubik text-secondary-100">
+                    For self drive {"→"}
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
 

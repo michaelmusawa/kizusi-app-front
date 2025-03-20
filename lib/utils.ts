@@ -69,13 +69,14 @@ export const calculateCancellationDetails = (
   let cancellationFee = 0;
   let refundAmount = amount;
 
-  if (daysDiff > 2) {
+  if (daysDiff.toFixed(0) > "2") {
     // More than 2 days prior: No fee
     cancellationFee = 0;
     refundAmount = amount;
-  } else if (daysDiff === 1) {
+  } else if (daysDiff.toFixed(0) === "1") {
     // 1 day prior: 20% fee based on 50% of the amount
-    cancellationFee = 0.2 * 0.5 * amount;
+    console.log("im here");
+    cancellationFee = 0.2 * (0.5 * amount);
     refundAmount = amount - cancellationFee;
   } else if (daysDiff <= 0) {
     // Same day or no-show: No refund
@@ -83,5 +84,31 @@ export const calculateCancellationDetails = (
     refundAmount = 0;
   }
 
+  console.log(daysDiff.toFixed(0), cancellationFee, refundAmount);
+
   return { daysDiff, cancellationFee, refundAmount };
 };
+
+export function calculateDaysBetween(startDate: Date, endDate: Date): number {
+  // Create new Date objects at midnight for both start and end dates
+  const start = new Date(
+    startDate.getFullYear(),
+    startDate.getMonth(),
+    startDate.getDate()
+  );
+  const end = new Date(
+    endDate.getFullYear(),
+    endDate.getMonth(),
+    endDate.getDate()
+  );
+
+  // Calculate the difference in milliseconds
+  const msInDay = 1000 * 60 * 60 * 24;
+  const diffInMs = end.getTime() - start.getTime();
+  const days = Math.round(diffInMs / msInDay);
+
+  if (days === 0) {
+    return 1;
+  }
+  return days;
+}

@@ -13,6 +13,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   departureAddress: null,
   bookType: null,
   date: null,
+  endDate: null,
   userAddons: [],
   rideDetails: { time: null, price: null },
 
@@ -66,6 +67,10 @@ export const useLocationStore = create<LocationStore>((set) => ({
 
   setDate: ({ date }: { date: string }) => {
     set({ date });
+  },
+
+  setEndDate: ({ endDate }: { endDate: string }) => {
+    set({ endDate });
   },
 
   setBookType: ({ bookType }: { bookType: string }) => {

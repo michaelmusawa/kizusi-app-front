@@ -17,7 +17,7 @@ export async function POST(request: Request) {
       }
     );
 
-    // Return the response back to the frontend
+    console.log("Dem response", response.data);
     return new Response(JSON.stringify(response.data), {
       headers: { "Content-Type": "application/json" },
     });

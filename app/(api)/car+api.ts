@@ -21,8 +21,6 @@ export async function GET(request: Request) {
 
     const cars = response.data;
 
-    console.log(response.data);
-
     return new Response(JSON.stringify({ data: cars }), {
       headers: { "Content-Type": "application/json" },
     });

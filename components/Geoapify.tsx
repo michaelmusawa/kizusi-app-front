@@ -1,9 +1,9 @@
 import { icons } from "@/constants";
 import React, { useEffect, useState } from "react";
-import { Platform, View } from "react-native";
+import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import { Image } from "react-native";
+import { Image, Text } from "react-native";
 
 interface MapProps {
   departureLongitude: number;
@@ -49,6 +49,13 @@ function MapWithMarkers({
     destinationLongitude,
   ]);
 
+  if (!departureLatitude && !departureLongitude)
+    return (
+      <View className="flex justify-between items-center w-full">
+        <ActivityIndicator size="small" color="#000" />
+      </View>
+    );
+
   return (
     <View className="w-1/2 h-40 rounded-lg overflow-hidden">
       <MapView
@@ -59,18 +66,20 @@ function MapWithMarkers({
         userInterfaceStyle="light"
       >
         {/* Departure Marker (Always Present) */}
+
         <Marker
           coordinate={{
             latitude: departureLatitude,
             longitude: departureLongitude,
           }}
           title="Departure"
+          description="Starting point"
           image={icons.selectedMarker}
         />
 
         {/* Destination Marker + Path (Conditional) */}
         {destinationLatitude && destinationLongitude && (
-          <>
+          <Text>
             <Marker
               coordinate={{
                 latitude: destinationLatitude,
@@ -93,7 +102,7 @@ function MapWithMarkers({
               strokeColor="#0286FF"
               strokeWidth={2}
             />
-          </>
+          </Text>
         )}
       </MapView>
     </View>

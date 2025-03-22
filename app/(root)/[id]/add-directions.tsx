@@ -51,6 +51,13 @@ export default function AddDirections() {
 
   useEffect(() => {
     setLocalBookType(bookType);
+    if (bookType === "full_day") {
+      setDestinationLocation({
+        latitude: null,
+        longitude: null,
+        address: null,
+      });
+    }
   }, [bookType]);
 
   useEffect(() => {

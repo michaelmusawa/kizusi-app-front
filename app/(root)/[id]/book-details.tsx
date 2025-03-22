@@ -23,6 +23,7 @@ import uuid from "react-native-uuid";
 import { LinearGradient } from "expo-linear-gradient";
 import { MapWithMarkers } from "@/components/Geoapify";
 import { calculateDaysBetween } from "@/lib/utils";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const BookDetails = () => {
   const { user } = useUser();
@@ -182,11 +183,11 @@ const BookDetails = () => {
       const response = await initiatePayment(paymentData);
 
       if (response.redirect_url) {
-        Linking.openURL(response.redirect_url);
-        // router.push(
-        //   // eslint-disable-next-line prettier/prettier
-        //   `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
-        // );
+        // Linking.openURL(response.redirect_url);
+        router.push(
+          // eslint-disable-next-line prettier/prettier
+          `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
+        );
       }
     } catch (error) {
       console.error("Payment initiation failed:", error);
@@ -202,7 +203,7 @@ const BookDetails = () => {
   }
 
   return (
-    <View>
+    <GestureHandlerRootView>
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerClassName="pb-32 bg-white"
@@ -321,7 +322,6 @@ const BookDetails = () => {
 
             <View className="flex w-full mt-4 py-4 rounded-lg relative">
               <View className="flex flex-row gap-2 items-center">
-                {/* Image section */}
                 <MapWithMarkers
                   departureLatitude={Number(departureLatitude)}
                   destinationLatitude={Number(destinationLatitude)}
@@ -352,12 +352,12 @@ const BookDetails = () => {
                         <Image source={icons.list} className="h-5 w-5" />
                         {"   "}
                         {bookType === "full_day"
-                          ? `Full day for ${numberOfDays}`
+                          ? `Full day: ${numberOfDays} ${numberOfDays === 1 ? "day" : "days"}`
                           : "Transfer"}
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
-                      <Image source={icons.calender} className="h-5 w-5" />
+                      <Image source={icons.calender} className="size-3" />
                       {endDate && "   From:"}
                       {"   "}
                       {new Date(date ?? "").toLocaleDateString()},{" "}
@@ -365,7 +365,7 @@ const BookDetails = () => {
                     </Text>
                     {endDate && (
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        <Image source={icons.calender} className="h-5 w-5" />
+                        <Image source={icons.calender} className="size-3" />
                         {endDate && "   To:"}
                         {"   "}
                         {new Date(endDate ?? "").toLocaleDateString()},{" "}
@@ -531,7 +531,7 @@ const BookDetails = () => {
           </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 

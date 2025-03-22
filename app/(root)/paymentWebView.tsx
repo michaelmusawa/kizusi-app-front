@@ -6,7 +6,8 @@ export default function App() {
   const { callbackUrl } = useLocalSearchParams<{ callbackUrl?: string }>();
 
   const onNavigationStateChange = (navState: any) => {
-    console.log("the navigation change", navState.url);
+    if (navState.url.includes("PaymentConfirmation")) {
+    }
   };
 
   return callbackUrl ? (

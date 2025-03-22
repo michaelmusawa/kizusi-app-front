@@ -9,7 +9,7 @@ import {
   Platform,
   Modal,
 } from "react-native";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams, usePathname } from "expo-router";
 import {
   fetchAPI,
   initiatePayment,
@@ -44,13 +44,25 @@ const HistoryDetails = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [cancelBooking, setCancelBooking] = useState(false);
+  const pathname = usePathname();
   const { user } = useUser();
+
+  console.log("params", params);
+  console.log("pathname", pathname);
 
   useEffect(() => {
     if (params.callback === "true" || params.completePayment === "true") {
       setShowSuccessModal(true);
+
+      // const newParams = new URLSearchParams(params as Record<string, string>);
+
+      // newParams.delete("callback");
+      // newParams.delete("completePayment");
+
+      // // Replace the URL without these parameters
+      // router.replace(`?${newParams.toString()}`);
     }
-    setShowSuccessModal(false);
+    // setShowSuccessModal(false);
   }, [params]);
 
   const {
@@ -297,7 +309,7 @@ const HistoryDetails = () => {
                   <View className="flex items-start justify-between w-full gap-1">
                     <View className="flex flex-row items-center justify-between">
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        <Image source={icons.list} className="h-5 w-5" />
+                        <Image source={icons.list} className="size-3" />
                         {"   "}
                         {booking?.bookType === "full_day"
                           ? `Full day for ${numberOfDays} day(s)`
@@ -305,7 +317,7 @@ const HistoryDetails = () => {
                       </Text>
                     </View>
                     <Text className="text-base font-rubik-bold text-secondary-100">
-                      <Image source={icons.calender} className="h-5 w-5" />
+                      <Image source={icons.calender} className="size-3" />
                       {booking?.bookingEndDate && "   From:"}
                       {"   "}
                       {new Date(
@@ -318,7 +330,7 @@ const HistoryDetails = () => {
                     </Text>
                     {booking?.bookingEndDate && (
                       <Text className="text-base font-rubik-bold text-secondary-100">
-                        <Image source={icons.calender} className="h-5 w-5" />
+                        <Image source={icons.calender} className="size-3" />
                         {booking?.bookingEndDate && "   To:"}
                         {"   "}
                         {new Date(
@@ -447,38 +459,39 @@ const HistoryDetails = () => {
               </View>
             </View>
           </View>
-          {booking?.paymentType === "reserve" && (
-            <View className="mt-4 p-4 bg-primary-100/50 rounded-lg">
-              <Text className="text-black-300 text-base font-rubik-medium">
-                A full payment is required before the booking date to confirm
-                your reservation.
-              </Text>
-              <View className="bg-white bottom-0 w-full rounded-2xl border-t border border-primary-200 py-4 px-7">
-                <View className="flex flex-row items-center justify-between gap-10">
-                  <View className="flex flex-col items-center">
-                    <Text className="text-black text-xs font-rubik-medium">
-                      Payment balance
-                    </Text>
-                    <Text
-                      numberOfLines={1}
-                      className="text-red-500 text-start text-2xl font-rubik-bold"
-                    >
-                      ${booking?.amount}
-                    </Text>
-                  </View>
+          {booking?.paymentType === "reserve" &&
+            booking.paymentStatus === "CONFIRMED" && (
+              <View className="mt-4 p-4 bg-primary-100/50 rounded-lg">
+                <Text className="text-black-300 text-base font-rubik-medium">
+                  A full payment is required before the booking date to confirm
+                  your reservation.
+                </Text>
+                <View className="bg-white bottom-0 w-full rounded-2xl border-t border border-primary-200 py-4 px-7">
+                  <View className="flex flex-row items-center justify-between gap-10">
+                    <View className="flex flex-col items-center">
+                      <Text className="text-black text-xs font-rubik-medium">
+                        Payment balance
+                      </Text>
+                      <Text
+                        numberOfLines={1}
+                        className="text-red-500 text-start text-2xl font-rubik-bold"
+                      >
+                        ${booking?.amount}
+                      </Text>
+                    </View>
 
-                  <TouchableOpacity
-                    onPress={handlePayment}
-                    className="flex-1 flex flex-row items-center justify-center bg-gray-100 py-2 rounded-full shadow-md shadow-zinc-400"
-                  >
-                    <Text className="text-gray-600 text-lg text-center font-rubik-bold">
-                      Complete payment
-                    </Text>
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={handlePayment}
+                      className="flex-1 flex flex-row items-center justify-center bg-gray-100 py-2 rounded-full shadow-md shadow-zinc-400"
+                    >
+                      <Text className="text-gray-600 text-lg text-center font-rubik-bold">
+                        Complete payment
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
                 </View>
               </View>
-            </View>
-          )}
+            )}
         </View>
       </ScrollView>
 
@@ -553,6 +566,7 @@ const HistoryDetails = () => {
                 "PROCEEDED",
                 "REFUNDED",
                 "NO SHOW",
+                "FAILED",
               ].includes(booking?.paymentStatus)
                 ? "Cancel booking"
                 : booking?.paymentStatus === "PENDING"
@@ -565,7 +579,9 @@ const HistoryDetails = () => {
                         ? "Wait for refund"
                         : booking?.bookingStatus === "NO SHOW"
                           ? "You missed your ride"
-                          : "Booking cancelled"}
+                          : booking?.paymentStatus === "FAILED"
+                            ? "Payment failed"
+                            : "Booking cancelled"}
             </Text>
           </TouchableOpacity>
         </View>
@@ -626,7 +642,7 @@ const HistoryDetails = () => {
               onPress={() => {
                 setShowSuccessModal(false);
 
-                router.back();
+                router.replace(`/(root)${pathname}?query=${params.query}`);
               }}
               className="mt-5"
             />

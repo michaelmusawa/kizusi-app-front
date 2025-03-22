@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
@@ -11,6 +11,8 @@ import { useLocationStore } from "@/store";
 const directionsAPI = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 
 export default function Map() {
+  const mapRef = useRef<MapView>(null);
+
   const {
     userLongitude,
     userLatitude,
@@ -37,6 +39,10 @@ export default function Map() {
       destinationLongitude,
     });
     setRegion(newRegion);
+
+    if (mapRef.current) {
+      mapRef.current.animateToRegion(newRegion, 1000); // Animate over 1 second
+    }
   }, [
     userLatitude,
     userLongitude,
@@ -56,12 +62,13 @@ export default function Map() {
   return (
     <View style={{ flex: 1 }}>
       <MapView
+        ref={mapRef}
         style={{ width: "100%", height: "100%" }}
         provider={PROVIDER_DEFAULT}
         tintColor="black"
         mapType={Platform.OS === "android" ? "standard" : "terrain"}
         showsPointsOfInterest={false}
-        initialRegion={region}
+        region={region}
         showsUserLocation={true}
         userInterfaceStyle="light"
       >

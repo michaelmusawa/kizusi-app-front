@@ -89,26 +89,40 @@ export const calculateCancellationDetails = (
   return { daysDiff, cancellationFee, refundAmount };
 };
 
-export function calculateDaysBetween(startDate: Date, endDate: Date): number {
-  // Create new Date objects at midnight for both start and end dates
-  const start = new Date(
-    startDate.getFullYear(),
-    startDate.getMonth(),
-    startDate.getDate()
-  );
-  const end = new Date(
-    endDate.getFullYear(),
-    endDate.getMonth(),
-    endDate.getDate()
-  );
-
-  // Calculate the difference in milliseconds
-  const msInDay = 1000 * 60 * 60 * 24;
-  const diffInMs = end.getTime() - start.getTime();
-  const days = Math.round(diffInMs / msInDay);
-
-  if (days === 0) {
-    return 1;
+export function calculateDaysBetween(
+  startDate: Date | string,
+  endDate: Date | string
+): number {
+  if (!startDate || !endDate) {
+    throw new Error("Both startDate and endDate are required.");
   }
-  return days;
+
+  // Convert strings to Date objects if necessary
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+    throw new Error(
+      "Invalid date format. Ensure you pass valid Date objects or ISO date strings."
+    );
+  }
+
+  // Normalize to midnight to avoid time zone issues
+  const normalizedStart = new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    start.getDate()
+  );
+  const normalizedEnd = new Date(
+    end.getFullYear(),
+    end.getMonth(),
+    end.getDate()
+  );
+
+  // Calculate the difference in days
+  const msInDay = 1000 * 60 * 60 * 24;
+  const diffInMs = normalizedEnd.getTime() - normalizedStart.getTime();
+  const days = Math.round(diffInMs / msInDay) + 1;
+
+  return days === 0 ? 1 : days;
 }

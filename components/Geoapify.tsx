@@ -3,7 +3,9 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, Platform, View } from "react-native";
 import MapView, { Marker, PROVIDER_DEFAULT } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import { Image, Text } from "react-native";
+import { Image } from "react-native";
+
+const directionsAPI = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 
 interface MapProps {
   departureLongitude: number;
@@ -24,8 +26,6 @@ function MapWithMarkers({
     latitudeDelta: 0.01,
     longitudeDelta: 0.01,
   });
-
-  const directionsAPI = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 
   useEffect(() => {
     const hasDestination = destinationLatitude && destinationLongitude;
@@ -61,13 +61,15 @@ function MapWithMarkers({
       <MapView
         style={{ width: "100%", height: "100%" }}
         provider={PROVIDER_DEFAULT}
-        initialRegion={region}
+        tintColor="black"
+        region={region}
         mapType={Platform.OS === "android" ? "standard" : "terrain"}
+        showsPointsOfInterest={false}
+        showsUserLocation={false}
         userInterfaceStyle="light"
       >
-        {/* Departure Marker (Always Present) */}
-
         <Marker
+          key="departure"
           coordinate={{
             latitude: departureLatitude,
             longitude: departureLongitude,
@@ -77,10 +79,10 @@ function MapWithMarkers({
           image={icons.selectedMarker}
         />
 
-        {/* Destination Marker + Path (Conditional) */}
-        {destinationLatitude && destinationLongitude && (
-          <Text>
+        {destinationLatitude && destinationLongitude ? (
+          <>
             <Marker
+              key="destination"
               coordinate={{
                 latitude: destinationLatitude,
                 longitude: destinationLongitude,
@@ -102,8 +104,8 @@ function MapWithMarkers({
               strokeColor="#0286FF"
               strokeWidth={2}
             />
-          </Text>
-        )}
+          </>
+        ) : null}
       </MapView>
     </View>
   );

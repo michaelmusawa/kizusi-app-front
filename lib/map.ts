@@ -1,5 +1,3 @@
-import { MarkerData } from "@/types/type";
-
 const directionsAPI = process.env.EXPO_PUBLIC_PLACES_API_KEY;
 
 export const calculateRegion = ({

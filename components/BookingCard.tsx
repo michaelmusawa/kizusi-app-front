@@ -1,11 +1,21 @@
 import { icons } from "@/constants";
 import { Booking } from "@/lib/definitions";
-import { formatDate } from "@/lib/utils";
+import { calculateDaysBetween, formatDate } from "@/lib/utils";
 import { router } from "expo-router";
 import { TouchableOpacity, Text, Image, View } from "react-native";
 import { HistoryMapWithMarkers } from "./Geoapify";
 
 const BookingCard = ({ booking }: { booking: Booking }) => {
+  let numberOfDays = 0;
+  if (booking?.bookingDate && booking?.bookingEndDate) {
+    numberOfDays = calculateDaysBetween(
+      booking.bookingDate,
+      booking.bookingEndDate
+    );
+  } else if (booking?.bookingDate) {
+    numberOfDays = 1;
+  }
+
   return (
     <TouchableOpacity
       onPress={() =>
@@ -73,9 +83,27 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
             </View>
           )}
 
-          <Text className="text-gray-500">
-            {formatDate(booking.bookingDate.toLocaleString())}
+          <Text className="text-base font-rubik-bold text-secondary-100">
+            <Image source={icons.calender} className="size-3" />
+            {booking.bookingEndDate && "   From:"}
+            {"   "}
+            {new Date(booking.bookingDate ?? "").toLocaleDateString()},{" "}
+            {new Date(booking.bookingDate ?? "").toLocaleTimeString()}
           </Text>
+          {booking.bookingEndDate && (
+            <>
+              <Text className="text-base font-rubik-bold text-secondary-100">
+                <Image source={icons.calender} className="size-3" />
+                {booking.bookingEndDate && "   To:"}
+                {"   "}
+                {new Date(
+                  booking.bookingEndDate ?? ""
+                ).toLocaleDateString()},{" "}
+                {new Date(booking.bookingEndDate ?? "").toLocaleTimeString()}
+              </Text>
+              <Text>{`For ${numberOfDays} ${numberOfDays === 1 ? "day" : "days"}`}</Text>
+            </>
+          )}
 
           <View className="flex flex-col mt-6 mb-8 gap-2 justify-center items-center">
             <View

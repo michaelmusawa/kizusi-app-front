@@ -114,9 +114,9 @@ declare interface LocationStore {
     longitude,
     address,
   }: {
-    latitude: number;
-    longitude: number;
-    address: string;
+    latitude: number | null;
+    longitude: number | null;
+    address: string | null;
   }) => void;
   setDepartureLocation: ({
     latitude,

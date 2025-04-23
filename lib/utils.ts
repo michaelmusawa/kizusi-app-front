@@ -126,3 +126,40 @@ export function calculateDaysBetween(
 
   return days === 0 ? 1 : days;
 }
+
+export const calculateAddonsAmount = (
+  userAddons: string[],
+  carAddons: any[]
+) => {
+  return carAddons.reduce((total, addon) => {
+    if (userAddons.includes(addon.addonName)) {
+      return total + parseFloat(addon.addonValue);
+    }
+    return total;
+  }, 0);
+};
+
+export const calculateRideAmount = (store: any, car: any) => {
+  let numberOfDays = 0;
+  if (store.date && store.endDate) {
+    numberOfDays = calculateDaysBetween(store.date, store.endDate);
+  } else if (store.date) {
+    numberOfDays = 1;
+  }
+
+  if (store.bookType === "full_day") {
+    return Number((car?.price * numberOfDays).toFixed(2));
+  } else if (store.rideDetails?.time && car?.price) {
+    return Number(((store.rideDetails.time * car?.price) / 1440).toFixed(2));
+  }
+
+  return 0;
+};
+
+export function calcCancel(bookingDate?: string, amount: number = 0) {
+  return calculateCancellationDetails(bookingDate, amount);
+}
+
+export function calcDays(from: Date, to: Date): number {
+  return calculateDaysBetween(from, to);
+}

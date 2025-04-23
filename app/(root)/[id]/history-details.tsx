@@ -149,7 +149,17 @@ const HistoryDetails = () => {
     console.log("the payment data", paymentData);
 
     try {
-      await initiatePayment(paymentData);
+      const response = await initiatePayment(paymentData);
+
+      console.log("Payment response:", response);
+
+      if (response.redirect_url) {
+        // Linking.openURL(response.redirect_url);
+        router.push(
+          // eslint-disable-next-line prettier/prettier
+          `/(root)/paymentWebView?callbackUrl=${response.redirect_url}`
+        );
+      }
     } catch (error) {
       console.error("Payment initiation failed:", error);
     }

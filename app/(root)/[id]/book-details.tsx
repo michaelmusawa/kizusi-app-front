@@ -546,7 +546,7 @@ import { useLocationStore } from "@/store";
 import uuid from "react-native-uuid";
 import * as Linking from "expo-linking";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-
+import { Text } from "react-native";
 import { initiatePayment } from "@/lib/fetch";
 import { calculateAddonsAmount, calculateRideAmount } from "@/lib/utils";
 import CarImageSection from "@/components/book-details/CarImageSection";
@@ -574,14 +574,15 @@ const BookDetails = () => {
       method: "GET",
     }
   );
-  const { data: userResponse } = useFetch<{ data: User | null }>(
-    `/(api)/user/${user?.id || ""}`,
-    {
-      method: "GET",
-    }
-  );
+  const {
+    data: response,
+    loading: userLoading,
+    error: userError,
+  } = useFetch<{ data: User | null }>(`/(api)/user/${user?.id || ""}`, {
+    method: "GET",
+  });
   const car = carResponse?.data;
-  const returnedUser = userResponse?.data;
+  const returnedUser = response?.data;
 
   const addonsAmount = calculateAddonsAmount(addons, car?.addons || []);
   const rideAmount = calculateRideAmount(locationStore, car);
@@ -640,7 +641,17 @@ const BookDetails = () => {
     <GestureHandlerRootView>
       <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
         <CarImageSection car={car} />
-        <UserDetails user={user} returnedUser={returnedUser} />
+        {userLoading && !userError ? (
+          <Text
+            numberOfLines={1}
+            className="text-secondary-100 text-start text-2xl font-rubik-bold"
+          >
+            Loading...
+          </Text>
+        ) : (
+          <UserDetails user={user} returnedUser={returnedUser} />
+        )}
+
         <AddonsSection car={car} addons={addons} setAddons={setAddons} />
         <DirectionsMap data={locationStore} />
         <PaymentSection

@@ -203,6 +203,8 @@ export default function AddDirections() {
     );
   };
 
+  console.log("The details", rideDetails);
+
   return (
     <>
       <RideLayout title="Car details" snapPoints={["50%", "85%"]}>
@@ -293,8 +295,9 @@ export default function AddDirections() {
               >
                 Ksh.
                 {(
-                  ((car?.price ?? 0) / 1440) *
-                  (rideDetails?.time ?? 0)
+                  (car?.price ?? 0) *
+                  0.05 *
+                  (rideDetails?.distance ?? 0)
                 ).toFixed(
                   // eslint-disable-next-line prettier/prettier
                   2

@@ -74,6 +74,48 @@ export const calculateRegion = ({
   };
 };
 
+// export const calculateTimes = async ({
+//   departureLatitude,
+//   departureLongitude,
+//   destinationLatitude,
+//   destinationLongitude,
+// }: {
+//   departureLatitude: number | null;
+//   departureLongitude: number | null;
+//   destinationLatitude: number | null;
+//   destinationLongitude: number | null;
+// }) => {
+//   if (
+//     !departureLatitude ||
+//     !departureLongitude ||
+//     !destinationLatitude ||
+//     !destinationLongitude
+//   ) {
+//     return;
+//   }
+
+//   try {
+//     const response = await fetch(
+//       `https://maps.googleapis.com/maps/api/directions/json?origin=${departureLatitude},${departureLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
+//     );
+
+//     const data = await response.json();
+
+//     if (!data.routes || data.routes.length === 0) {
+//       console.error("No routes found.");
+//       return;
+//     }
+
+//     const timeToDestination = data.routes[0].legs[0].duration.value;
+//     const totalTime = timeToDestination / 60;
+//     const price = totalTime * 0.5;
+
+//     return { time: totalTime, price };
+//   } catch (error) {
+//     console.error("Error calculating times:", error);
+//   }
+// };
+
 export const calculateTimes = async ({
   departureLatitude,
   departureLongitude,
@@ -85,6 +127,7 @@ export const calculateTimes = async ({
   destinationLatitude: number | null;
   destinationLongitude: number | null;
 }) => {
+  // make sure all coordinates are present
   if (
     !departureLatitude ||
     !departureLongitude ||
@@ -98,19 +141,31 @@ export const calculateTimes = async ({
     const response = await fetch(
       `https://maps.googleapis.com/maps/api/directions/json?origin=${departureLatitude},${departureLongitude}&destination=${destinationLatitude},${destinationLongitude}&key=${directionsAPI}`
     );
-
     const data = await response.json();
 
-    if (!data.routes || data.routes.length === 0) {
+    if (!data.routes?.length) {
       console.error("No routes found.");
       return;
     }
 
-    const timeToDestination = data.routes[0].legs[0].duration.value;
-    const totalTime = timeToDestination / 60;
-    const price = totalTime * 0.5;
+    const leg = data.routes[0].legs[0];
 
-    return { time: totalTime, price };
+    // time in seconds → minutes
+    const timeSeconds = leg.duration.value;
+    const timeMinutes = timeSeconds / 60;
+
+    // distance in meters → kilometers
+    const distanceMeters = leg.distance.value;
+    const distanceKm = distanceMeters / 1000;
+
+    // simple price model: $0.5 per minute
+    const price = timeMinutes * 0.5;
+
+    return {
+      time: timeMinutes, // in minutes
+      distance: distanceKm, // in kilometers
+      price, // in your currency units
+    };
   } catch (error) {
     console.error("Error calculating times:", error);
   }

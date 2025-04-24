@@ -100,9 +100,9 @@ const CarDetails = () => {
             <Text className="text-2xl text-secondary-100 font-rubik-extrabold">
               Ksh. {car?.price}/day
             </Text>
-            <Text className="text-xl text-secondary-600 font-rubik-semibold">
+            {/* <Text className="text-xl text-secondary-600 font-rubik-semibold">
               Ksh. {((car?.price ?? 0) / 1440).toFixed(2)}/minute
-            </Text>
+            </Text> */}
           </View>
         </View>
 

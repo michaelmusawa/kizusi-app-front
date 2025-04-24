@@ -15,7 +15,7 @@ export const useLocationStore = create<LocationStore>((set) => ({
   date: null,
   endDate: null,
   userAddons: [],
-  rideDetails: { time: null, price: null },
+  rideDetails: { time: null, distance: null, price: null },
 
   setUserLocation: ({
     latitude,
@@ -81,7 +81,15 @@ export const useLocationStore = create<LocationStore>((set) => ({
     set({ userAddons });
   },
 
-  setRideDetails: ({ time, price }: { time: number; price: number }) => {
-    set((state) => ({ rideDetails: { time, price } }));
+  setRideDetails: ({
+    time,
+    distance,
+    price,
+  }: {
+    time: number;
+    distance: number;
+    price: number;
+  }) => {
+    set((state) => ({ rideDetails: { time, distance, price } }));
   },
 }));

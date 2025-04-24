@@ -99,7 +99,11 @@ declare interface LocationStore {
   endDate: string | null;
   bookType: string | null;
   userAddons: string[];
-  rideDetails: { time: number | null; price: number | null };
+  rideDetails: {
+    time: number | null;
+    distance: number | null;
+    price: number | null;
+  };
   setUserLocation: ({
     latitude,
     longitude,
@@ -131,5 +135,13 @@ declare interface LocationStore {
   setEndDate: ({ endDate }: { endDate: string }) => void;
   setBookType: ({ bookType }: { bookType: string }) => void;
   setUserAddons: (payload: string[]) => void;
-  setRideDetails: ({ time, price }: { time: number; price: number }) => void;
+  setRideDetails: ({
+    time,
+    distance,
+    price,
+  }: {
+    time: number;
+    distance: number;
+    price: number;
+  }) => void;
 }

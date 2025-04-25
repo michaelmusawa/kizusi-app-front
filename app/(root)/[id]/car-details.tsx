@@ -195,9 +195,100 @@
 // export default CarDetails;
 
 // File: screens/CarDetails.tsx
+// import React, { useRef } from "react";
+// import { View, ScrollView, Text, Dimensions, Animated } from "react-native";
+// import { useLocalSearchParams } from "expo-router";
+// import { useFetch } from "@/lib/fetch";
+// import { Car } from "@/lib/definitions";
+// import { CarDetailsHeader } from "@/components/car-details/CarDetailsHeader";
+// import { CarDetailsFeatures } from "@/components/car-details/CarDetailsFeatures";
+// import { CarDetailsOverview } from "@/components/car-details/CarDetailsOverview";
+// import { CarDetailsAddons } from "@/components/car-details/CarDetailsAddons";
+// import { CarDetailsFooter } from "@/components/car-details/CarDetailsFooter";
+
+// const CarDetails = () => {
+//   const { id } = useLocalSearchParams<{ id: string }>();
+//   const windowHeight = Dimensions.get("window").height;
+//   const headerHeight = windowHeight / 2;
+
+//   const scrollY = useRef(new Animated.Value(0)).current;
+//   const animateHeight = scrollY.interpolate({
+//     inputRange: [0, headerHeight],
+//     outputRange: [headerHeight, 0],
+//     extrapolate: "clamp",
+//   });
+//   const animateOpacity = scrollY.interpolate({
+//     inputRange: [0, headerHeight / 2, headerHeight],
+//     outputRange: [1, 0.5, 0],
+//     extrapolate: "clamp",
+//   });
+
+//   const { data, loading, error } = useFetch<{ data: Car }>(`/(api)/car/${id}`, {
+//     method: "GET",
+//   });
+//   const car = data?.data;
+//   if (loading) return <Text className="text-center mt-4">Loading...</Text>;
+//   if (error || !car)
+//     return <Text className="text-center mt-4">Error loading car details.</Text>;
+
+//   return (
+//     <View className="h-full bg-white">
+//       <Animated.ScrollView
+//         showsVerticalScrollIndicator={false}
+//         scrollEventThrottle={16}
+//         onScroll={Animated.event(
+//           [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+//           { useNativeDriver: false }
+//         )}
+//         contentContainerStyle={{ paddingBottom: 200 }}
+//       >
+//         <Animated.View
+//           style={{
+//             height: animateHeight,
+//             opacity: animateOpacity,
+//             overflow: "hidden",
+//           }}
+//         >
+//           <CarDetailsHeader car={car} />
+//         </Animated.View>
+
+//         <View
+//           style={{
+//             position: "absolute",
+//             top: headerHeight - 40,
+//             left: 20,
+//             right: 20,
+//             zIndex: 10,
+//           }}
+//         >
+//           <View className="bg-white p-4 rounded-2xl shadow-lg">
+//             <Text className="text-2xl font-extrabold text-gray-900 text-center">
+//               {car.name}
+//             </Text>
+//             <Text className="text-sm text-gray-500 mt-1 text-center">
+//               {car.category.categoryName}
+//             </Text>
+//             <Text className="mt-2 text-xl font-bold text-blue-500 text-center">{`Ksh. ${car.price}/day`}</Text>
+//           </View>
+//         </View>
+
+//         <View className="px-5 mt-14">
+//           <CarDetailsFeatures car={car} />
+//           <CarDetailsOverview car={car} />
+//           <CarDetailsAddons car={car} />
+//         </View>
+//       </Animated.ScrollView>
+
+//       <CarDetailsFooter id={id!} />
+//     </View>
+//   );
+// };
+
+// export default CarDetails;
+
 import React, { useRef } from "react";
-import { View, ScrollView, Text, Dimensions, Animated } from "react-native";
-import { useLocalSearchParams } from "expo-router";
+import { View, Text, Dimensions, Animated } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
 import { CarDetailsHeader } from "@/components/car-details/CarDetailsHeader";
@@ -205,13 +296,18 @@ import { CarDetailsFeatures } from "@/components/car-details/CarDetailsFeatures"
 import { CarDetailsOverview } from "@/components/car-details/CarDetailsOverview";
 import { CarDetailsAddons } from "@/components/car-details/CarDetailsAddons";
 import { CarDetailsFooter } from "@/components/car-details/CarDetailsFooter";
+import { SimilarVehicles } from "@/components/car-details/SimilarVehicles";
+import { useCars } from "@/hook/useCars";
+import { LiveChatSupport } from "@/components/LiveChatSupport";
 
-const CarDetails = () => {
+export const CarDetails: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
   const windowHeight = Dimensions.get("window").height;
   const headerHeight = windowHeight / 2;
 
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Header animations
   const animateHeight = scrollY.interpolate({
     inputRange: [0, headerHeight],
     outputRange: [headerHeight, 0],
@@ -223,6 +319,20 @@ const CarDetails = () => {
     extrapolate: "clamp",
   });
 
+  // Card animations
+  const cardTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight * 0.85],
+    extrapolate: "clamp",
+  });
+  const cardOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight * 0.4, headerHeight * 0.8],
+    outputRange: [1, 0.7, 0],
+    extrapolate: "clamp",
+  });
+
+  const { cars, loading: carsLoading, error: carsError } = useCars("", "", "");
+
   const { data, loading, error } = useFetch<{ data: Car }>(`/(api)/car/${id}`, {
     method: "GET",
   });
@@ -232,7 +342,7 @@ const CarDetails = () => {
     return <Text className="text-center mt-4">Error loading car details.</Text>;
 
   return (
-    <View className="h-full bg-white">
+    <View className="flex-1 bg-white">
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
@@ -242,6 +352,7 @@ const CarDetails = () => {
         )}
         contentContainerStyle={{ paddingBottom: 200 }}
       >
+        {/* Animated Header */}
         <Animated.View
           style={{
             height: animateHeight,
@@ -252,12 +363,44 @@ const CarDetails = () => {
           <CarDetailsHeader car={car} />
         </Animated.View>
 
-        <View className="px-5 mt-14">
+        {/* Tailwind-styled Hanging Card */}
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: headerHeight - 50,
+            left: 20,
+            right: 20,
+            zIndex: 10,
+            transform: [{ translateY: cardTranslateY }],
+            opacity: cardOpacity,
+          }}
+        >
+          <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center">
+            <Text className="text-2xl font-extrabold text-gray-900 text-center">
+              {car.name}
+            </Text>
+            <Text className="text-sm text-gray-500 mt-1 text-center">
+              {car.category.categoryName}
+            </Text>
+            <Text className="text-xl font-bold text-blue-500 mt-2 text-center">
+              {`Ksh. ${car.price}/day`}
+            </Text>
+          </View>
+        </Animated.View>
+
+        {/* Main Content */}
+        <View className="px-5 mt-32">
           <CarDetailsFeatures car={car} />
           <CarDetailsOverview car={car} />
           <CarDetailsAddons car={car} />
         </View>
+
+        <SimilarVehicles
+          recommendations={cars}
+          onSelect={(id) => router.push(`/${id}/car-details`)}
+        />
       </Animated.ScrollView>
+      <LiveChatSupport />
 
       <CarDetailsFooter id={id!} />
     </View>

@@ -7,9 +7,11 @@ interface OverviewProps {
 }
 export const CarDetailsOverview: React.FC<OverviewProps> = ({ car }) => (
   <View className="mt-7">
-    <Text className="text-black-300 text-xl font-rubik-bold">Overview</Text>
-    <Text className="text-secondary-600 text-base font-rubik mt-2">
-      {car.description}
-    </Text>
+    <View className="bg-white rounded-2xl shadow-md p-4">
+      <Text className="text-lg font-semibold text-gray-800 mb-2">Overview</Text>
+      <Text className="text-gray-600 text-base leading-relaxed">
+        {car.description}
+      </Text>
+    </View>
   </View>
 );

@@ -301,13 +301,12 @@ import { useLocalSearchParams, router } from "expo-router";
 import { useUserLocation } from "@/hook/useUserLocation";
 import { useCars } from "@/hook/useCars";
 import { useCategories } from "@/hook/useCategories";
-import { useCurrentUser } from "@/hook/useCurrentUser";
 import { Header } from "@/components/Home/Header";
-import { SearchBar } from "@/components/Home/SearchBar";
 import { CategoriesList } from "@/components/Home/CategoriesList";
 import { FiltersSection } from "@/components/Home/FiltersSection";
 import { CarsGrid } from "@/components/Home/CarsGrid";
 import Search from "@/components/Search";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const HomeContainer = () => {
   useUserLocation();
@@ -319,15 +318,11 @@ const HomeContainer = () => {
     cars,
     loading: carsLoading,
     error: carsError,
-  } = useCars(params.filter, params.query, seeAll ? limit : "");
+  } = useCars(params.filter, params.query, seeAll ? limit : undefined);
   const { categories, loading: catLoading, error: catError } = useCategories();
-  const {
-    returnedUser,
-    loading: userLoading,
-    error: userError,
-  } = useCurrentUser();
 
   const uniqueBrands = Array.from(
+    // eslint-disable-next-line prettier/prettier
     new Set(categories.flatMap((c) => c.brands.map((b) => b.brandName)))
   );
 
@@ -335,7 +330,7 @@ const HomeContainer = () => {
   const scrollY = useRef(new Animated.Value(0)).current;
 
   // Interpolate height & opacity for Categories section
-  const headerHeight = 350; // adjust to actual CategoriesList height
+  const headerHeight = 360; // adjust to actual CategoriesList height
   const animateHeight = scrollY.interpolate({
     inputRange: [0, headerHeight],
     outputRange: [headerHeight, 0],
@@ -348,55 +343,57 @@ const HomeContainer = () => {
   });
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      {/* Static header and search */}
-      <Header />
-      <Search cars={cars} />
+    <GestureHandlerRootView>
+      <SafeAreaView className="flex-1">
+        {/* Static header and search */}
+        <Header />
+        <Search cars={cars} />
 
-      {/* Scrollable content */}
-      <Animated.ScrollView
-        contentContainerStyle={{ paddingTop: 10 }}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-      >
-        {/* Animated CategoriesList */}
-        {!params.query && seeAll && (
-          <Animated.View
-            style={{
-              height: animateHeight,
-              opacity: animateOpacity,
-              overflow: "hidden",
+        {/* Scrollable content */}
+        <Animated.ScrollView
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            // eslint-disable-next-line prettier/prettier
+            { useNativeDriver: false }
+          )}
+        >
+          {/* Animated CategoriesList */}
+          {!params.query && seeAll && (
+            <Animated.View
+              style={{
+                height: animateHeight,
+                opacity: animateOpacity,
+                overflow: "hidden",
+              }}
+            >
+              <CategoriesList
+                categories={categories}
+                loading={catLoading}
+                error={catError}
+                onPress={(name: string) => router.setParams({ query: name })}
+              />
+            </Animated.View>
+          )}
+
+          {/* Filters and CarsGrid scroll normally */}
+          <FiltersSection
+            brands={uniqueBrands}
+            seeAll={seeAll}
+            onToggle={() => {
+              setSeeAll((prev) => !prev);
+              setLimit((prev) => (prev === 6 ? Infinity : 6));
             }}
-          >
-            <CategoriesList
-              categories={categories}
-              loading={catLoading}
-              error={catError}
-              onPress={(name) => router.setParams({ query: name })}
-            />
-          </Animated.View>
-        )}
-
-        {/* Filters and CarsGrid scroll normally */}
-        <FiltersSection
-          brands={uniqueBrands}
-          seeAll={seeAll}
-          onToggle={() => {
-            setSeeAll((prev) => !prev);
-            setLimit((prev) => (prev === 6 ? Infinity : 6));
-          }}
-        />
-        <CarsGrid
-          cars={cars}
-          loading={carsLoading}
-          error={carsError}
-          onCardPress={(id) => router.push(`/${id}/car-details`)}
-        />
-      </Animated.ScrollView>
-    </SafeAreaView>
+          />
+          <CarsGrid
+            cars={cars}
+            loading={carsLoading}
+            error={carsError}
+            onCardPress={(id) => router.push(`/${id}/car-details`)}
+          />
+        </Animated.ScrollView>
+      </SafeAreaView>
+    </GestureHandlerRootView>
   );
 };
 

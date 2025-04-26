@@ -8,7 +8,7 @@ interface AddonsProps {
   car: Car;
 }
 export const CarDetailsAddons: React.FC<AddonsProps> = ({ car }) => (
-  <View className="mt-7">
+  <View className="mt-5">
     {/* <Text className="text-black-300 text-xl font-rubik-bold">
       Available addons
     </Text>
@@ -34,7 +34,7 @@ export const CarDetailsAddons: React.FC<AddonsProps> = ({ car }) => (
         );
       })}
     </View> */}
-    <View className="bg-white rounded-2xl shadow-md p-4">
+    <View className="bg-gray-50 rounded-2xl shadow-md p-4">
       <Text className="text-lg font-semibold text-gray-800 mb-4">
         Available Add‑Ons
       </Text>
@@ -44,11 +44,12 @@ export const CarDetailsAddons: React.FC<AddonsProps> = ({ car }) => (
           return (
             <TouchableOpacity
               key={i}
-              className="flex-1 bg-gray-50 rounded-2xl p-3 items-center shadow-sm"
+              className="flex-1 bg-gray-100 rounded-2xl p-3 items-center shadow-sm"
               activeOpacity={0.7}
             >
-              <View className="bg-gradient-to-br from-green-300 to-green-500 p-3 rounded-full mb-2 shadow-md">
-                <Text className="text-xl text-white">+{addon.addonValue}</Text>
+              <Text className="text-xs text-gray-700">+{addon.addonValue}</Text>
+              <View className="p-3 rounded-full mb-2 shadow-md">
+                <Text className="text-lg">{Icon}</Text>
               </View>
               <Text className="text-sm text-gray-700 font-medium text-center">
                 {addon.addonName}

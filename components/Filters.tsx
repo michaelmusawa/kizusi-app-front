@@ -21,21 +21,20 @@ const Filters = ({ brands }: { brands: string[] }) => {
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      className="mt-3 mb-2"
+      contentContainerStyle={{ paddingVertical: 4 }}
     >
       <TouchableOpacity
         onPress={() => handleCategoryPress("")}
-        className={`flex flex-col items-start mr-4 px-4 py-2 rounded-full ${
+        className={`px-4 py-2 rounded-full mr-2 mb-2 ${
           selectedCategory === ""
             ? "bg-secondary-100/50"
             : "bg-primary-100 border border-primary-200"
         }`}
+        accessibilityRole="button"
       >
         <Text
-          className={`text-sm ${
-            selectedCategory === ""
-              ? "text-gray-50 font-rubik-bold mt-0.5"
-              : "text-black-300 font-rubik"
+          className={`font-rubik-regular text-sm ${
+            selectedCategory === "" ? "text-gray-50" : "text-black-300"
           }`}
         >
           All
@@ -45,17 +44,15 @@ const Filters = ({ brands }: { brands: string[] }) => {
         <TouchableOpacity
           onPress={() => handleCategoryPress(brand)}
           key={index}
-          className={`flex flex-col items-start mr-4 px-4 py-2 rounded-full ${
+          className={`px-4 py-2 rounded-full mr-2 mb-2 ${
             selectedCategory === brand
               ? "bg-secondary-100/50"
               : "bg-primary-100 border border-primary-200"
           }`}
         >
           <Text
-            className={`text-sm ${
-              selectedCategory === brand
-                ? "text-gray-50 font-rubik-bold mt-0.5"
-                : "text-black-300 font-rubik"
+            className={`font-rubik-regular text-sm ${
+              selectedCategory === brand ? "text-gray-50" : "text-black-300"
             }`}
           >
             {brand}

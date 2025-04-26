@@ -27,6 +27,7 @@ export const useCurrentUser = () => {
     if (isLoaded && isSignedIn) {
       refetch();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLoaded, isSignedIn]);
 
   // Sync returnedUser state when response changes

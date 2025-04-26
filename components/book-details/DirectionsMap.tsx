@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, Dimensions } from "react-native";
 import { MapWithMarkers } from "@/components/Geoapify";
 import { icons } from "@/constants";
 import { calculateDaysBetween } from "@/lib/utils";
@@ -39,44 +39,67 @@ const DirectionsMap: React.FC<Props> = ({ data }) => {
     numberOfDays = calculateDaysBetween(date, endDate);
   }
 
+  const { width } = Dimensions.get("window");
+  const itemWidth = width - 40; // account for horizontal padding
+  const aspectRatio = 16 / 9;
+
   return (
-    <View className="mt-7 px-5">
-      <Text className="text-black-300 text-xl font-rubik-bold">Directions</Text>
-      <View className="flex w-full mt-4 py-4 rounded-lg bg-gray-50">
-        <View className="flex flex-row gap-2 items-center">
-          <MapWithMarkers
-            departureLatitude={Number(departureLatitude)}
-            departureLongitude={Number(departureLongitude)}
-            destinationLatitude={Number(destinationLatitude)}
-            destinationLongitude={Number(destinationLongitude)}
-          />
-          <View className="flex-1">
-            <View className="flex-row items-center mb-2">
-              <Image source={icons.point} className="h-5 w-5" />
-              <Text className="ml-2 font-semibold">{departureAddress}</Text>
-            </View>
+    <View>
+      <View className="bg-gray-50 rounded-2xl shadow-md p-1 mt-5">
+        <Text className="text-lg font-semibold text-gray-800 mb-4">
+          Directions
+        </Text>
+
+        <View
+          className="rounded-2xl overflow-hidden bg-white shadow-lg"
+          style={{ width: itemWidth, aspectRatio }}
+        >
+          {/* Full-size map as background */}
+          <View>
+            <MapWithMarkers
+              departureLatitude={Number(departureLatitude)}
+              departureLongitude={Number(departureLongitude)}
+              destinationLatitude={Number(destinationLatitude)}
+              destinationLongitude={Number(destinationLongitude)}
+            />
+          </View>
+
+          {/* Text overlay at bottom */}
+          <View className="absolute bottom-0 left-0 right-0 bg-black/40 px-4 py-3 rounded-2xl">
+            <Text
+              className="text-white text-base font-semibold"
+              numberOfLines={1}
+            >
+              Departure: {departureAddress}
+            </Text>
             {destinationAddress && (
-              <View className="flex-row items-center mb-2">
-                <Image source={icons.to} className="h-5 w-5" />
-                <Text className="ml-2 font-semibold">{destinationAddress}</Text>
-              </View>
+              <Text
+                className="text-white text-base font-semibold mt-1"
+                numberOfLines={1}
+              >
+                Destination: {destinationAddress}
+              </Text>
             )}
-            <View className="mt-3">
-              <Text className="text-base font-rubik-bold text-secondary-100">
+
+            <View className="flex-row justify-between items-center mt-2">
+              <Text className="text-white text-sm font-rubik-bold">
                 {bookType === "full_day"
                   ? `Full day: ${numberOfDays} ${numberOfDays === 1 ? "day" : "days"}`
                   : "Transfer"}
               </Text>
-              <Text className="text-base font-rubik-bold text-secondary-100 mt-1">
-                {new Date(date ?? "").toLocaleDateString()}{" "}
-                {new Date(date ?? "").toLocaleTimeString()}
-              </Text>
-              {endDate && (
-                <Text className="text-base font-rubik-bold text-secondary-100 mt-1">
-                  {new Date(endDate).toLocaleDateString()}{" "}
-                  {new Date(endDate).toLocaleTimeString()}
+
+              <View className="items-end">
+                <Text className="text-white text-sm font-rubik-bold">
+                  {date ? new Date(date).toLocaleDateString() : "N/A"}{" "}
+                  {date ? new Date(date).toLocaleTimeString() : "N/A"}
                 </Text>
-              )}
+                {endDate && (
+                  <Text className="text-white text-sm font-rubik-bold mt-1">
+                    {new Date(endDate).toLocaleDateString()}{" "}
+                    {new Date(endDate).toLocaleTimeString()}
+                  </Text>
+                )}
+              </View>
             </View>
           </View>
         </View>

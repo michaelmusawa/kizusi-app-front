@@ -2,12 +2,13 @@ import React from "react";
 import { ScrollView, ActivityIndicator, View } from "react-native";
 import { Card } from "@/components/CarCard";
 import NoResults from "../NoResults";
+import { Car } from "@/lib/definitions";
 
 interface CarsGridProps {
-  cars: Array<{ id: string } & any>;
+  cars: Car[];
   loading: boolean;
   error: any;
-  onCardPress: (id: string) => void;
+  onCardPress: (id: number) => void;
 }
 
 export const CarsGrid: React.FC<CarsGridProps> = ({

@@ -8,15 +8,16 @@ interface FeaturesProps {
   car: Car;
 }
 export const CarDetailsFeatures: React.FC<FeaturesProps> = ({ car }) => (
-  <View className="bg-white rounded-2xl shadow-md p-4">
+  <View className="bg-gray-50 rounded-2xl shadow-md p-4">
     <Text className="text-lg font-semibold text-gray-800 mb-4">Features</Text>
     <View className="flex-row flex-wrap justify-between">
       {car.features.map((feat, i) => {
-        const Icon = featureIcons[feat.featureName.toLowerCase()] || icons.star;
+        const Icon =
+          (featureIcons as any)[feat.featureName.toLowerCase()] || icons.star;
         return (
           <View key={i} className="w-1/3 items-center mb-6">
-            <View className="bg-gradient-to-br from-primary-100 to-green-500 p-3 rounded-full shadow-lg">
-              <Image source={Icon} className="w-6 h-6" />
+            <View className="p-2 rounded-full border border-primary-100 shadow-lg">
+              <Image source={Icon} className="size-6" />
             </View>
             <Text className="mt-2 text-sm text-gray-700 font-medium text-center">
               {feat.featureValue} {feat.featureName}

@@ -10,6 +10,7 @@ import { calculateTimes } from "@/lib/map";
 import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
 import { calculateDaysBetween } from "@/lib/utils";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export default function AddDirections() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -203,10 +204,8 @@ export default function AddDirections() {
     );
   };
 
-  console.log("The details", rideDetails);
-
   return (
-    <>
+    <GestureHandlerRootView>
       <RideLayout title="Car details" snapPoints={["50%", "85%"]}>
         {error && <Text className="text-red-500 text-center">{error}</Text>}
         <View className="flex flex-row gap-4">
@@ -315,7 +314,7 @@ export default function AddDirections() {
                     No date selected
                   </Text>
                 ) : (
-                  car?.price * numberOfDays
+                  (car?.price ?? 0) * numberOfDays
                 )}
               </Text>
             )}
@@ -331,6 +330,6 @@ export default function AddDirections() {
           </TouchableOpacity>
         </View>
       </View>
-    </>
+    </GestureHandlerRootView>
   );
 }

@@ -6,10 +6,16 @@ import { Car } from "@/lib/definitions";
 type Props = {
   car?: Car;
   addons: string[];
+  addonsAmount?: number;
   setAddons: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const AddonsSection: React.FC<Props> = ({ car, addons, setAddons }) => {
+const AddonsSection: React.FC<Props> = ({
+  car,
+  addons,
+  addonsAmount,
+  setAddons,
+}) => {
   const handlePress = (addonName: string) => {
     setAddons((prev) =>
       prev.includes(addonName)
@@ -21,11 +27,21 @@ const AddonsSection: React.FC<Props> = ({ car, addons, setAddons }) => {
 
   // Sum display must come from parent via utils
   return (
-    <View className="mt-7 px-5">
-      <Text className="text-black-300 text-xl font-rubik-bold">
-        Select addons
-      </Text>
-      <View className="flex-row mt-4">
+    <View className="bg-gray-50 rounded-2xl shadow-md p-4 mt-5">
+      <View className="flex-row items-center justify-between mb-4">
+        <Text className="flex flex-row justify-between text-lg font-semibold text-gray-800">
+          Select addons
+        </Text>
+        {addonsAmount && addonsAmount > 0 ? (
+          <Text className="flex flex-row justify-between text-sm font-semibold text-gray-800">
+            Total: {addonsAmount}
+          </Text>
+        ) : (
+          <Text></Text>
+        )}
+      </View>
+
+      <View className="flex-row gap-2">
         {car?.addons?.map((addon, idx) => {
           const icon = addonIcons[addon.addonName] || "❓";
           const selected = addons.includes(addon.addonName);
@@ -34,23 +50,17 @@ const AddonsSection: React.FC<Props> = ({ car, addons, setAddons }) => {
             <TouchableOpacity
               key={idx}
               onPress={() => handlePress(addon.addonName)}
-              className="flex-1 items-center"
+              className="flex-1 bg-gray-100 rounded-2xl p-3 items-center shadow-sm"
             >
-              <Text className="text-xs font-rubik-medium">
-                +{addon.addonValue}
-              </Text>
+              <Text className="text-xs text-gray-700">+{addon.addonValue}</Text>
               <View
-                className={`size-14 rounded-full flex items-center justify-center mt-1.5 ${
-                  selected ? "border bg-primary-100" : "bg-primary-100/50"
+                className={`p-3 rounded-full mb-2 shadow-md ${
+                  selected ? "bg-primary-100/50" : ""
                 }`}
               >
                 <Text className="text-lg">{icon}</Text>
               </View>
-              <Text
-                numberOfLines={1}
-                ellipsizeMode="tail"
-                className="text-black-300 text-sm font-rubik mt-1"
-              >
+              <Text className="text-sm text-gray-700 font-medium text-center">
                 {addon.addonName}
               </Text>
             </TouchableOpacity>

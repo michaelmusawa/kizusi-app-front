@@ -299,6 +299,7 @@ import { CarDetailsFooter } from "@/components/car-details/CarDetailsFooter";
 import { SimilarVehicles } from "@/components/car-details/SimilarVehicles";
 import { useCars } from "@/hook/useCars";
 import { LiveChatSupport } from "@/components/LiveChatSupport";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 export const CarDetails: React.FC = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -331,7 +332,7 @@ export const CarDetails: React.FC = () => {
     extrapolate: "clamp",
   });
 
-  const { cars, loading: carsLoading, error: carsError } = useCars("", "", "");
+  const { cars, loading: carsLoading, error: carsError } = useCars("", "");
 
   const { data, loading, error } = useFetch<{ data: Car }>(`/(api)/car/${id}`, {
     method: "GET",
@@ -342,68 +343,72 @@ export const CarDetails: React.FC = () => {
     return <Text className="text-center mt-4">Error loading car details.</Text>;
 
   return (
-    <View className="flex-1 bg-white">
-      <Animated.ScrollView
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false }
-        )}
-        contentContainerStyle={{ paddingBottom: 200 }}
-      >
-        {/* Animated Header */}
-        <Animated.View
-          style={{
-            height: animateHeight,
-            opacity: animateOpacity,
-            overflow: "hidden",
-          }}
+    <GestureHandlerRootView>
+      <View className="flex-1">
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            // eslint-disable-next-line prettier/prettier
+            { useNativeDriver: false }
+          )}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
-          <CarDetailsHeader car={car} />
-        </Animated.View>
+          {/* Animated Header */}
+          <Animated.View
+            style={{
+              height: animateHeight,
+              opacity: animateOpacity,
+              overflow: "hidden",
+            }}
+          >
+            <CarDetailsHeader car={car} />
+          </Animated.View>
 
-        {/* Tailwind-styled Hanging Card */}
-        <Animated.View
-          style={{
-            position: "absolute",
-            top: headerHeight - 50,
-            left: 20,
-            right: 20,
-            zIndex: 10,
-            transform: [{ translateY: cardTranslateY }],
-            opacity: cardOpacity,
-          }}
-        >
-          <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center">
-            <Text className="text-2xl font-extrabold text-gray-900 text-center">
-              {car.name}
-            </Text>
-            <Text className="text-sm text-gray-500 mt-1 text-center">
-              {car.category.categoryName}
-            </Text>
-            <Text className="text-xl font-bold text-blue-500 mt-2 text-center">
-              {`Ksh. ${car.price}/day`}
-            </Text>
+          {/* Tailwind-styled Hanging Card */}
+          <Animated.View
+            style={{
+              position: "absolute",
+              top: headerHeight - 50,
+              left: 20,
+              right: 20,
+              zIndex: 10,
+              transform: [{ translateY: cardTranslateY }],
+              opacity: cardOpacity,
+            }}
+          >
+            <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center w-2/3 m-auto">
+              <Text className="text-2xl font-extrabold text-gray-900 text-center">
+                {car.name}
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1 text-center">
+                {car.category.categoryName}
+              </Text>
+              <Text className="text-xl font-bold text-secondary-100 mt-2 text-center">
+                {`Ksh. ${car.price}/day`}
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Main Content */}
+          <View className="px-5 mt-20">
+            <CarDetailsFeatures car={car} />
+            <CarDetailsOverview car={car} />
+            <CarDetailsAddons car={car} />
+            <SimilarVehicles
+              recommendations={cars}
+              onSelect={(id) => {
+                router.replace(`/${id}/car-details`);
+              }}
+            />
           </View>
-        </Animated.View>
+        </Animated.ScrollView>
+        <LiveChatSupport />
 
-        {/* Main Content */}
-        <View className="px-5 mt-32">
-          <CarDetailsFeatures car={car} />
-          <CarDetailsOverview car={car} />
-          <CarDetailsAddons car={car} />
-        </View>
-
-        <SimilarVehicles
-          recommendations={cars}
-          onSelect={(id) => router.push(`/${id}/car-details`)}
-        />
-      </Animated.ScrollView>
-      <LiveChatSupport />
-
-      <CarDetailsFooter id={id!} />
-    </View>
+        <CarDetailsFooter id={id!} />
+      </View>
+    </GestureHandlerRootView>
   );
 };
 

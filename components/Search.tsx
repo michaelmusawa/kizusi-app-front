@@ -120,7 +120,7 @@ import {
 } from "react-native";
 import { useDebouncedCallback } from "use-debounce";
 import { icons } from "@/constants";
-import { useLocalSearchParams, router, usePathname } from "expo-router";
+import { useLocalSearchParams, router } from "expo-router";
 import { Car } from "@/lib/definitions";
 
 interface SearchProps {
@@ -147,7 +147,9 @@ const Search: React.FC<SearchProps> = ({ cars }) => {
           (car) =>
             car.name.toLowerCase().includes(lower) ||
             car.category.categoryName.toLowerCase().includes(lower) ||
+            // eslint-disable-next-line prettier/prettier
             car.brand.brandName.toLowerCase().includes(lower)
+          // eslint-disable-next-line prettier/prettier
         )
       );
       debouncedSetParams(text);
@@ -158,7 +160,7 @@ const Search: React.FC<SearchProps> = ({ cars }) => {
   }, [query, cars, debouncedSetParams]);
 
   const handleSelect = (car: Car) => {
-    const label = `${car.name} ${car.category.categoryName}`;
+    // const label = `${car.name} ${car.category.categoryName}`;
     setQuery(car.name);
     setFilteredCars([]);
     router.push(`/${car.id}/car-details`);
@@ -173,47 +175,49 @@ const Search: React.FC<SearchProps> = ({ cars }) => {
   };
 
   return (
-    <View className="w-full px-4 mt-5">
-      <View className="flex-row items-center bg-accent-100 border border-gray-100 rounded-lg px-3 py-2">
-        <Image source={icons.search} className="w-5 h-5" />
-        <TextInput
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Search for car"
-          className="ml-2 flex-1 text-sm font-rubik text-black-300"
-          returnKeyType="search"
-        />
+    <View>
+      <View className="mt-5 mx-4 p-4 bg-gray-50 rounded-lg shadow-md">
+        <View className="flex-row items-center border border-gray-300 rounded-lg px-3 py-2">
+          <Image source={icons.search} className="w-5 h-5" />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Search for car"
+            className="ml-2 flex-1 text-sm font-rubik text-black-300"
+            returnKeyType="search"
+          />
+          {query.length > 0 && (
+            <TouchableOpacity onPress={clearSearch} className="ml-2">
+              <Image source={icons.close} className="w-5 h-5" />
+            </TouchableOpacity>
+          )}
+        </View>
+
         {query.length > 0 && (
-          <TouchableOpacity onPress={clearSearch} className="ml-2">
-            <Image source={icons.close} className="w-5 h-5" />
-          </TouchableOpacity>
+          <ScrollView
+            className="bg-white rounded-lg mt-2 max-h-60"
+            keyboardShouldPersistTaps="handled"
+          >
+            {filteredCars.length > 0 ? (
+              filteredCars.map((car) => (
+                <TouchableOpacity
+                  key={car.id}
+                  onPress={() => handleSelect(car)}
+                  className="px-3 py-2 border-b border-gray-100"
+                >
+                  <Text className="text-sm font-rubik text-black-300">
+                    {car.name}, {car.category.categoryName}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            ) : (
+              <View className="py-4">
+                <Text className="text-center text-gray-500">No cars found</Text>
+              </View>
+            )}
+          </ScrollView>
         )}
       </View>
-
-      {query.length > 0 && (
-        <ScrollView
-          className="bg-white rounded-lg mt-2 max-h-60"
-          keyboardShouldPersistTaps="handled"
-        >
-          {filteredCars.length > 0 ? (
-            filteredCars.map((car) => (
-              <TouchableOpacity
-                key={car.id}
-                onPress={() => handleSelect(car)}
-                className="px-3 py-2 border-b border-gray-100"
-              >
-                <Text className="text-sm font-rubik text-black-300">
-                  {car.name}, {car.category.categoryName}
-                </Text>
-              </TouchableOpacity>
-            ))
-          ) : (
-            <View className="py-4">
-              <Text className="text-center text-gray-500">No cars found</Text>
-            </View>
-          )}
-        </ScrollView>
-      )}
     </View>
   );
 };

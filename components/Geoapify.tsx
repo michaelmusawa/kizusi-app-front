@@ -57,7 +57,7 @@ function MapWithMarkers({
     );
 
   return (
-    <View className="w-1/2 h-40 rounded-lg overflow-hidden">
+    <View className="rounded-lg overflow-hidden">
       <MapView
         style={{ width: "100%", height: "100%" }}
         provider={PROVIDER_DEFAULT}

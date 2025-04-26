@@ -537,10 +537,10 @@
 
 // export default BookDetails;
 
-import { ScrollView } from "react-native";
+import { Animated, Dimensions, View } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useFetch } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
 import uuid from "react-native-uuid";
@@ -549,13 +549,13 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Text } from "react-native";
 import { initiatePayment } from "@/lib/fetch";
 import { calculateAddonsAmount, calculateRideAmount } from "@/lib/utils";
-import CarImageSection from "@/components/book-details/CarImageSection";
-import UserDetails from "@/components/book-details/UserDetails";
 import AddonsSection from "@/components/book-details/AddonsSection";
 import PaymentSection from "@/components/book-details/PaymentSection";
 import DirectionsMap from "@/components/book-details/DirectionsMap";
 import { Car, User } from "@/lib/definitions";
 import BottomBar from "@/components/BottomBar";
+import { CarDetailsHeader } from "@/components/car-details/CarDetailsHeader";
+import { UserDetails } from "@/components/book-details/UserDetails";
 
 const BookDetails = () => {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -637,35 +637,118 @@ const BookDetails = () => {
     }
   };
 
+  const windowHeight = Dimensions.get("window").height;
+  const headerHeight = windowHeight / 2;
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Header animations
+  const animateHeight = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [headerHeight, 0],
+    extrapolate: "clamp",
+  });
+  const animateOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight / 2, headerHeight],
+    outputRange: [1, 0.5, 0],
+    extrapolate: "clamp",
+  });
+
+  // Card animations
+  const cardTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight * 0.85],
+    extrapolate: "clamp",
+  });
+  const cardOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight * 0.4, headerHeight * 0.8],
+    outputRange: [1, 0.7, 0],
+    extrapolate: "clamp",
+  });
+
   return (
     <GestureHandlerRootView>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <CarImageSection car={car} />
-        {userLoading && !userError ? (
-          <Text
-            numberOfLines={1}
-            className="text-secondary-100 text-start text-2xl font-rubik-bold"
+      <View className="flex-1">
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            { useNativeDriver: false }
+          )}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
+          {/* Animated Header */}
+          <Animated.View
+            style={{
+              height: animateHeight,
+              opacity: animateOpacity,
+              overflow: "hidden",
+            }}
           >
-            Loading...
-          </Text>
-        ) : (
-          <UserDetails user={user} returnedUser={returnedUser} />
-        )}
+            <CarDetailsHeader car={car} />
+          </Animated.View>
 
-        <AddonsSection car={car} addons={addons} setAddons={setAddons} />
-        <DirectionsMap data={locationStore} />
-        <PaymentSection
-          amount={paymentAmount}
-          paymentType={paymentType}
-          setPaymentType={setPaymentType}
-          paymentOption={paymentOption}
-          setPaymentOption={setPaymentOption}
-          isAgreed={isAgreed}
-          setIsAgreed={setIsAgreed}
-          error={error}
-          handlePayment={handlePayment}
-        />
-      </ScrollView>
+          {/* Tailwind-styled Hanging Card */}
+          <Animated.View
+            style={{
+              position: "absolute",
+              top: headerHeight - 50,
+              left: 20,
+              right: 20,
+              zIndex: 10,
+              transform: [{ translateY: cardTranslateY }],
+              opacity: cardOpacity,
+            }}
+          >
+            <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center w-2/3 m-auto">
+              <Text className="text-2xl font-extrabold text-gray-900 text-center">
+                {car?.name}
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1 text-center">
+                {car?.category.categoryName}
+              </Text>
+              <Text className="text-xl font-bold text-secondary-100 mt-2 text-center">
+                {`Ksh. ${car?.price}/day`}
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Main Content */}
+          <View className="px-5 mt-16">
+            {userLoading && !userError ? (
+              <Text
+                numberOfLines={1}
+                className="text-secondary-100 text-start text-2xl font-rubik-bold"
+              >
+                Loading...
+              </Text>
+            ) : (
+              <UserDetails user={user} returnedUser={returnedUser} />
+            )}
+
+            <AddonsSection
+              car={car}
+              addons={addons}
+              setAddons={setAddons}
+              addonsAmount={addonsAmount}
+            />
+
+            <DirectionsMap data={locationStore} />
+            <PaymentSection
+              amount={paymentAmount}
+              paymentType={paymentType}
+              setPaymentType={setPaymentType}
+              paymentOption={paymentOption}
+              setPaymentOption={setPaymentOption}
+              isAgreed={isAgreed}
+              setIsAgreed={setIsAgreed}
+              error={error}
+              handlePayment={handlePayment}
+            />
+          </View>
+        </Animated.ScrollView>
+      </View>
       <BottomBar
         paymentAmount={paymentAmount}
         userExists={!!user}

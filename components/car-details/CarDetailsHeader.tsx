@@ -7,21 +7,21 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Car } from "@/lib/definitions";
 
 interface HeaderProps {
-  car: Car;
+  car?: Car;
 }
 
 export const CarDetailsHeader: React.FC<HeaderProps> = ({ car }) => (
-  <View className="w-full flex justify-center items-center rounded-b-full relative">
+  <View className="w-full flex justify-center items-center rounded-b-[40px] overflow-hidden relative">
     <Image
-      source={{ uri: car.image }}
-      className="size-full"
+      source={{ uri: car?.image }}
+      className="size-full rounded"
       resizeMode="cover"
     />
     {/* <BlurView intensity={60} tint="light" className="absolute inset-0" /> */}
     <LinearGradient
       colors={["rgba(255,255,255,0)", "rgba(255,255,255,1)"]}
       style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 80 }}
-      className="rounded-b-full"
+      className="rounded-b-3xl"
     />
     <View
       className="absolute inset-x-7 z-50"
@@ -35,7 +35,7 @@ export const CarDetailsHeader: React.FC<HeaderProps> = ({ car }) => (
           <Image source={icons.backArrow} className="w-5 h-5" />
         </Pressable>
         <Text className="text-sm font-rubik-bold text-secondary-100 px-4 py-2 bg-gray-100 rounded-full">
-          {car.brand.brandName}
+          {car?.brand?.brandName}
         </Text>
       </View>
     </View>

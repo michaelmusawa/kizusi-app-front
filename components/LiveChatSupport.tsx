@@ -1,20 +1,10 @@
 import { icons } from "@/constants";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, TouchableOpacity, Text, Image } from "react-native";
 import AskAIModal from "./ai/AskAIModal";
-// import { Kommunicate } from "@kommunicate/kommunicate-react-native";
 
 export const LiveChatSupport: React.FC = () => {
   const [askAIModalOpen, setAskAIModalOpen] = useState(false);
-  //   useEffect(() => {
-  //     Kommunicate.init("YOUR_KM_APP_ID"); // initialize Kommunicate SDK
-  //   }, []);
-
-  //   const openChat = () => {
-  //     Kommunicate.login({ userId: "guest_user" })
-  //       .then(() => Kommunicate.openConversation({ withPreChat: true }))
-  //       .catch(err => console.error("Chat init error", err));
-  //   };
 
   return (
     <>

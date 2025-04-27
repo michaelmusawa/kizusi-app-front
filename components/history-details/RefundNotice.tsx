@@ -8,8 +8,8 @@ type Props = {
 
 const RefundNotice: React.FC<Props> = ({ amount, onPay }) => (
   <View className="mt-4 px-5">
-    <View className="bg-primary-100/50 rounded-lg p-4">
-      <Text className="font-rubik-medium text-base text-black-300">
+    <View className="bg-primary-100/10 rounded-lg p-4">
+      <Text className="font-rubik-medium text-base text-gray-700">
         A full payment is required before the booking date to confirm your
         reservation.
       </Text>

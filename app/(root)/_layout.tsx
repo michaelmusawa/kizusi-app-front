@@ -1,5 +1,6 @@
 import { Stack } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
+import { LiveChatSupport } from "@/components/LiveChatSupport";
 
 export default function Layout() {
   return (

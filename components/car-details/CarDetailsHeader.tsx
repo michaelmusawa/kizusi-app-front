@@ -8,9 +8,10 @@ import { Car } from "@/lib/definitions";
 
 interface HeaderProps {
   car?: Car;
+  uri?: string;
 }
 
-export const CarDetailsHeader: React.FC<HeaderProps> = ({ car }) => (
+export const CarDetailsHeader: React.FC<HeaderProps> = ({ car, uri }) => (
   <View className="w-full flex justify-center items-center rounded-b-[40px] overflow-hidden relative">
     <Image
       source={{ uri: car?.image }}
@@ -29,7 +30,9 @@ export const CarDetailsHeader: React.FC<HeaderProps> = ({ car }) => (
     >
       <View className="flex-row justify-between items-center w-full">
         <Pressable
-          onPress={() => router.back()}
+          onPress={() => {
+            uri ? router.push(uri) : router.back();
+          }}
           className="p-3 bg-white/80 rounded-full shadow"
         >
           <Image source={icons.backArrow} className="w-5 h-5" />

@@ -572,6 +572,7 @@ const BookDetails = () => {
     `/(api)/car/${id || ""}`,
     {
       method: "GET",
+      // eslint-disable-next-line prettier/prettier
     }
   );
   const {
@@ -624,6 +625,7 @@ const BookDetails = () => {
       addons,
       description: "Car Rental Payment",
       callbackUrl: Linking.createURL(
+        // eslint-disable-next-line prettier/prettier
         `/(root)/${reference}/history-details?query=${id}&callback=true`
       ),
     };
@@ -674,6 +676,7 @@ const BookDetails = () => {
           scrollEventThrottle={16}
           onScroll={Animated.event(
             [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            // eslint-disable-next-line prettier/prettier
             { useNativeDriver: false }
           )}
           contentContainerStyle={{ paddingBottom: 100 }}

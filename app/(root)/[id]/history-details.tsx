@@ -752,13 +752,13 @@
 
 // export default HistoryDetails;
 
-import React, { useEffect, useState } from "react";
-import { ScrollView, View, Text, Dimensions } from "react-native";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, View, Text, Dimensions, Animated } from "react-native";
 import { useLocalSearchParams, usePathname, router } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { useFetch, initiatePayment, initiateRefund } from "@/lib/fetch";
 import { Booking, Car, User } from "@/lib/definitions";
-import { calcCancel } from "@/lib/utils";
+import { calcCancel, calculateAddonsAmount } from "@/lib/utils";
 import uuid from "react-native-uuid";
 import * as Linking from "expo-linking";
 import CarImageSection from "@/components/book-details/CarImageSection";
@@ -771,6 +771,9 @@ import SuccessModal from "@/components/history-details/SuccessModal";
 import ErrorModal from "@/components/history-details/ErrorModal";
 import PaymentMethodSection from "@/components/history-details/PaymentMethodSection";
 import { images } from "@/constants";
+import { CarDetailsHeader } from "@/components/car-details/CarDetailsHeader";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import PaymentSection from "@/components/book-details/PaymentSection";
 
 const HistoryDetails: React.FC = () => {
   const { id, query, callback, completePayment } = useLocalSearchParams<{
@@ -819,6 +822,10 @@ const HistoryDetails: React.FC = () => {
   });
 
   const returnedUser = userResponse?.data || null;
+
+  const addons = booking?.addons?.map((addon) => addon.addonName);
+
+  const addonsAmount = calculateAddonsAmount(addons || [], car?.addons || []);
 
   // inside HistoryDetails component…
 
@@ -910,123 +917,190 @@ const HistoryDetails: React.FC = () => {
     }
   }, [booking?.paymentType, callback, completePayment]);
 
+  const windowHeight = Dimensions.get("window").height;
+  const headerHeight = windowHeight / 2;
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Header animations
+  const animateHeight = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [headerHeight, 0],
+    extrapolate: "clamp",
+  });
+  const animateOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight / 2, headerHeight],
+    outputRange: [1, 0.5, 0],
+    extrapolate: "clamp",
+  });
+
+  // Card animations
+  const cardTranslateY = scrollY.interpolate({
+    inputRange: [0, headerHeight],
+    outputRange: [0, -headerHeight * 0.85],
+    extrapolate: "clamp",
+  });
+  const cardOpacity = scrollY.interpolate({
+    inputRange: [0, headerHeight * 0.4, headerHeight * 0.8],
+    outputRange: [1, 0.7, 0],
+    extrapolate: "clamp",
+  });
+
   if (loading) return <Text>Loading…</Text>;
   if (error || !booking) return <Text>Error loading details.</Text>;
 
   return (
-    <View style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 200 }}>
-        <CarImageSection car={car} />
-        <DirectionsMap
-          data={{
-            departureLatitude: booking.departureLatitude,
-            departureLongitude: booking.departureLongitude,
-            destinationLatitude: booking.destinationLatitude,
-            destinationLongitude: booking.destinationLongitude,
-            departureAddress: booking.departure,
-            destinationAddress: booking.destination,
-            date: booking.bookingDate,
-            endDate: booking.bookingEndDate,
-            bookType: booking.bookType,
-            rideDetails: booking.rideDetails,
+    <GestureHandlerRootView>
+      <View className="flex-1">
+        <Animated.ScrollView
+          showsVerticalScrollIndicator={false}
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+            // eslint-disable-next-line prettier/prettier
+            { useNativeDriver: false }
+          )}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
+          {/* Animated Header */}
+          <Animated.View
+            style={{
+              height: animateHeight,
+              opacity: animateOpacity,
+              overflow: "hidden",
+            }}
+          >
+            <CarDetailsHeader car={car} uri={`/(root)/(tabs)/history`} />
+          </Animated.View>
+
+          {/* Tailwind-styled Hanging Card */}
+          <Animated.View
+            style={{
+              position: "absolute",
+              top: headerHeight - 50,
+              left: 20,
+              right: 20,
+              zIndex: 10,
+              transform: [{ translateY: cardTranslateY }],
+              opacity: cardOpacity,
+            }}
+          >
+            <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center w-2/3 m-auto">
+              <Text className="text-2xl font-extrabold text-gray-900 text-center">
+                {car?.name}
+              </Text>
+              <Text className="text-sm text-gray-500 mt-1 text-center">
+                {car?.category.categoryName}
+              </Text>
+              <Text className="text-xl font-bold text-secondary-100 mt-2 text-center">
+                {`Ksh. ${car?.price}/day`}
+              </Text>
+            </View>
+          </Animated.View>
+
+          {/* Main Content */}
+          <View className="px-5 mt-16">
+            <AddonsSection
+              car={car}
+              addons={addons}
+              addonsAmount={addonsAmount}
+            />
+            <DirectionsMap
+              data={{
+                departureLatitude: Number(booking.departureLatitude),
+                departureLongitude: Number(booking.departureLongitude),
+                destinationLatitude: Number(booking.destinationLatitude),
+                destinationLongitude: Number(booking.destinationLongitude),
+                departureAddress: booking.departure,
+                destinationAddress: booking.destination,
+                date: booking.bookingDate,
+                endDate: booking.bookingEndDate,
+                bookType: booking.bookType,
+                rideDetails: booking.rideDetails,
+              }}
+            />
+
+            <PaymentSection
+              amount={booking.amount}
+              paymentType={booking.paymentType}
+              paymentStatus={booking.paymentStatus}
+              onPay={onPay}
+            />
+          </View>
+        </Animated.ScrollView>
+        <StatusBar
+          paymentStatus={booking.paymentStatus}
+          bookingStatus={booking.bookingStatus}
+          amount={booking.amount}
+          onCancel={() => setShowConfirm(true)}
+          disabled={
+            !["CANCELLED", "REFUNDED", "PROCEEDED", "NO SHOW"].includes(
+              booking.bookingStatus
+            ) || booking.paymentStatus !== "CONFIRMED"
+          }
+          buttonText={
+            booking.bookingStatus === "PENDING" &&
+            ![
+              "CANCELLED",
+              "PENDING",
+              "PROCEEDED",
+              "REFUNDED",
+              "NO SHOW",
+              "FAILED",
+            ].includes(booking.paymentStatus)
+              ? "Cancel booking"
+              : undefined
+          }
+        />
+
+        <ConfirmationModal
+          isVisible={showConfirm}
+          daysDiff={daysDiff}
+          fee={cancellationFee}
+          refund={refundAmount}
+          onConfirm={() => {
+            onCancel();
+            setShowConfirm(false);
+          }}
+          onCancel={() => setShowConfirm(false)}
+        />
+
+        <SuccessModal
+          isVisible={showSuccess}
+          imageSource={
+            // use a “check” icon both for a successful booking or cancellation
+            images.check
+          }
+          title={
+            didCancel
+              ? "Cancelled"
+              : callback === "true"
+                ? "Booked"
+                : "Payment completed"
+          }
+          message={
+            didCancel
+              ? "The booking has been cancelled successfully. You will be contacted by the admin for your refund soon. Go to Profile → Help for more information."
+              : callback === "true"
+                ? "Your booking has been placed successfully. You will be contacted soon by the admin."
+                : "You have completed your booking payment successfully."
+          }
+          primaryText={
+            // “View Booking” once it’s done, “Try Again” on initial payment error
+            "View Booking"
+          }
+          onPrimary={() => {
+            setShowSuccess(false);
+            if (didCancel) {
+              setDidCancel(false);
+              // after cancel, take them back to the same history-details
+            }
+            router.push(`/(root)/${id}/history-details?query=${query}`);
           }}
         />
-        <AddonsSection car={car} addons={booking.addons} />
-        <PaymentMethodSection paymentType={booking.paymentType} />
-        {booking.paymentType === "reserve" &&
-          booking.paymentStatus === "CONFIRMED" && (
-            <RefundNotice amount={booking.amount} onPay={onPay} />
-          )}
-      </ScrollView>
-      <StatusBar
-        paymentStatus={booking.paymentStatus}
-        bookingStatus={booking.bookingStatus}
-        amount={booking.amount}
-        onCancel={() => setShowConfirm(true)}
-        disabled={
-          !["CANCELLED", "REFUNDED", "PROCEEDED", "NO SHOW"].includes(
-            booking.bookingStatus
-          ) || booking.paymentStatus !== "CONFIRMED"
-        }
-        buttonText={
-          booking.bookingStatus === "PENDING" &&
-          ![
-            "CANCELLED",
-            "PENDING",
-            "PROCEEDED",
-            "REFUNDED",
-            "NO SHOW",
-            "FAILED",
-          ].includes(booking.paymentStatus)
-            ? "Cancel booking"
-            : undefined
-        }
-      />
-
-      <ConfirmationModal
-        isVisible={showConfirm}
-        daysDiff={daysDiff}
-        fee={cancellationFee}
-        refund={refundAmount}
-        onConfirm={() => {
-          onCancel();
-          setShowConfirm(false);
-        }}
-        onCancel={() => setShowConfirm(false)}
-      />
-
-      <SuccessModal
-        isVisible={showSuccess}
-        imageSource={
-          // use a “check” icon both for a successful booking or cancellation
-          images.check
-        }
-        title={
-          didCancel
-            ? "Cancelled"
-            : callback === "true"
-              ? "Booked"
-              : "Payment completed"
-        }
-        message={
-          didCancel
-            ? "The booking has been cancelled successfully. You will be contacted by the admin for your refund soon. Go to Profile → Help for more information."
-            : callback === "true"
-              ? "Your booking has been placed successfully. You will be contacted soon by the admin."
-              : "You have completed your booking payment successfully."
-        }
-        primaryText={
-          // “View Booking” once it’s done, “Try Again” on initial payment error
-          didCancel || callback === "true" ? "View Booking" : "Try Again"
-        }
-        onPrimary={() => {
-          setShowSuccess(false);
-          if (didCancel) {
-            setDidCancel(false);
-            // after cancel, take them back to the same history-details
-            router.push(`/(root)/${id}/history-details?query=${query}`);
-          } else if (callback === "true") {
-            // after a new booking, go back to the history-details too
-            router.push(`/(root)/${id}/history-details?query=${query}`);
-          } else {
-            // on a payment error retry, send them back to book-details
-            router.push(`/(root)/${query}/book-details`);
-          }
-        }}
-        // only show the “Cancel” secondary button when it was a payment error
-        secondaryText={!didCancel && callback !== "true" ? "Cancel" : undefined}
-        onSecondary={
-          !didCancel && callback !== "true"
-            ? () => {
-                setShowSuccess(false);
-                // remove the flag so they can try payment again
-                router.replace(`/(root)${pathname}?query=${query}`);
-              }
-            : undefined
-        }
-      />
-      <ErrorModal isVisible={showError} onClose={() => setShowError(false)} />
-    </View>
+        <ErrorModal isVisible={showError} onClose={() => setShowError(false)} />
+      </View>
+    </GestureHandlerRootView>
   );
 };
 

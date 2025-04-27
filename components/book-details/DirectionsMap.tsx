@@ -5,16 +5,16 @@ import { icons } from "@/constants";
 import { calculateDaysBetween } from "@/lib/utils";
 
 export interface DirectionsData {
-  departureLatitude: string;
-  departureLongitude: string;
-  destinationLatitude: string;
-  destinationLongitude: string;
-  departureAddress: string;
-  destinationAddress?: string;
-  date?: string;
-  endDate?: string;
-  bookType: "full_day" | string;
-  rideDetails?: { time: number };
+  departureLatitude: number | null;
+  departureLongitude: number | null;
+  destinationLatitude: number | null;
+  destinationLongitude: number | null;
+  departureAddress: string | null;
+  destinationAddress?: string | null;
+  date?: string | null | Date;
+  endDate?: string | null | Date;
+  bookType: "full_day" | string | null;
+  rideDetails?: { time: number | null };
 }
 
 type Props = {

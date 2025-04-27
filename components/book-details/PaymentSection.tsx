@@ -107,29 +107,32 @@ import React from "react";
 import { View, Text, Pressable, Image, TouchableOpacity } from "react-native";
 import { Checkbox } from "@/components/CheckBox";
 import { icons } from "@/constants";
+import RefundNotice from "../history-details/RefundNotice";
 
 type Props = {
   amount: number;
-  paymentType: "full" | "reserve";
-  setPaymentType: (val: "full" | "reserve") => void;
-  paymentOption: "pesapal";
-  setPaymentOption: (val: "pesapal") => void;
-  isAgreed: boolean;
-  setIsAgreed: (val: boolean) => void;
-  error: string | null;
-  handlePayment: () => void;
+  paymentType: string;
+  paymentStatus?: string;
+  onPay?: () => void;
+  setPaymentType?: (val: string) => void;
+  paymentOption?: string;
+  setPaymentOption?: (val: string) => void;
+  isAgreed?: boolean;
+  setIsAgreed?: (val: boolean) => void;
+  error?: string | null;
 };
 
 const PaymentSection: React.FC<Props> = ({
   amount,
   paymentType,
+  paymentStatus,
+  onPay,
   setPaymentType,
   paymentOption,
   setPaymentOption,
   isAgreed,
   setIsAgreed,
   error,
-  handlePayment,
 }) => (
   <View className="mt-5">
     {/* Card Container */}
@@ -145,7 +148,10 @@ const PaymentSection: React.FC<Props> = ({
         {["full", "reserve"].map((type) => (
           <TouchableOpacity
             key={type}
-            onPress={() => setPaymentType(type === "full" ? "full" : "reserve")}
+            onPress={() =>
+              setPaymentType &&
+              setPaymentType(type === "full" ? "full" : "reserve")
+            }
             className={`flex-1 py-2 items-center rounded-full ${
               paymentType === type ? "bg-white" : "bg-transparent"
             }`}
@@ -167,7 +173,9 @@ const PaymentSection: React.FC<Props> = ({
           ({ icon, label, value }) => (
             <Pressable
               key={value}
-              onPress={() => setPaymentOption(value as "pesapal")}
+              onPress={() =>
+                setPaymentOption && setPaymentOption(value as "pesapal")
+              }
               className={`w-28 h-20 items-center justify-center rounded-xl border-2 ${
                 paymentOption === value
                   ? "border-primary-300 bg-primary-50"
@@ -182,13 +190,25 @@ const PaymentSection: React.FC<Props> = ({
       </View>
 
       {/* Terms & Conditions */}
-      <View className="items-center space-x-3">
-        <Checkbox checked={isAgreed} onChange={setIsAgreed} />
-      </View>
-      {error && (
-        <Text className="text-red-500 text-sm font-semibold text-center">
-          {error}
-        </Text>
+
+      {!paymentStatus && (
+        <>
+          <View className="items-center space-x-3">
+            <Checkbox
+              checked={isAgreed ?? false}
+              onChange={setIsAgreed ?? (() => {})}
+            />
+          </View>
+          {error && (
+            <Text className="text-red-500 text-sm font-semibold text-center">
+              {error}
+            </Text>
+          )}
+        </>
+      )}
+
+      {paymentType === "reserve" && paymentStatus === "CONFIRMED" && (
+        <RefundNotice amount={amount} onPay={onPay ?? (() => {})} />
       )}
 
       {/* Pay Now Button */}

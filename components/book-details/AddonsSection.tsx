@@ -4,10 +4,10 @@ import { addonIcons } from "@/constants/data";
 import { Car } from "@/lib/definitions";
 
 type Props = {
-  car?: Car;
-  addons: string[];
+  car?: Car | null;
+  addons?: string[];
   addonsAmount?: number;
-  setAddons: React.Dispatch<React.SetStateAction<string[]>>;
+  setAddons?: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
 const AddonsSection: React.FC<Props> = ({
@@ -17,7 +17,7 @@ const AddonsSection: React.FC<Props> = ({
   setAddons,
 }) => {
   const handlePress = (addonName: string) => {
-    setAddons((prev) =>
+    setAddons?.((prev) =>
       prev.includes(addonName)
         ? prev.filter((a) => a !== addonName)
         : // eslint-disable-next-line prettier/prettier
@@ -44,7 +44,7 @@ const AddonsSection: React.FC<Props> = ({
       <View className="flex-row gap-2">
         {car?.addons?.map((addon, idx) => {
           const icon = addonIcons[addon.addonName] || "❓";
-          const selected = addons.includes(addon.addonName);
+          const selected = addons?.includes(addon.addonName);
 
           return (
             <TouchableOpacity

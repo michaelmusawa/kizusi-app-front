@@ -338,8 +338,9 @@ export const CarDetails: React.FC = () => {
     method: "GET",
   });
   const car = data?.data;
-  if (loading) return <Text className="text-center mt-4">Loading...</Text>;
-  if (error || !car)
+  if (loading && carsLoading)
+    return <Text className="text-center mt-4">Loading...</Text>;
+  if ((error && carsError) || !car)
     return <Text className="text-center mt-4">Error loading car details.</Text>;
 
   return (
@@ -404,7 +405,6 @@ export const CarDetails: React.FC = () => {
             />
           </View>
         </Animated.ScrollView>
-        <LiveChatSupport />
 
         <CarDetailsFooter id={id!} />
       </View>

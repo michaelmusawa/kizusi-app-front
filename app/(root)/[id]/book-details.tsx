@@ -727,7 +727,11 @@ const BookDetails = () => {
                 Loading...
               </Text>
             ) : (
-              <UserDetails user={user} returnedUser={returnedUser} />
+              <UserDetails
+                user={user}
+                returnedUser={returnedUser}
+                w={"w-2/3"}
+              />
             )}
 
             <AddonsSection
@@ -747,7 +751,6 @@ const BookDetails = () => {
               isAgreed={isAgreed}
               setIsAgreed={setIsAgreed}
               error={error}
-              handlePayment={handlePayment}
             />
           </View>
         </Animated.ScrollView>

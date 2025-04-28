@@ -34,8 +34,6 @@ export default function ProfileForm() {
 
   const returnedUser = response?.data;
 
-  console.log("the motherfucker", returnedUser);
-
   const [form, setForm] = useState({
     name: returnedUser?.name ?? user?.fullName ?? "",
     email: returnedUser?.email ?? user?.primaryEmailAddress?.emailAddress ?? "",

@@ -753,23 +753,20 @@
 // export default HistoryDetails;
 
 import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, View, Text, Dimensions, Animated } from "react-native";
-import { useLocalSearchParams, usePathname, router } from "expo-router";
+import { View, Text, Dimensions, Animated } from "react-native";
+import { useLocalSearchParams, router } from "expo-router";
 import { useUser } from "@clerk/clerk-expo";
 import { useFetch, initiatePayment, initiateRefund } from "@/lib/fetch";
 import { Booking, Car, User } from "@/lib/definitions";
 import { calcCancel, calculateAddonsAmount } from "@/lib/utils";
 import uuid from "react-native-uuid";
 import * as Linking from "expo-linking";
-import CarImageSection from "@/components/book-details/CarImageSection";
 import DirectionsMap from "@/components/book-details/DirectionsMap";
 import AddonsSection from "@/components/book-details/AddonsSection";
-import RefundNotice from "@/components/history-details/RefundNotice";
 import StatusBar from "@/components/history-details/StatusBar";
 import ConfirmationModal from "@/components/history-details/ConfirmationModal";
 import SuccessModal from "@/components/history-details/SuccessModal";
 import ErrorModal from "@/components/history-details/ErrorModal";
-import PaymentMethodSection from "@/components/history-details/PaymentMethodSection";
 import { images } from "@/constants";
 import { CarDetailsHeader } from "@/components/car-details/CarDetailsHeader";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -782,7 +779,6 @@ const HistoryDetails: React.FC = () => {
     callback?: string;
     completePayment?: string;
   }>();
-  const pathname = usePathname();
   const { user } = useUser();
 
   // local UI state
@@ -800,6 +796,7 @@ const HistoryDetails: React.FC = () => {
   const booking = bookingRes?.data;
   const { daysDiff, cancellationFee, refundAmount } = calcCancel(
     booking?.bookingDate,
+    // eslint-disable-next-line prettier/prettier
     booking?.amount
   );
 
@@ -813,13 +810,13 @@ const HistoryDetails: React.FC = () => {
 
   const car = carResponse?.data || null;
 
-  const {
-    data: userResponse,
-    loading: userLoading,
-    error: userError,
-  } = useFetch<{ data: User }>(`/(api)/user/${user?.id || ""}`, {
-    method: "GET",
-  });
+  const { data: userResponse } = useFetch<{ data: User }>(
+    `/(api)/user/${user?.id || ""}`,
+    {
+      method: "GET",
+      // eslint-disable-next-line prettier/prettier
+    }
+  );
 
   const returnedUser = userResponse?.data || null;
 
@@ -880,6 +877,7 @@ const HistoryDetails: React.FC = () => {
           returnedUser?.phone ?? user?.primaryPhoneNumber?.phoneNumber,
         description: "Complete car rental payment",
         callbackUrl: Linking.createURL(
+          // eslint-disable-next-line prettier/prettier
           `/(root)/${id}/history-details?query=${query}&completePayment=true`
         ),
       };
@@ -892,11 +890,13 @@ const HistoryDetails: React.FC = () => {
       // If you get a redirect_url, send the user to your WebView
       if (payResponse.redirect_url) {
         router.push(
+          // eslint-disable-next-line prettier/prettier
           `/(root)/paymentWebView?callbackUrl=${payResponse.redirect_url}`
         );
       } else {
         console.error(
           "Payment initiation did not return a redirect_url:",
+          // eslint-disable-next-line prettier/prettier
           payResponse
         );
         setShowError(true);
@@ -986,15 +986,21 @@ const HistoryDetails: React.FC = () => {
             }}
           >
             <View className="bg-gray-100/70 blur-lg p-4 rounded-2xl shadow-lg items-center w-2/3 m-auto">
-              <Text className="text-2xl font-extrabold text-gray-900 text-center">
-                {car?.name}
-              </Text>
-              <Text className="text-sm text-gray-500 mt-1 text-center">
-                {car?.category.categoryName}
-              </Text>
-              <Text className="text-xl font-bold text-secondary-100 mt-2 text-center">
-                {`Ksh. ${car?.price}/day`}
-              </Text>
+              {carLoading && !carError ? (
+                <Text>Loading…</Text>
+              ) : (
+                <>
+                  <Text className="text-2xl font-extrabold text-gray-900 text-center">
+                    {car?.name}
+                  </Text>
+                  <Text className="text-sm text-gray-500 mt-1 text-center">
+                    {car?.category.categoryName}
+                  </Text>
+                  <Text className="text-xl font-bold text-secondary-100 mt-2 text-center">
+                    {`Ksh. ${car?.price}/day`}
+                  </Text>
+                </>
+              )}
             </View>
           </Animated.View>
 
@@ -1035,6 +1041,7 @@ const HistoryDetails: React.FC = () => {
           onCancel={() => setShowConfirm(true)}
           disabled={
             !["CANCELLED", "REFUNDED", "PROCEEDED", "NO SHOW"].includes(
+              // eslint-disable-next-line prettier/prettier
               booking.bookingStatus
             ) || booking.paymentStatus !== "CONFIRMED"
           }
@@ -1095,7 +1102,14 @@ const HistoryDetails: React.FC = () => {
               setDidCancel(false);
               // after cancel, take them back to the same history-details
             }
-            router.push(`/(root)/${id}/history-details?query=${query}`);
+            if (id && query) {
+              router.push(
+                // eslint-disable-next-line prettier/prettier
+                `/(root)/${id}/history-details?query=${query}` as any
+              );
+            } else {
+              console.error("Invalid id or query:", { id, query });
+            }
           }}
         />
         <ErrorModal isVisible={showError} onClose={() => setShowError(false)} />

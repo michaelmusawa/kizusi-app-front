@@ -91,6 +91,7 @@ export const calculateCancellationDetails = (
 
 export function calculateDaysBetween(
   startDate: Date | string,
+  // eslint-disable-next-line prettier/prettier
   endDate: Date | string
 ): number {
   if (!startDate || !endDate) {
@@ -103,6 +104,7 @@ export function calculateDaysBetween(
 
   if (isNaN(start.getTime()) || isNaN(end.getTime())) {
     throw new Error(
+      // eslint-disable-next-line prettier/prettier
       "Invalid date format. Ensure you pass valid Date objects or ISO date strings."
     );
   }
@@ -111,11 +113,13 @@ export function calculateDaysBetween(
   const normalizedStart = new Date(
     start.getFullYear(),
     start.getMonth(),
+    // eslint-disable-next-line prettier/prettier
     start.getDate()
   );
   const normalizedEnd = new Date(
     end.getFullYear(),
     end.getMonth(),
+    // eslint-disable-next-line prettier/prettier
     end.getDate()
   );
 
@@ -129,6 +133,7 @@ export function calculateDaysBetween(
 
 export const calculateAddonsAmount = (
   userAddons: string[],
+  // eslint-disable-next-line prettier/prettier
   carAddons: any[]
 ) => {
   return carAddons.reduce((total, addon) => {
@@ -156,7 +161,7 @@ export const calculateRideAmount = (store: any, car: any) => {
   return 0;
 };
 
-export function calcCancel(bookingDate?: string, amount: number = 0) {
+export function calcCancel(bookingDate?: Date, amount: number = 0) {
   return calculateCancellationDetails(bookingDate, amount);
 }
 

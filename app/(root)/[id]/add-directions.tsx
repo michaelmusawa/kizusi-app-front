@@ -11,6 +11,7 @@ import { useFetch } from "@/lib/fetch";
 import { Car } from "@/lib/definitions";
 import { calculateDaysBetween } from "@/lib/utils";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function AddDirections() {
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -59,6 +60,7 @@ export default function AddDirections() {
         address: null,
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bookType]);
 
   useEffect(() => {
@@ -319,15 +321,23 @@ export default function AddDirections() {
               </Text>
             )}
           </View>
-
-          <TouchableOpacity
-            onPress={handleProceedToBook}
-            className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400"
+          <LinearGradient
+            // your two color stops
+            colors={["#FED309", "#58B8C9"]}
+            start={[0, 0]}
+            end={[1, 0]}
+            // tailwind classNames applied via style prop, or convert to style object
+            className="flex-1 rounded-full shadow-md shadow-zinc-400 overflow-hidden"
           >
-            <Text className="text-white text-lg text-center font-rubik-bold">
-              Proceed to book
-            </Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              onPress={handleProceedToBook}
+              className="flex-1 flex flex-row items-center justify-center py-2 "
+            >
+              <Text className="text-white text-lg text-center font-rubik-bold">
+                Proceed to book
+              </Text>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
       </View>
     </GestureHandlerRootView>

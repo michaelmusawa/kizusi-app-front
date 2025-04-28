@@ -9,31 +9,6 @@ interface AddonsProps {
 }
 export const CarDetailsAddons: React.FC<AddonsProps> = ({ car }) => (
   <View className="mt-5">
-    {/* <Text className="text-black-300 text-xl font-rubik-bold">
-      Available addons
-    </Text>
-    <View className="flex-row mt-4 gap-1">
-      {car.addons.map((addon, i) => {
-        const icon = addonIcons[addon.addonName] || "❓";
-        return (
-          <View key={i} className="flex-1 items-center min-w-16 max-w-20">
-            <Text className="text-xs text-secondary-600 font-rubik-medium">
-              +{addon.addonValue}
-            </Text>
-            <View className="size-14 rounded-full bg-primary-100 items-center justify-center">
-              <Text className="text-lg">{icon}</Text>
-            </View>
-            <Text
-              className="text-black-300 text-sm text-center font-rubik mt-1.5"
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {addon.addonName}
-            </Text>
-          </View>
-        );
-      })}
-    </View> */}
     <View className="bg-gray-50 rounded-2xl shadow-md p-4">
       <Text className="text-lg font-semibold text-gray-800 mb-4">
         Available Add‑Ons

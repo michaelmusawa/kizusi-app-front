@@ -41,7 +41,7 @@ export default function Map() {
     setRegion(newRegion);
 
     if (mapRef.current) {
-      mapRef.current.animateToRegion(newRegion, 1000); // Animate over 1 second
+      mapRef.current.animateToRegion(newRegion, 1000);
     }
   }, [
     userLatitude,
@@ -60,7 +60,7 @@ export default function Map() {
     );
 
   return (
-    <View style={{ flex: 1 }}>
+    <View>
       <MapView
         ref={mapRef}
         style={{ width: "100%", height: "100%" }}

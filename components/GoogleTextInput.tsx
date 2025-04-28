@@ -19,7 +19,7 @@ const GoogleTextInput = ({
   const [input, setInput] = useState(initialLocation || "");
   const apiKey = process.env.EXPO_PUBLIC_PLACES_API_KEY; // Ensure this is properly set
   const { suggestions, fetchSuggestions, clearSuggestions } =
-    usePlacesAutocomplete(apiKey); // Use the hook
+    usePlacesAutocomplete(apiKey || "");
 
   // Update input when initialLocation changes
   useEffect(() => {
@@ -31,12 +31,35 @@ const GoogleTextInput = ({
     fetchSuggestions(text);
   };
 
-  const onSuggestionPress = async (placeId, selectedSuggestion) => {
+  interface PlaceDetailsResponse {
+    result: {
+      geometry: {
+        location: {
+          lat: number;
+          lng: number;
+        };
+      };
+      formatted_address?: string;
+      name?: string;
+    };
+  }
+
+  interface Suggestion {
+    place_id: string;
+    description: string;
+  }
+
+  const onSuggestionPress = async (
+    placeId: string,
+    // eslint-disable-next-line prettier/prettier
+    selectedSuggestion: string
+  ): Promise<void> => {
     try {
       const response = await fetch(
+        // eslint-disable-next-line prettier/prettier
         `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&key=${apiKey}`
       );
-      const details = await response.json();
+      const details: PlaceDetailsResponse = await response.json();
 
       if (!details.result) {
         throw new Error("No place details found");
@@ -51,10 +74,10 @@ const GoogleTextInput = ({
       handlePress({
         latitude: details.result.geometry.location.lat,
         longitude: details.result.geometry.location.lng,
-        address: fullAddress,
+        address: fullAddress || "Unknown address",
       });
 
-      setInput(fullAddress);
+      setInput(fullAddress || "");
       clearSuggestions();
     } catch (error) {
       console.error("Error fetching place details:", error);
@@ -72,7 +95,7 @@ const GoogleTextInput = ({
       />
       {suggestions.length > 0 && input !== "" && (
         <FlatList
-          data={suggestions}
+          data={suggestions as Suggestion[]}
           keyExtractor={(item) => item.place_id}
           scrollEnabled={false}
           renderItem={({ item }) => (

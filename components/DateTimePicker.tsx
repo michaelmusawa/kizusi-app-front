@@ -24,7 +24,7 @@ export const DateTimePickerComponent = ({
     const currentDate = selectedDate || localDate;
     setStartPickerVisible(false);
     setLocalDate(currentDate);
-    setDate({ date: currentDate });
+    setDate({ date: currentDate as string });
   };
 
   // For end date/time
@@ -32,7 +32,7 @@ export const DateTimePickerComponent = ({
     const currentDate = selectedDate || localEndDate;
     setEndPickerVisible(false);
     setLocalEndDate(currentDate);
-    setEndDate({ endDate: currentDate });
+    setEndDate({ endDate: currentDate as string });
   };
 
   const showStartPicker = (mode: "date" | "time") => {
@@ -63,13 +63,17 @@ export const DateTimePickerComponent = ({
                   onPress={() => showStartPicker("date")}
                   className="p-2 border border-gray-300 rounded-lg bg-gray-50"
                 >
-                  <Text>{date ? date.toLocaleDateString() : "Start Date"}</Text>
+                  <Text>
+                    {date ? new Date(date).toLocaleDateString() : "Start Date"}
+                  </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   onPress={() => showStartPicker("time")}
                   className="p-2 border border-gray-300 rounded-lg bg-gray-50"
                 >
-                  <Text>{date ? date.toLocaleTimeString() : "Start Time"}</Text>
+                  <Text>
+                    {date ? new Date(date).toLocaleTimeString() : "Start Time"}
+                  </Text>
                 </TouchableOpacity>
               </>
             ) : (
@@ -96,7 +100,7 @@ export const DateTimePickerComponent = ({
                 >
                   <Text>
                     {localEndDate
-                      ? localEndDate.toLocaleDateString()
+                      ? new Date(localEndDate).toLocaleDateString()
                       : "End Date"}
                   </Text>
                 </TouchableOpacity>
@@ -107,7 +111,7 @@ export const DateTimePickerComponent = ({
                 >
                   <Text>
                     {localEndDate
-                      ? localEndDate.toLocaleTimeString()
+                      ? new Date(localEndDate).toLocaleTimeString()
                       : "End Time"}
                   </Text>
                 </TouchableOpacity>
@@ -133,13 +137,17 @@ export const DateTimePickerComponent = ({
                 onPress={() => showStartPicker("date")}
                 className="p-2 border border-gray-300 rounded-lg bg-gray-50"
               >
-                <Text>{date ? date.toLocaleDateString() : "Start Date"}</Text>
+                <Text>
+                  {date ? new Date(date).toLocaleDateString() : "Start Date"}
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 onPress={() => showStartPicker("time")}
                 className="p-2 border border-gray-300 rounded-lg bg-gray-50"
               >
-                <Text>{date ? date.toLocaleTimeString() : "Start Time"}</Text>
+                <Text>
+                  {date ? new Date(date).toLocaleTimeString() : "Start Time"}
+                </Text>
               </TouchableOpacity>
             </>
           ) : (
@@ -157,7 +165,7 @@ export const DateTimePickerComponent = ({
       {startPickerVisible && (
         <DateTimePicker
           testID="startDateTimePicker"
-          value={localDate}
+          value={localDate as Date}
           mode={startMode}
           is24Hour={true}
           onChange={onChangeStart}
@@ -167,7 +175,7 @@ export const DateTimePickerComponent = ({
       {endPickerVisible && (
         <DateTimePicker
           testID="endDateTimePicker"
-          value={localEndDate}
+          value={localEndDate as Date}
           mode={endMode}
           is24Hour={true}
           onChange={onChangeEnd}

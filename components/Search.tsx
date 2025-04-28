@@ -128,9 +128,13 @@ interface SearchProps {
 }
 
 const Search: React.FC<SearchProps> = ({ cars }) => {
-  const params = useLocalSearchParams<{ query?: string }>();
-  const [query, setQuery] = useState<string>(params.query || "");
+  const { query: paramQuery = "" } = useLocalSearchParams<{ query?: string }>();
+  const [query, setQuery] = useState(paramQuery);
   const [filteredCars, setFilteredCars] = useState<Car[]>([]);
+
+  useEffect(() => {
+    setQuery(paramQuery);
+  }, [paramQuery]);
 
   // Debounced router update
   const debouncedSetParams = useDebouncedCallback((text: string) => {
@@ -155,7 +159,7 @@ const Search: React.FC<SearchProps> = ({ cars }) => {
       debouncedSetParams(text);
     } else {
       setFilteredCars([]);
-      // debouncedSetParams("");
+      //debouncedSetParams("");
     }
   }, [query, cars, debouncedSetParams]);
 
@@ -168,9 +172,10 @@ const Search: React.FC<SearchProps> = ({ cars }) => {
   };
 
   const clearSearch = () => {
-    setQuery("");
-    setFilteredCars([]);
-    debouncedSetParams("");
+    router.setParams({ query: "" });
+    //setQuery("");
+    //setFilteredCars([]);
+    //debouncedSetParams("");
     Keyboard.dismiss();
   };
 

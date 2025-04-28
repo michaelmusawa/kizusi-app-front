@@ -53,9 +53,10 @@ import { User } from "@/lib/definitions";
 type Props = {
   user: any; // from Clerk
   returnedUser?: User | null;
+  w: string;
 };
 
-export const UserDetails: React.FC<Props> = ({ user, returnedUser }) => {
+export const UserDetails: React.FC<Props> = ({ user, returnedUser, w }) => {
   const photoUri =
     returnedUser?.image ??
     user?.externalAccounts?.[0]?.imageUrl ??
@@ -72,19 +73,24 @@ export const UserDetails: React.FC<Props> = ({ user, returnedUser }) => {
 
   return (
     <View>
-      <View className="w-2/3 max-w-md mx-auto mt-5 rounded-3xl overflow-hidden bg-gray-50 shadow-md">
+      <View
+        className={`${w} max-w-md mx-auto mt-5 rounded-3xl overflow-hidden bg-gray-50 shadow-md`}
+      >
         {/* Gradient Header */}
         <LinearGradient
-          colors={["#4F46E5", "#22C55E"]}
+          colors={[
+            "#FBE132" /* lighter yellow */,
+            "#7FD0DA" /* lighter teal */,
+          ]}
           start={[0, 0]}
           end={[1, 0]}
-          className="h-32 rounded-b-full z-40"
+          className="h-24 rounded-b-full z-40"
         >
           {/* Avatar overlaps header and panel */}
           <View className="absolute bottom-0 left-1/2 -translate-x-1/2">
             <Image
               source={{ uri: photoUri }}
-              className="w-24 h-24 rounded-full border-4 border-white"
+              className="w-24 h-24 rounded-full border-4 border-white translate-y-5"
             />
           </View>
         </LinearGradient>

@@ -53,7 +53,10 @@ export type Booking = {
   paymentType: string;
   carName: string;
   addons: { addonId: string; addonName: string; addonValue: number }[];
+  rideDetails: RideDetails;
 };
+
+export type RideDetails = { time: number; distance: number; price: number };
 
 export type PaymentData = {
   amount?: number | null;

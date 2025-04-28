@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Props = {
   paymentAmount: number;
@@ -29,14 +30,26 @@ const BottomBar: React.FC<Props> = ({
         </Text>
       </View>
 
-      <TouchableOpacity
-        onPress={userExists ? onCheckout : () => router.push(signInPath)}
-        className="flex-1 flex flex-row items-center justify-center bg-secondary-100 py-2 rounded-full shadow-md shadow-zinc-400"
+      <LinearGradient
+        // your two color stops
+        colors={["#FED309", "#58B8C9"]}
+        start={[0, 0]}
+        end={[1, 0]}
+        // tailwind classNames applied via style prop, or convert to style object
+        className="flex-1 rounded-full shadow-md shadow-zinc-400 overflow-hidden"
       >
-        <Text className="text-white text-lg text-center font-rubik-bold">
-          {userExists ? "Check out" : "Login to check out"}
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          // remove the background color here, since the gradient sits behind
+          onPress={
+            userExists ? onCheckout : () => router.push(signInPath as any)
+          }
+          className="flex-1 flex-row items-center justify-center py-2 rounded-full"
+        >
+          <Text className="text-white text-lg text-center font-rubik-bold">
+            {userExists ? "Check out" : "Login to check out"}
+          </Text>
+        </TouchableOpacity>
+      </LinearGradient>
     </View>
   </View>
 );

@@ -4,17 +4,32 @@ import { useAuth, useUser } from "@clerk/clerk-expo";
 import { icons } from "@/constants";
 import { useCurrentUser } from "@/hook/useCurrentUser";
 import { router } from "expo-router";
+import { useEffect } from "react";
 
 export const Header = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
   const { returnedUser, loading, error } = useCurrentUser();
 
+  useEffect(() => {
+    if (user) {
+      // Fetch or update user data when the user changes
+      console.log("User has changed:", user);
+    }
+  }, [user]);
+
   return (
     <View>
       <View className="flex-row mt-2 p-4 rounded-lg shadow-md items-center justify-between bg-gray-50">
         <TouchableOpacity
-          onPress={user ? () => signOut : () => router.push("/(auth)/sign-in")}
+          onPress={
+            user
+              ? () => {
+                  signOut();
+                  router.push("/(root)/(tabs)");
+                }
+              : () => router.push("/(auth)/sign-in")
+          }
         >
           <View className="rounded-full size-10 items-center justify-center border border-secondary-100">
             {loading && !error ? (
@@ -42,7 +57,11 @@ export const Header = () => {
             {user ? returnedUser?.name || user.fullName : "Welcome"}
           </Text>
         </View>
-        <TouchableOpacity onPress={() => Linking.openURL("https://google.com")}>
+        <TouchableOpacity
+          onPress={() =>
+            Linking.openURL("https://www.kizusismartex.co.ke/?v=25bc6654798e")
+          }
+        >
           <Text className="text-secondary-100">For self drive →</Text>
         </TouchableOpacity>
       </View>

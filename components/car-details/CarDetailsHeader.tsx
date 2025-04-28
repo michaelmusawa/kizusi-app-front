@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Car } from "@/lib/definitions";
 
 interface HeaderProps {
-  car?: Car;
+  car?: Car | null;
   uri?: string;
 }
 
@@ -31,7 +31,11 @@ export const CarDetailsHeader: React.FC<HeaderProps> = ({ car, uri }) => (
       <View className="flex-row justify-between items-center w-full">
         <Pressable
           onPress={() => {
-            uri ? router.push(uri) : router.back();
+            if (uri) {
+              router.push(uri as any);
+            } else {
+              router.back();
+            }
           }}
           className="p-3 bg-white/80 rounded-full shadow"
         >

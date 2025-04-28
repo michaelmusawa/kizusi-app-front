@@ -1,6 +1,6 @@
 import { icons } from "@/constants";
 import { Booking } from "@/lib/definitions";
-import { calculateDaysBetween, formatDate } from "@/lib/utils";
+import { calculateDaysBetween } from "@/lib/utils";
 import { router } from "expo-router";
 import { TouchableOpacity, Text, Image, View } from "react-native";
 import { HistoryMapWithMarkers } from "./Geoapify";
@@ -10,6 +10,7 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
   if (booking?.bookingDate && booking?.bookingEndDate) {
     numberOfDays = calculateDaysBetween(
       booking.bookingDate,
+      // eslint-disable-next-line prettier/prettier
       booking.bookingEndDate
     );
   } else if (booking?.bookingDate) {
@@ -20,7 +21,8 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
     <TouchableOpacity
       onPress={() =>
         router.push(
-          `/(root)/${booking.id}/history-details?query=${booking.carId}`
+          // eslint-disable-next-line prettier/prettier
+          `/(root)/${booking.id}/history-details?query=${booking.carId}` as any
         )
       }
       className="bg-white rounded-lg shadow-md p-4 mb-4"
@@ -97,9 +99,10 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
                 {booking.bookingEndDate && "   To:"}
                 {"   "}
                 {new Date(
+                  // eslint-disable-next-line prettier/prettier
                   booking.bookingEndDate ?? ""
-                ).toLocaleDateString()},{" "}
-                {new Date(booking.bookingEndDate ?? "").toLocaleTimeString()}
+                ).toLocaleDateString()}
+                , {new Date(booking.bookingEndDate ?? "").toLocaleTimeString()}
               </Text>
               <Text>{`For ${numberOfDays} ${numberOfDays === 1 ? "day" : "days"}`}</Text>
             </>
@@ -130,7 +133,7 @@ const BookingCard = ({ booking }: { booking: Booking }) => {
                         : "text-white font-JakartaSemiBold"
                 }
               >
-                {booking.bookingStatus}
+                <Text>Trip</Text> {booking.bookingStatus.toLowerCase()}
               </Text>
             </View>
             {booking.bookingStatus === "CANCELLED" && (

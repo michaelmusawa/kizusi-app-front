@@ -1,7 +1,6 @@
 import React from "react";
-import { View, Text, Image, Dimensions } from "react-native";
+import { View, Text, Dimensions } from "react-native";
 import { MapWithMarkers } from "@/components/Geoapify";
-import { icons } from "@/constants";
 import { calculateDaysBetween } from "@/lib/utils";
 
 export interface DirectionsData {

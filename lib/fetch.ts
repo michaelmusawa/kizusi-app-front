@@ -4,6 +4,7 @@ import { PaymentData, RefundData } from "./definitions";
 export const fetchAPI = async (url: string, options?: RequestInit) => {
   try {
     console.log(url);
+    console.log("The options", options);
     const response = await fetch(url, options);
     if (!response.ok) {
       console.log(`HTTP error! status: ${response.status}`);
